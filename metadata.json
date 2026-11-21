@@ -1,0 +1,6 @@
+{
+  "name": "CRICKIFY",
+  "description": "Your Game. Your Home. Your AI Coach. The next generation of AI-powered cricket learning, video biomechanics, training, and PlayZone challenges.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

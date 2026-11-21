@@ -1,0 +1,351 @@
+{
+  "entities": {
+    "UserWorkspace": {
+      "title": "UserWorkspace",
+      "description": "Private cricketer workspace storing profile preferences, bounded curriculum progress, bookmarks, quiz high scores, and Turf IQ configuration.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "email": { "type": "string", "maxLength": 160 },
+        "avatarUrl": { "type": "string", "maxLength": 512 },
+        "ageGroup": { "type": "string", "enum": ["Under-14", "14-18", "19-25", "26-35", "35+"] },
+        "experience": { "type": "string", "maxLength": 160 },
+        "skillLevel": { "type": "string", "enum": ["Beginner", "Intermediate", "Advanced", "Competitive"] },
+        "role": { "type": "string", "enum": ["Batter", "Fast Bowler", "Spin Bowler", "All-Rounder", "Wicketkeeper"] },
+        "battingHand": { "type": "string", "enum": ["Right-handed", "Left-handed"] },
+        "bowlingStyle": { "type": "string", "enum": ["Fast", "Medium Pace", "Off-Spin", "Leg-Spin", "None"] },
+        "ballType": { "type": "string", "enum": ["Leather Ball", "Tennis Ball", "Both"] },
+        "environment": { "type": "string", "enum": ["Regular Cricket", "Turf / Box Cricket", "Both"] },
+        "goals": { "type": "array", "description": "Up to 12 player training goals." },
+        "dailyMinutes": { "type": "number" },
+        "trainingDaysPerWeek": { "type": "number" },
+        "language": { "type": "string", "enum": ["English", "Tamil", "Hindi"] },
+        "equipment": { "type": "array", "description": "Up to 20 player equipment items." },
+        "onboardingCompleted": { "type": "boolean" },
+        "completedLessonIds": { "type": "array", "description": "Up to 200 completed academy lesson IDs." },
+        "completedExerciseIds": { "type": "array", "description": "Up to 300 completed exercise IDs." },
+        "savedExerciseIds": { "type": "array", "description": "Up to 300 bookmarked exercise IDs." },
+        "savedTutorialIds": { "type": "array", "description": "Up to 200 saved tutorial IDs." },
+        "bookmarkedTipIds": { "type": "array", "description": "Up to 200 bookmarked daily cricket tip IDs." },
+        "completedChallenges": { "type": "array", "description": "Up to 100 completed challenge IDs." },
+        "exerciseNotes": { "type": "object", "description": "Map of exerciseId to personal training note (max 200 entries)." },
+        "quizHighScores": { "type": "object", "description": "Map of quiz topic to best percentage score (max 40 entries)." },
+        "turfRules": { "type": "object", "description": "Saved custom Turf / Box Cricket arena configuration." },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "ownerId",
+        "name",
+        "email",
+        "ageGroup",
+        "skillLevel",
+        "role",
+        "battingHand",
+        "bowlingStyle",
+        "ballType",
+        "environment",
+        "dailyMinutes",
+        "trainingDaysPerWeek",
+        "language",
+        "onboardingCompleted",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "VideoAnalysisReport": {
+      "title": "VideoAnalysisReport",
+      "description": "Biomechanical cricket video analysis report grounded in extracted keyframes and MediaPipe landmarks.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "clientCreatedAt": { "type": "string", "maxLength": 64 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "skillCategory": { "type": "string", "enum": ["Batting", "Bowling", "Fielding"] },
+        "technique": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "skillLevel": { "type": "string", "enum": ["Beginner", "Intermediate", "Advanced", "Competitive"] },
+        "handedness": { "type": "string", "enum": ["Right-handed", "Left-handed"] },
+        "cameraAngle": { "type": "string", "maxLength": 80 },
+        "playerNotes": { "type": "string", "maxLength": 2000 },
+        "insufficientEvidence": { "type": "boolean" },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "cameraAngleNotes": { "type": "string", "maxLength": 1000 },
+        "observedStrengths": { "type": "array" },
+        "areasToImprove": { "type": "array" },
+        "observations": { "type": "array" },
+        "recommendedExerciseIds": { "type": "array" },
+        "recommendedTutorialIds": { "type": "array" },
+        "personalImprovementPlan": { "type": "array" },
+        "limitationsNotice": { "type": "string", "maxLength": 1500 },
+        "frames": { "type": "array", "description": "Up to 8 compressed pose telemetry keyframes (no raw video)." },
+        "poseSummary": { "type": "object" },
+        "coachFeedback": { "type": "string", "maxLength": 3000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "ownerId",
+        "clientCreatedAt",
+        "title",
+        "skillCategory",
+        "technique",
+        "skillLevel",
+        "handedness",
+        "cameraAngle",
+        "playerNotes",
+        "insufficientEvidence",
+        "summary",
+        "observedStrengths",
+        "areasToImprove",
+        "observations",
+        "recommendedExerciseIds",
+        "recommendedTutorialIds",
+        "personalImprovementPlan",
+        "limitationsNotice",
+        "frames",
+        "poseSummary",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SavedVideoRecord": {
+      "title": "SavedVideoRecord",
+      "description": "Metadata and compressed thumbnail for an analyzed practice clip (raw video files are never stored in Firestore).",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "clientCreatedAt": { "type": "string", "maxLength": 64 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "skillCategory": { "type": "string", "enum": ["Batting", "Bowling", "Fielding"] },
+        "technique": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "durationSec": { "type": "number" },
+        "thumbnailDataUrl": { "type": "string", "maxLength": 200000 },
+        "reportId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "ownerId",
+        "clientCreatedAt",
+        "title",
+        "skillCategory",
+        "technique",
+        "durationSec",
+        "thumbnailDataUrl",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "CoachMessage": {
+      "title": "CoachMessage",
+      "description": "AI Cricket Coach conversation message with optional saved bookmark flag.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "role": { "type": "string", "enum": ["user", "assistant"] },
+        "content": { "type": "string", "minLength": 1, "maxLength": 12000 },
+        "clientTimestamp": { "type": "string", "maxLength": 64 },
+        "language": { "type": "string", "enum": ["English", "Tamil", "Hindi"] },
+        "linkedReportId": { "type": "string", "maxLength": 128 },
+        "recommendedExerciseIds": { "type": "array" },
+        "recommendedLessonIds": { "type": "array" },
+        "recommendedTutorialIds": { "type": "array" },
+        "saved": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "role", "content", "clientTimestamp", "language", "saved", "createdAt", "updatedAt"]
+    },
+    "TrainingPlan": {
+      "title": "TrainingPlan",
+      "description": "Personalized daily routine and 7-day training schedule generated for the player.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "clientCreatedAt": { "type": "string", "maxLength": 64 },
+        "goal": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "dailyMinutes": { "type": "number" },
+        "daysPerWeek": { "type": "number" },
+        "workloadNote": { "type": "string", "maxLength": 2000 },
+        "dailyRoutine": { "type": "array" },
+        "weeklySchedule": { "type": "array" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "ownerId",
+        "clientCreatedAt",
+        "goal",
+        "dailyMinutes",
+        "daysPerWeek",
+        "workloadNote",
+        "dailyRoutine",
+        "weeklySchedule",
+        "isActive",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "TrainingHistoryEntry": {
+      "title": "TrainingHistoryEntry",
+      "description": "Completed workout or practice session entry.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "clientDate": { "type": "string", "maxLength": 64 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "durationMinutes": { "type": "number" },
+        "exercisesCompleted": { "type": "array" },
+        "notes": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "ownerId",
+        "clientDate",
+        "title",
+        "durationMinutes",
+        "exercisesCompleted",
+        "notes",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "MatchAnalysisRecord": {
+      "title": "MatchAnalysisRecord",
+      "description": "Saved Match IQ scorecard entries and AI tactical match review.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "matchFormat": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "teamName": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "opponentName": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "battingRows": { "type": "array" },
+        "bowlingRows": { "type": "array" },
+        "notes": { "type": "string", "maxLength": 2000 },
+        "analysis": { "type": "object" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "ownerId",
+        "matchFormat",
+        "teamName",
+        "opponentName",
+        "battingRows",
+        "bowlingRows",
+        "notes",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "CoachSquadPlayer": {
+      "title": "CoachSquadPlayer",
+      "description": "Academy coach roster entry with assigned lessons, drills, and consent flag.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "role": { "type": "string", "enum": ["Batter", "Fast Bowler", "Spin Bowler", "All-Rounder", "Wicketkeeper"] },
+        "level": { "type": "string", "enum": ["Beginner", "Intermediate", "Advanced", "Competitive"] },
+        "group": { "type": "string", "maxLength": 80 },
+        "consentGranted": { "type": "boolean" },
+        "assignedLessonIds": { "type": "array" },
+        "assignedExerciseIds": { "type": "array" },
+        "notes": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "ownerId",
+        "name",
+        "role",
+        "level",
+        "group",
+        "consentGranted",
+        "assignedLessonIds",
+        "assignedExerciseIds",
+        "notes",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PlayZoneSession": {
+      "title": "PlayZoneSession",
+      "description": "Completed CRICKIFY PlayZone Batting Challenge session summary, runs, timing score, and suggested drill.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "clientCreatedAt": { "type": "string", "maxLength": 64 },
+        "gameType": { "type": "string", "enum": ["batting_challenge"] },
+        "challengeBalls": { "type": "number" },
+        "difficulty": { "type": "string", "enum": ["Beginner", "Intermediate", "Pro"] },
+        "totalRuns": { "type": "number" },
+        "ballsFaced": { "type": "number" },
+        "successfulShots": { "type": "number" },
+        "missedDeliveries": { "type": "number" },
+        "wickets": { "type": "number" },
+        "timingScore": { "type": "number" },
+        "suggestedDrillId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "ownerId",
+        "clientCreatedAt",
+        "gameType",
+        "challengeBalls",
+        "difficulty",
+        "totalRuns",
+        "ballsFaced",
+        "successfulShots",
+        "missedDeliveries",
+        "wickets",
+        "timingScore",
+        "suggestedDrillId",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserWorkspace" },
+      "description": "Owner-only cricketer profile, preferences, progress IDs, quiz scores, and Turf IQ configuration."
+    },
+    "/users/{userId}/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/VideoAnalysisReport" },
+      "description": "Owner-only saved video analysis reports."
+    },
+    "/users/{userId}/savedVideos/{videoId}": {
+      "schema": { "$ref": "#/entities/SavedVideoRecord" },
+      "description": "Owner-only saved practice clip metadata and compressed thumbnails."
+    },
+    "/users/{userId}/coachMessages/{messageId}": {
+      "schema": { "$ref": "#/entities/CoachMessage" },
+      "description": "Owner-only AI Cricket Coach messages and saved coaching advice."
+    },
+    "/users/{userId}/trainingPlans/{planId}": {
+      "schema": { "$ref": "#/entities/TrainingPlan" },
+      "description": "Owner-only personalized training plans and schedules."
+    },
+    "/users/{userId}/trainingHistory/{entryId}": {
+      "schema": { "$ref": "#/entities/TrainingHistoryEntry" },
+      "description": "Owner-only completed workout and practice history."
+    },
+    "/users/{userId}/matchAnalyses/{matchId}": {
+      "schema": { "$ref": "#/entities/MatchAnalysisRecord" },
+      "description": "Owner-only saved Match IQ scorecards and tactical reviews."
+    },
+    "/users/{userId}/squadPlayers/{playerId}": {
+      "schema": { "$ref": "#/entities/CoachSquadPlayer" },
+      "description": "Owner-only Coach & Academy Mode squad entries."
+    },
+    "/users/{userId}/playzoneSessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/PlayZoneSession" },
+      "description": "Owner-only PlayZone Batting Challenge results and personal best history."
+    }
+  }
+}

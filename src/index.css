@@ -1,0 +1,305 @@
+@import "tailwindcss";
+
+@theme {
+  --color-grass: #087F55;
+  --color-primary-green: #103B2A;
+  --color-fresh-lime: #B7F34A;
+  --color-deep-green: #103B2A;
+  --color-stadium-dark: #101714;
+  --color-soft-green: #EDF3EA;
+  --color-light-bg: #F7F7EF;
+  --color-ivory-bg: #F7F7EF;
+  --color-energy-orange: #FF941F;
+  --color-main-text: #101714;
+  --color-secondary-text: #55635B;
+
+  --font-display: "Barlow Condensed", sans-serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background-color: #F4F7EF;
+    color: #101714;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: #F4F7EF;
+    color: #101714;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Global Subtle Cricket Ground Mowed Turf & Pitch Atmosphere */
+.cricket-turf-canvas {
+  background-color: #F4F7EF;
+  background-image:
+    radial-gradient(ellipse 80% 420px at 50% 0%, rgba(168, 217, 78, 0.14) 0%, rgba(8, 127, 85, 0.05) 55%, transparent 100%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(16, 59, 42, 0.024) 0px,
+      rgba(16, 59, 42, 0.024) 64px,
+      transparent 64px,
+      transparent 128px
+    );
+}
+
+/* Light Athletic Card Surfaces */
+.athletic-card {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(16, 59, 42, 0.13);
+  box-shadow: 0 12px 30px -16px rgba(16, 23, 20, 0.1);
+}
+
+.athletic-card-hover {
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease, border-color 0.24s ease;
+}
+
+.athletic-card-hover:hover {
+  transform: translateY(-3px);
+  border-color: rgba(8, 127, 85, 0.48);
+  box-shadow: 0 20px 40px -16px rgba(16, 59, 42, 0.18);
+}
+
+/* Page-Distinct Visual Identities */
+/* PlayZone — Immersive Dark Gaming Arena */
+.stadium-dark-panel {
+  background:
+    radial-gradient(circle at 82% 18%, rgba(183, 243, 74, 0.2) 0%, rgba(16, 23, 20, 0) 48%),
+    radial-gradient(circle at 14% 88%, rgba(8, 127, 85, 0.22) 0%, transparent 45%),
+    linear-gradient(135deg, #09120E 0%, #103B2A 54%, #0C1512 100%);
+  border: 1px solid rgba(183, 243, 74, 0.28);
+  box-shadow: 0 24px 54px -22px rgba(5, 14, 10, 0.68);
+}
+
+/* Academy — Emerald & Warm Ivory */
+.ivory-academy-surface {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FBFDF7 100%);
+  border: 1px solid rgba(8, 127, 85, 0.16);
+  box-shadow: 0 12px 30px -18px rgba(16, 59, 42, 0.14);
+}
+
+/* Video Analysis — Midnight Charcoal & Energetic Orange */
+.studio-dark-panel {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(255, 148, 31, 0.22) 0%, transparent 48%),
+    radial-gradient(circle at 10% 90%, rgba(255, 148, 31, 0.08) 0%, transparent 42%),
+    linear-gradient(145deg, #0D1412 0%, #141C1A 58%, #0A0E0D 100%);
+  border: 1px solid rgba(255, 148, 31, 0.34);
+  box-shadow: 0 24px 48px -22px rgba(7, 14, 10, 0.68);
+}
+
+/* AI Coach — Deep Forest Green & Electric Lime */
+.coach-dark-panel {
+  background:
+    radial-gradient(circle at 86% 12%, rgba(183, 243, 74, 0.22) 0%, transparent 50%),
+    radial-gradient(circle at 12% 92%, rgba(8, 127, 85, 0.28) 0%, transparent 48%),
+    linear-gradient(145deg, #0B2D1F 0%, #103B2A 58%, #082016 100%);
+  border: 1px solid rgba(183, 243, 74, 0.32);
+  box-shadow: 0 24px 48px -22px rgba(10, 32, 22, 0.58);
+}
+
+/* Match IQ — Broadcast Scoreboard Dark */
+.scoreboard-dark-panel {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(255, 148, 31, 0.14) 0%, transparent 45%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.022) 0px, rgba(255, 255, 255, 0.022) 1px, transparent 1px, transparent 22px),
+    linear-gradient(135deg, #0F171A 0%, #162326 60%, #0E251E 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 44px -22px rgba(8, 15, 18, 0.55);
+}
+
+/* Training Planner — Fresh Green & Clean Ivory */
+.training-clean-surface {
+  background:
+    radial-gradient(circle at 90% 10%, rgba(168, 217, 78, 0.14) 0%, transparent 48%),
+    linear-gradient(180deg, #FFFFFF 0%, #F4F8EC 100%);
+  border: 1px solid rgba(8, 127, 85, 0.2);
+  box-shadow: 0 12px 30px -18px rgba(16, 59, 42, 0.12);
+}
+
+/* Turf IQ — Cricket Pitch Green */
+.turf-arena-panel {
+  background:
+    radial-gradient(circle at 82% 20%, rgba(168, 217, 78, 0.2) 0%, transparent 50%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0px, rgba(255, 255, 255, 0.025) 36px, transparent 36px, transparent 72px),
+    linear-gradient(135deg, #0A281C 0%, #113F2C 62%, #0C2119 100%);
+  border: 1px solid rgba(183, 243, 74, 0.28);
+  box-shadow: 0 22px 44px -22px rgba(8, 28, 18, 0.58);
+}
+
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 32px -12px rgba(16, 23, 20, 0.16);
+}
+
+.hero-mote {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(183, 243, 74, 0.85) 0%, rgba(183, 243, 74, 0) 70%);
+  animation: particle-rise 5.4s ease-in-out infinite;
+}
+
+@keyframes stadium-camera-drift {
+  0%, 100% {
+    transform: scale(1.03) translate3d(0px, 0px, 0px);
+  }
+  50% {
+    transform: scale(1.06) translate3d(-8px, -4px, 0px);
+  }
+}
+
+@keyframes floodlight-pulse {
+  0%, 100% {
+    opacity: 0.72;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes ball-hover-float {
+  0%, 100% {
+    transform: translate3d(0px, 0px, 0px);
+  }
+  50% {
+    transform: translate3d(0px, -10px, 0px);
+  }
+}
+
+@keyframes ball-trail-pulse {
+  0%, 100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes neon-ring-breathe {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.92;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes particle-rise {
+  0%, 100% {
+    opacity: 0.2;
+    transform: translate3d(0px, 0px, 0px);
+  }
+  50% {
+    opacity: 0.65;
+    transform: translate3d(4px, -14px, 0px);
+  }
+}
+
+@keyframes drawer-slide-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-16px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes score-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes boundary-flash-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.88);
+  }
+  65% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.animate-stadium-drift {
+  animation: stadium-camera-drift 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-floodlight-pulse {
+  animation: floodlight-pulse 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-ball-float {
+  animation: ball-hover-float 4.4s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-ball-trail {
+  animation: ball-trail-pulse 3.6s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.animate-neon-ring {
+  animation: neon-ring-breathe 3.6s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-particle-rise {
+  animation: particle-rise 5.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-drawer-in {
+  animation: drawer-slide-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-score-pop {
+  animation: score-pop 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-boundary-flash {
+  animation: boundary-flash-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

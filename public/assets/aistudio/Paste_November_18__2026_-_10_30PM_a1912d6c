@@ -1,0 +1,1861 @@
+# PITCHIQ — ULTIMATE AI CRICKET ACADEMY
+## COMPLETE MASTER DEVELOPMENT PROMPT
+
+Build and transform my existing project into PITCHIQ — a complete, premium, AI-powered cricket learning, coaching, training, fitness and performance improvement platform.
+
+**PRODUCT NAME:** PITCHIQ
+
+**TAGLINE:** Every Ball. Every Move. Every Improvement.
+
+**POSITIONING:** Your Personal AI Cricket Academy.
+
+**CORE VISION:** Learn cricket. Master techniques. Practise smarter. Analyse mistakes. Improve every day.
+
+IMPORTANT: This is a complete application development and redesign task. Do not just create a homepage, landing page or static dashboard.
+
+Inspect the entire existing project, understand its current code, components, routes, APIs, database and working features before modifying anything.
+
+Preserve existing working functionality, especially video upload, AI integrations and computer vision. Improve the existing project without unnecessarily deleting working features.
+
+The finished application must be visually impressive, educationally detailed, genuinely functional and responsive.
+
+==================================================
+1. PRODUCT VISION AND TARGET USERS
+==================================================
+
+PITCHIQ is a personal AI cricket academy designed for:
+
+- Complete beginners who want to learn cricket from zero.
+- Intermediate players who want to correct mistakes.
+- Advanced players who want to improve their performance.
+- Competitive players preparing for tournaments.
+- Turf cricket and box cricket players.
+- Cricket coaches and academies.
+
+PITCHIQ must combine:
+
+1. Complete cricket education.
+2. Batting academy.
+3. Bowling academy.
+4. Fielding academy.
+5. Professional cricket tutorial library.
+6. Cricket tips and tricks.
+7. Practical exercise library.
+8. Physical fitness training.
+9. Personalised daily and weekly workout planner.
+10. AI cricket coach.
+11. Video recording and upload.
+12. AI video technique analysis.
+13. Personalised mistake correction.
+14. Turf cricket intelligence.
+15. Match intelligence.
+16. Cricket quiz and challenges.
+17. Player progress tracking.
+18. Coach and academy management.
+
+The most important user journey:
+
+LEARN → WATCH → UNDERSTAND → PRACTISE → RECORD → ANALYSE → CORRECT → IMPROVE.
+
+A player should be able to learn a technique, watch a tutorial, practise the technique, record their performance, upload the video, receive feedback, understand their mistakes and get exercises to improve.
+
+Do not turn this into an ordinary cricket score-tracking application.
+
+==================================================
+2. PREMIUM CRICKET-THEMED UI AND VISUAL DESIGN
+==================================================
+
+I DO NOT WANT A SIMPLE, PLAIN, GENERIC WHITE WEBSITE OR A BORING DASHBOARD.
+
+I want PITCHIQ to have a distinctive, premium, elegant, cinematic and attractive cricket identity.
+
+The design should combine:
+
+- International cricket stadium atmosphere.
+- Professional cricket academy.
+- Modern sports technology.
+- Sports broadcasting graphics.
+- Premium athletic performance applications.
+- Interactive digital learning platform.
+
+### Colour palette
+
+Use these colours consistently:
+
+- Stadium green: #092F22
+- Forest green: #123D2B
+- Emerald: #167B50
+- Cricket lime: #B5E66D
+- Pitch cream: #F4F1E6
+- Warm ivory: #F8F6EE
+- Deep charcoal: #111A17
+- Gold accent: #D5AD57
+- Pure white: #FFFFFF
+- Muted green: #84958A
+
+### Design elements
+
+Include:
+
+- Large cinematic cricket stadium backgrounds.
+- Beautiful cricket player action photography.
+- Professional batting, bowling and fielding visuals.
+- Rich forest-green and emerald gradients.
+- Subtle cricket grass textures.
+- Cricket pitch-inspired patterns.
+- Stadium floodlight-inspired effects.
+- Scoreboard-style UI components.
+- Cricket ball and bat illustrations.
+- Shot trajectory graphics.
+- Pitch boundary markings.
+- Field placement diagrams.
+- Elegant sports typography.
+- Attractive layered cards.
+- Premium glass and surface effects used selectively.
+- Smooth page transitions.
+- Subtle hover animations.
+- Beautiful loading transitions.
+- Modern charts and progress visualizations.
+
+Use strong, large section headings and comfortable body text.
+
+Every section should look polished and purposeful.
+
+Use different visual compositions for Batting, Bowling, Fielding, Fitness and Turf IQ while keeping one consistent PITCHIQ brand.
+
+Avoid:
+- Plain generic white dashboards.
+- Entirely black interfaces with empty space.
+- Tiny typography.
+- Cramped cards.
+- Too many small boxes.
+- Random unrelated stock images.
+- Excessive glowing effects.
+- Excessive gradients.
+- Unnecessary animations.
+- Fake statistics.
+- Decorative elements that reduce readability.
+
+The website must look excellent on desktop, tablet and mobile.
+
+==================================================
+3. BRANDING AND NAVIGATION
+==================================================
+
+Create a premium PITCHIQ logo and consistent visual identity.
+
+Use a cricket-inspired icon or custom logo treatment.
+
+Create a collapsible desktop sidebar and attractive mobile navigation.
+
+### Main navigation
+
+HOME
+- Dashboard
+- My Cricket Journey
+- Daily Cricket Tip
+
+CRICKET ACADEMY
+- Beginner Academy
+- Intermediate Academy
+- Advanced Academy
+- Professional Masterclass
+- Batting Academy
+- Bowling Academy
+- Fielding Academy
+- Wicketkeeping
+- Cricket Rules
+
+AI COACH
+- AI Cricket Coach
+- Voice Coach
+- Ask Without Video
+- Coaching History
+
+PRACTICE AND ANALYSIS
+- Quick Camera Capture
+- Upload Video
+- Batting Analysis
+- Bowling Analysis
+- Fielding Analysis
+- Technique Correction Studio
+- Why Did I Get Out?
+
+TRAINING CENTRE
+- Batting Exercises
+- Bowling Exercises
+- Fielding Exercises
+- Cricket Fitness
+- Strength Training
+- Stamina Training
+- Speed and Agility
+- Mobility and Flexibility
+- Recovery and Rest
+- My Training Planner
+
+TURF IQ
+- Turf Cricket Academy
+- Turf Batting
+- Turf Bowling
+- Turf Fielding
+- Turf Practice
+- Turf Match Strategy
+- Custom Turf Rules
+
+MATCH IQ
+- Scorecard Analysis
+- Player Statistics
+- Team Performance
+- Opponent Analysis
+- Tactical Planning
+
+MY DEVELOPMENT
+- Learning Progress
+- Training History
+- Saved Videos
+- Saved Reports
+- Cricket Quiz
+- Challenges
+- Achievements
+- My Profile
+
+All navigation elements must work and open the correct pages.
+
+==================================================
+4. HOMEPAGE — IMPRESSIVE FIRST IMPRESSION
+==================================================
+
+Build a cinematic, attractive homepage.
+
+Hero headline:
+
+"MASTER YOUR GAME. OWN EVERY MOMENT."
+
+Supporting text:
+
+"Learn professional cricket techniques, practise smarter and improve every part of your game with your personal AI cricket coach."
+
+Use a beautiful cricket stadium or batsman action background.
+
+Primary buttons:
+
+- Start Your Cricket Journey.
+- Explore Cricket Academy.
+- Meet Your AI Coach.
+
+Create these sections:
+
+1. Hero section.
+2. About PITCHIQ.
+3. Batting, Bowling and Fielding.
+4. Cricket Learning Academy.
+5. AI Cricket Coach.
+6. Record and Analyse.
+7. Cricket Training Centre.
+8. Turf IQ.
+9. Match Intelligence.
+10. How PITCHIQ Works.
+11. Player Progress.
+12. Final call to action.
+13. Footer.
+
+Use strong photography, attractive layouts, cricket-inspired animations and premium typography.
+
+Do not invent real testimonials, user numbers, ratings or achievements.
+
+==================================================
+5. ONBOARDING AND PLAYER PROFILE
+==================================================
+
+Create a guided onboarding experience.
+
+Ask for:
+
+- Player name or display name.
+- Age group.
+- Cricket experience.
+- Skill level.
+- Primary role.
+- Right-handed or left-handed batting.
+- Bowling style.
+- Fast bowling, medium pace, off-spin or leg-spin.
+- Leather ball or tennis ball.
+- Regular cricket or turf/box cricket.
+- Main improvement goals.
+- Available practice time.
+- Preferred language.
+- Available equipment.
+
+Skill levels:
+
+- Beginner.
+- Intermediate.
+- Advanced.
+- Competitive.
+
+Use the information to personalise lessons, AI coaching, exercise difficulty and training schedules.
+
+Allow users to edit their profile at any time.
+
+==================================================
+6. COMPLETE CRICKET ACADEMY AND CURRICULUM
+==================================================
+
+Create a proper structured cricket education system.
+
+### BEGINNER
+
+- Introduction to cricket.
+- History and formats.
+- Cricket equipment.
+- Understanding the cricket pitch.
+- Wickets and stumps.
+- Runs and scoring.
+- Overs and innings.
+- Basic cricket rules.
+- Batting fundamentals.
+- Bowling fundamentals.
+- Fielding fundamentals.
+- Catching.
+- Throwing.
+- Basic match understanding.
+
+### INTERMEDIATE
+
+- Front-foot batting.
+- Back-foot batting.
+- Shot selection.
+- Straight drive.
+- Cover drive.
+- Pull shot.
+- Hook shot.
+- Cut shot.
+- Sweep shot.
+- Playing spin.
+- Playing fast bowling.
+- Bowling variations.
+- Swing and seam.
+- Spin bowling.
+- Fielding positions.
+- Wicketkeeping.
+- Match awareness.
+
+### ADVANCED
+
+- Advanced shot selection.
+- Power hitting.
+- Reading bowlers.
+- Playing different bowling styles.
+- Building an innings.
+- Reverse swing.
+- Bowling variations.
+- Death bowling.
+- Advanced field placements.
+- Tactical planning.
+- Pressure management.
+- Captaincy.
+
+### PROFESSIONAL MASTERCLASS
+
+- T20 batting strategies.
+- ODI innings management.
+- Test match technique.
+- Advanced bowling plans.
+- Tactical field placement.
+- Match preparation.
+- Professional training concepts.
+- Performance consistency.
+- Fitness and recovery.
+
+==================================================
+7. DETAILED CRICKET LESSON SYSTEM
+==================================================
+
+Every individual cricket technique must open a complete lesson page.
+
+Do not show only a small description or two sentences.
+
+Each lesson must include:
+
+1. Lesson title.
+2. Skill level.
+3. Learning objectives.
+4. Why the technique matters.
+5. Equipment required.
+6. Detailed explanation.
+7. Correct body positioning.
+8. Step-by-step instructions.
+9. Visual diagrams.
+10. Technique demonstration.
+11. Common mistakes.
+12. How to correct mistakes.
+13. Professional coaching tips.
+14. Beginner drill.
+15. Intermediate drill.
+16. Advanced drill.
+17. Relevant YouTube tutorial.
+18. Knowledge quiz.
+19. Practical assessment.
+20. Mark as completed.
+21. Recommended next lesson.
+
+Use accurate cricket terminology and explain difficult words in simple language.
+
+For example, a batting grip lesson must explain top-hand placement, bottom-hand placement, V alignment, grip pressure, wrist movement and common grip errors.
+
+A cover-drive lesson must explain foot movement, head position, balance, front-foot placement, bat path, contact position and follow-through.
+
+A bowling action lesson must explain run-up, gathering, bound, arm movement, front-foot landing, release and follow-through.
+
+Use genuine visual diagrams and demonstrations wherever possible.
+
+==================================================
+8. BATTING ACADEMY — COMPLETE EXPERIENCE
+==================================================
+
+Create a dedicated Batting Academy page.
+
+### Hero
+
+Title: MASTER YOUR BATTING.
+
+Subtitle: Build excellent technique, improve timing, develop powerful shots and play with confidence.
+
+Use cinematic batting photography.
+
+Buttons:
+- Explore Techniques.
+- Watch Batting Tutorials.
+- Upload My Batting Video.
+- Start Batting Practice.
+
+### A. Batting technique library
+
+FOUNDATIONS:
+- Batting grip.
+- Stance.
+- Guard.
+- Backlift.
+- Head position.
+- Balance.
+- Bat preparation.
+- Footwork.
+- Weight transfer.
+- Follow-through.
+
+BATTING SHOTS:
+- Straight drive.
+- Cover drive.
+- Off drive.
+- On drive.
+- Square cut.
+- Late cut.
+- Pull shot.
+- Hook shot.
+- Sweep.
+- Reverse sweep.
+- Flick.
+- Lofted shots.
+- Defensive shots.
+
+ADVANCED BATTING:
+- Playing fast bowling.
+- Playing spin.
+- Reading line and length.
+- Playing yorkers.
+- Playing bouncers.
+- Timing and placement.
+- Power hitting.
+- Strike rotation.
+- Shot selection.
+- Building an innings.
+- Batting under pressure.
+
+### B. Batting tips and tricks
+
+Create a searchable and filterable tips library.
+
+Include:
+
+- How to improve batting timing.
+- How to improve footwork.
+- How to play straight drives.
+- How to improve cover drives.
+- How to play short-pitched bowling.
+- How to handle leg-spin.
+- How to handle off-spin.
+- How to improve power hitting.
+- How to improve hand-eye coordination.
+- How to develop a strong backlift.
+- How to improve balance.
+- How to play yorkers.
+- How to rotate strike.
+- How to avoid unnecessary dismissals.
+- How to build confidence against fast bowling.
+- How to build an innings.
+
+Every tip must contain:
+- Problem.
+- Why it happens.
+- Correct technique.
+- Step-by-step solution.
+- Common mistakes.
+- Practical drill.
+- Coaching advice.
+- Related lesson.
+
+### C. Batting practice drills
+
+Create individual instructional pages for:
+
+- Shadow batting.
+- Grip practice.
+- Stance practice.
+- Backlift practice.
+- Front-foot movement.
+- Back-foot movement.
+- Straight-drive practice.
+- Cover-drive practice.
+- Pull-shot practice.
+- Hook-shot practice.
+- Cut-shot practice.
+- Sweep practice.
+- Throwdown practice.
+- Tennis-ball wall drill.
+- Reaction-ball drill.
+- Soft-ball reaction drill.
+- Timing drills.
+- Target batting.
+- Single-stump practice.
+- Defensive batting.
+- Playing spin.
+- Playing pace.
+- Running between wickets.
+- Quick turning.
+- Boundary placement.
+- Power hitting.
+
+==================================================
+9. BOWLING ACADEMY — COMPLETE EXPERIENCE
+==================================================
+
+Create a separate Bowling Academy page.
+
+### Hero
+
+Title: MASTER YOUR BOWLING.
+
+Subtitle: Develop your bowling action, improve accuracy, master variations and become a smarter bowler.
+
+Use professional fast-bowling or spin-bowling photography.
+
+### A. Fast bowling techniques
+
+- Bowling grip.
+- Run-up.
+- Gathering.
+- Bound.
+- Bowling arm.
+- Non-bowling arm.
+- Front-foot landing.
+- Body alignment.
+- Release.
+- Follow-through.
+- Seam position.
+- Swing bowling.
+- Reverse swing.
+- Yorker.
+- Bouncer.
+- Slower ball.
+- Off cutter.
+- Leg cutter.
+- Death-over bowling.
+
+### B. Spin bowling techniques
+
+- Off-spin grip.
+- Leg-spin grip.
+- Finger position.
+- Wrist position.
+- Release.
+- Flight.
+- Drift.
+- Turn.
+- Top spinner.
+- Googly.
+- Arm ball.
+- Variation control.
+- Line and length.
+- Accuracy.
+
+### C. Bowling tips and tricks
+
+- Improve bowling accuracy.
+- Improve run-up rhythm.
+- Control line and length.
+- Bowl accurate yorkers.
+- Bowl slower balls.
+- Develop swing.
+- Improve seam position.
+- Improve spin release.
+- Reduce wides and no-balls.
+- Bowl against aggressive batters.
+- Plan a complete over.
+- Improve death bowling.
+- Develop consistency.
+
+### D. Bowling practice drills
+
+- Shadow bowling.
+- Run-up rhythm.
+- Target bowling.
+- Line-and-length practice.
+- Yorker target.
+- Single-stump bowling.
+- Seam-position drill.
+- Wrist-position drill.
+- Spin-release practice.
+- Flight-control drill.
+- Slower-ball practice.
+- Balance and landing drill.
+- Follow-through practice.
+- Accuracy games.
+
+Provide complete instructions, equipment, sets, repetitions, rest, difficulty, mistakes and corrections.
+
+Include appropriate workload and recovery guidance, especially for developing fast bowlers.
+
+==================================================
+10. FIELDING ACADEMY — COMPLETE EXPERIENCE
+==================================================
+
+Create a separate Fielding Academy.
+
+### Hero
+
+Title: BECOME A COMPLETE FIELDER.
+
+Subtitle: Improve reflexes, catching, throwing, movement and match awareness.
+
+### A. Fielding techniques
+
+- Ready position.
+- Athletic stance.
+- High catches.
+- Low catches.
+- Close catches.
+- Slip catching.
+- Ground fielding.
+- Two-handed pickup.
+- One-handed pickup.
+- Throwing technique.
+- Direct hits.
+- Diving stops.
+- Boundary fielding.
+- Backing up.
+- Wicketkeeping fundamentals.
+- Footwork.
+- Anticipation.
+
+### B. Fielding tips
+
+- Improve catching confidence.
+- Learn soft hands.
+- Judge high catches.
+- Improve throwing accuracy.
+- Direct-hit techniques.
+- Faster ground-ball pickup.
+- Improve reaction.
+- Improve fielding position.
+- Boundary awareness.
+- Safe diving technique.
+
+### C. Fielding practice drills
+
+- Wall catching.
+- Partner catching.
+- High-ball catching.
+- Low-ball catching.
+- Reaction-ball drill.
+- Ground-ball pickup.
+- Cone pickup.
+- Target throwing.
+- Direct-hit practice.
+- Agility ladder.
+- Shuttle drills.
+- Quick-release throwing.
+- Wicketkeeping movement.
+
+Explain all drills in detail.
+
+==================================================
+11. YOUTUBE CRICKET TUTORIAL LIBRARY
+==================================================
+
+This is one of the most important features.
+
+Create an attractive section called:
+
+"LEARN FROM THE BEST — CRICKET MASTERCLASS."
+
+Users must be able to watch genuine cricket coaching tutorials directly within PITCHIQ.
+
+Create separate video collections.
+
+### Batting tutorials
+
+- Batting grip.
+- Batting stance.
+- Backlift.
+- Straight drive.
+- Cover drive.
+- Pull shot.
+- Hook shot.
+- Cut shot.
+- Sweep shot.
+- Footwork.
+- Timing.
+- Playing fast bowling.
+- Playing spin.
+- Power hitting.
+
+### Bowling tutorials
+
+- Bowling action.
+- Grip.
+- Run-up.
+- Swing bowling.
+- Seam bowling.
+- Yorker.
+- Bouncer.
+- Slower ball.
+- Off-spin.
+- Leg-spin.
+- Googly.
+- Accuracy.
+- Death bowling.
+
+### Fielding tutorials
+
+- Catching.
+- High catches.
+- Ground fielding.
+- Throwing.
+- Direct hits.
+- Diving.
+- Wicketkeeping.
+- Reaction drills.
+- Professional fielding.
+
+### Fitness tutorials
+
+- Cricket warm-up.
+- Cricket strength training.
+- Cricket stamina.
+- Speed and agility.
+- Mobility.
+- Core exercises.
+- Recovery education.
+
+### Video card design
+
+Each video must display:
+
+- Real YouTube thumbnail.
+- Genuine title.
+- Channel name.
+- Duration when available.
+- Difficulty level.
+- Short explanation.
+- Play button.
+- Embedded playback.
+- External YouTube link.
+
+Use the YouTube Data API where configured or manually curated and verified YouTube video IDs.
+
+Never invent YouTube video IDs, titles, thumbnails, channel names or URLs.
+
+Use cricket coaching and instructional videos rather than random match highlights.
+
+Provide search and filters for category and skill level.
+
+Keep API credentials secure on the backend.
+
+If YouTube API integration is unavailable, provide a verified curated collection with a configuration path for adding videos later.
+
+==================================================
+12. CRICKET TRAINING CENTRE — COMPLETE EXERCISE LIBRARY
+==================================================
+
+Create a major navigation section called:
+
+PITCHIQ CRICKET TRAINING CENTRE.
+
+This is a full training and exercise education system.
+
+It must include:
+
+- Batting exercises.
+- Bowling exercises.
+- Fielding exercises.
+- Cricket fitness.
+- Strength training.
+- Stamina training.
+- Speed.
+- Agility.
+- Flexibility.
+- Mobility.
+- Core stability.
+- Recovery.
+
+### A. Batting exercises
+
+TECHNIQUE:
+- Shadow batting.
+- Grip practice.
+- Stance practice.
+- Backlift practice.
+- Head-position practice.
+- Front-foot movement.
+- Back-foot movement.
+- Balance practice.
+- Follow-through practice.
+
+SHOT PRACTICE:
+- Straight-drive drill.
+- Cover-drive drill.
+- Pull-shot drill.
+- Hook-shot drill.
+- Cut-shot drill.
+- Sweep-shot drill.
+- Flick-shot drill.
+- Defensive-shot drill.
+
+TIMING AND REACTION:
+- Tennis-ball wall drill.
+- Throwdown practice.
+- Reaction-ball drill.
+- Soft-ball reaction.
+- Variable-length throwdowns.
+- Hand-eye coordination.
+- Target batting.
+- Single-stump batting.
+- Controlled power hitting.
+
+MATCH SKILLS:
+- Running between wickets.
+- Quick-turning drill.
+- Calling and communication.
+- Strike rotation.
+- Boundary placement.
+- Defensive batting.
+- Spin-playing practice.
+- Pace-playing practice.
+
+### B. Bowling exercises
+
+FAST BOWLING:
+- Grip practice.
+- Shadow bowling.
+- Run-up rhythm.
+- Gathering practice.
+- Front-foot landing control.
+- Balance.
+- Seam position.
+- Target bowling.
+- Line and length.
+- Yorker target.
+- Slower-ball grip practice.
+- Follow-through.
+
+SPIN BOWLING:
+- Finger-spin release.
+- Wrist-spin release.
+- Grip practice.
+- Wrist position.
+- Spin control.
+- Flight control.
+- Target bowling.
+- Length control.
+- Top-spinner practice.
+- Variation practice.
+
+### C. Fielding exercises
+
+CATCHING:
+- Wall catching.
+- Partner catching.
+- High-ball catching.
+- Low catching.
+- Close catching.
+- Slip catching.
+- Reaction-ball catching.
+
+GROUND FIELDING:
+- Two-handed pickup.
+- One-handed pickup.
+- Cone pickup.
+- Ground-ball reaction.
+- Controlled diving progression.
+- Quick recovery.
+
+THROWING:
+- Target throwing.
+- Direct-hit practice.
+- Quick-release throwing.
+- Long-throw technique.
+- Relay throwing.
+
+MOVEMENT:
+- Agility ladder.
+- Cone shuttle.
+- Side-to-side movement.
+- Forward and backward movement.
+- Short acceleration.
+- Reaction drills.
+- Boundary awareness.
+
+==================================================
+13. CRICKET FITNESS AND PHYSICAL TRAINING
+==================================================
+
+Build a complete fitness education section specifically for cricket players.
+
+### Strength exercises
+
+- Bodyweight squats.
+- Lunges.
+- Push-ups.
+- Glute bridges.
+- Calf raises.
+- Planks.
+- Side planks.
+- Bird dogs.
+- Resistance-band exercises.
+
+### Stamina exercises
+
+- Light jogging.
+- Interval running.
+- Shuttle runs.
+- Progressive aerobic conditioning.
+- Cricket-specific repeated movement drills.
+
+### Speed exercises
+
+- Short acceleration sprints.
+- Cone acceleration.
+- Shuttle runs.
+- Change-of-direction drills.
+- Reaction starts.
+
+### Agility exercises
+
+- Agility ladder.
+- Lateral shuffle.
+- Cone drills.
+- Single-leg balance.
+- Controlled direction changes.
+
+### Mobility and flexibility
+
+- Dynamic warm-up.
+- Hip mobility.
+- Shoulder mobility.
+- Ankle mobility.
+- Thoracic rotation.
+- Gentle post-training stretching.
+
+### Core stability
+
+- Front plank.
+- Side plank.
+- Dead bug.
+- Bird dog.
+- Controlled trunk stability.
+
+For every exercise provide:
+- Correct technique.
+- Purpose.
+- Muscles or movement qualities involved.
+- Starting position.
+- Step-by-step instructions.
+- Sets and repetitions or duration.
+- Rest time.
+- Difficulty.
+- Common mistakes.
+- Corrections.
+- Easier variation.
+- Harder variation.
+- Safe progression.
+
+==================================================
+14. COMPLETE EXERCISE DETAIL PAGE
+==================================================
+
+Every exercise must open an individual detail page.
+
+Display:
+
+1. Exercise name.
+2. Large instructional image or video.
+3. What is this exercise?
+4. Why should a cricketer do it?
+5. Which skill does it improve?
+6. Equipment required.
+7. Starting position.
+8. Step-by-step execution.
+9. Correct posture.
+10. Sets.
+11. Repetitions or duration.
+12. Rest time.
+13. Weekly frequency.
+14. Beginner version.
+15. Intermediate version.
+16. Advanced version.
+17. Common mistakes.
+18. Corrections.
+19. Easier variation.
+20. Harder variation.
+21. Related YouTube demonstration.
+22. Mark completed.
+23. Save exercise.
+24. Personal notes.
+
+Do not show only an exercise name without teaching the user how to perform it.
+
+==================================================
+15. PERSONAL AI TRAINING PLANNER
+==================================================
+
+Build a personalised daily and weekly training planner.
+
+Ask the player for:
+
+- Age group.
+- Cricket role.
+- Skill level.
+- Main weakness.
+- Training goal.
+- Available time per day.
+- Number of training days per week.
+- Available equipment.
+- Training location.
+- Current training workload.
+- Recovery availability.
+
+Generate:
+
+- Daily training routine.
+- Weekly training schedule.
+- Batting drills.
+- Bowling drills.
+- Fielding drills.
+- Strength exercises.
+- Stamina sessions.
+- Speed and agility work.
+- Mobility sessions.
+- Recovery days.
+
+Example:
+
+PLAYER:
+Intermediate batsman.
+
+GOAL:
+Improve timing and stamina.
+
+AVAILABLE TIME:
+45 minutes.
+
+SAMPLE SESSION:
+1. Warm-up — 7 minutes.
+2. Shadow batting — 5 minutes.
+3. Front-foot and back-foot drills — 10 minutes.
+4. Throwdown practice — 8 minutes.
+5. Target batting — 5 minutes.
+6. Appropriate conditioning — 5 minutes.
+7. Cool-down — 5 minutes.
+
+This is only an example. Generate plans according to the player's actual ability, age group, workload and goals.
+
+Allow:
+- Generate plan.
+- Edit plan.
+- Regenerate plan.
+- Save plan.
+- Start training session.
+- Mark exercise completed.
+- Record notes.
+- Track completion.
+
+==================================================
+16. AI MISTAKE-TO-EXERCISE RECOMMENDATION
+==================================================
+
+This is a major differentiator for PITCHIQ.
+
+Connect video-analysis reports directly to the exercise library.
+
+Example:
+
+If a batting analysis identifies an observable footwork issue:
+
+- Explain the observation.
+- Recommend footwork exercises.
+- Show exercise instructions.
+- Display relevant demonstrations.
+- Allow the player to start a training session.
+- Save exercise completion.
+- Track progress.
+
+If a bowling report identifies a run-up rhythm inconsistency:
+
+- Recommend suitable run-up exercises.
+- Explain the purpose.
+- Give progressive practice instructions.
+- Include recovery guidance.
+
+If a fielding report identifies a pickup-position issue:
+
+- Recommend ground-ball pickup drills.
+- Recommend cone pickup.
+- Recommend footwork exercises.
+
+Add a prominent button:
+
+"START MY IMPROVEMENT SESSION"
+
+Only recommend exercises related to actual observations and player level.
+
+==================================================
+17. AI CRICKET COACH
+==================================================
+
+Build a complete conversational AI coach.
+
+It must not be a simple static chatbot with a few suggested questions.
+
+Support:
+- Text conversation.
+- Voice input.
+- Spoken responses where supported.
+- Video-assisted coaching.
+- Coaching without video.
+- Follow-up questions.
+- Chat history.
+- Saved advice.
+- Personalised recommendations.
+
+Example questions:
+
+- I cannot play straight drives.
+- How can I improve my batting timing?
+- How do I bowl a yorker?
+- How do I improve my bowling action?
+- How can I improve my stamina?
+- How do I become a better fielder?
+- Why do I keep getting bowled?
+- How should I play leg-spin?
+- What exercises should I perform today?
+- Create a 30-minute batting practice routine.
+
+The AI should:
+
+1. Understand the question.
+2. Ask clarifying questions when needed.
+3. Explain techniques.
+4. Identify possible mistakes.
+5. Suggest practical corrections.
+6. Recommend exercises.
+7. Recommend relevant tutorials.
+8. Generate a training plan.
+9. Explain how to measure improvement.
+
+Adapt responses to beginner, intermediate and advanced players.
+
+If no video is provided, the coach must not pretend to see the player's technique.
+
+Use real Gemini API integration through a secure backend. Keep API keys out of frontend code.
+
+==================================================
+18. VIDEO RECORDING AND UPLOAD
+==================================================
+
+Create a prominent feature:
+
+RECORD YOUR PRACTICE.
+
+Support:
+
+- Upload MP4, MOV and supported video formats.
+- Direct browser camera recording.
+- Camera permission handling.
+- Live camera preview.
+- Front and rear camera selection where supported.
+- Start and stop recording.
+- Pause and resume where supported.
+- Recording timer.
+- Retake.
+- Save.
+- Playback.
+- Video analysis.
+
+Allow users to choose:
+
+- Batting, bowling or fielding.
+- Technique being practised.
+- Skill level.
+- Handedness where applicable.
+- Camera angle.
+- Optional notes.
+
+### Suggested camera views
+
+BATTING:
+- Side view for stance and movement.
+- Front or diagonal view for alignment and footwork.
+
+BOWLING:
+- Side view for the bowling sequence.
+- Front view for alignment where appropriate.
+
+FIELDING:
+- Wide-angle view showing the player and movement.
+
+Validate video format, duration and file size.
+
+Show honest processing states, errors and retry options.
+
+Do not fake video processing.
+
+==================================================
+19. AI VIDEO ANALYSIS ENGINE
+==================================================
+
+Use the actual implemented computer vision system.
+
+Suggested technologies:
+
+- OpenCV.
+- MediaPipe Pose Landmarker.
+- NumPy.
+- Pandas.
+- Gemini for grounded coaching explanations.
+- Additional validated models where required.
+
+### Video analysis pipeline
+
+1. Validate video.
+2. Extract frames.
+3. Select relevant frames.
+4. Detect the player where supported.
+5. Estimate pose landmarks.
+6. Track movement.
+7. Calculate supported metrics.
+8. Identify observable patterns.
+9. Attach timestamps and confidence.
+10. Generate a structured report.
+11. Recommend corrections and exercises.
+
+### Batting analysis
+
+Where supported, assess:
+
+- Stance.
+- Head stability.
+- Balance.
+- Foot positioning.
+- Front-foot movement.
+- Back-foot movement.
+- Weight transfer.
+- Batting movement.
+- Swing path if measurable.
+- Follow-through.
+
+### Bowling analysis
+
+Where supported, assess:
+
+- Run-up rhythm.
+- Gathering.
+- Body alignment.
+- Bowling arm path.
+- Non-bowling arm.
+- Front-foot landing.
+- Balance.
+- Follow-through.
+- Visible wrist or seam position where footage permits.
+
+### Fielding analysis
+
+Where supported, assess:
+
+- Ready position.
+- Posture.
+- Movement.
+- Balance.
+- Pickup mechanics.
+- Catching movement.
+- Throwing mechanics.
+- Footwork.
+- Recovery.
+
+### Critical accuracy requirements
+
+Pose estimation alone cannot reliably determine bat-ball contact, ball speed, shot power, spin rate, bowling speed, actual line and length or reaction time.
+
+Do not claim unsupported measurements.
+
+Do not fabricate pose landmarks, timestamps, metrics, scores or detected mistakes.
+
+If a technique cannot be assessed, clearly say "Insufficient visual evidence" or "Not available."
+
+Do not certify a bowling action as legal or illegal through ordinary phone-video pose estimation. Explain limitations and recommend qualified assessment when appropriate.
+
+==================================================
+20. AI ANALYSIS REPORT
+==================================================
+
+After every successful video analysis, display a premium, detailed report.
+
+Include:
+
+1. Uploaded video preview.
+2. Selected skill and technique.
+3. Analysis summary.
+4. Observed strengths.
+5. Areas to improve.
+6. Observed technical issues.
+7. Video timestamps.
+8. Relevant frames.
+9. Confidence level.
+10. Why each observation matters.
+11. Step-by-step corrections.
+12. Recommended exercises.
+13. Related YouTube tutorials.
+14. Personal improvement plan.
+15. Save report.
+
+Example report structure:
+
+OBSERVATION:
+Possible balance inconsistency during the shot.
+
+VIDEO EVIDENCE:
+Display the actual frame and timestamp.
+
+WHY IT MATTERS:
+Balance can influence control and consistency.
+
+CORRECTION:
+- Practise a stable stance.
+- Perform controlled shadow batting.
+- Practise slow front-foot movement.
+- Repeat the movement with supervision where needed.
+
+RECOMMENDED EXERCISES:
+- Balance drill.
+- Shadow batting.
+- Front-foot movement drill.
+
+This is an illustrative format, not a result to display as an actual video finding unless supported by the uploaded video.
+
+==================================================
+21. TURF IQ — BOX CRICKET ACADEMY
+==================================================
+
+Create a separate Turf IQ module.
+
+It must focus on tennis-ball cricket, turf cricket and box cricket.
+
+### Turf batting
+
+- Tennis-ball batting.
+- Short-pitch batting.
+- Controlled power hitting.
+- Ground shots.
+- Side-net shots where permitted.
+- Strike rotation.
+- Boundary awareness.
+- Shot selection.
+
+### Turf bowling
+
+- Yorkers.
+- Slower balls.
+- Pace variation.
+- Accuracy.
+- Line and length.
+- Wide control.
+- Death-over bowling.
+
+### Turf fielding
+
+- Wall rebounds.
+- Side-net awareness.
+- Close catching.
+- Quick returns.
+- Boundary positioning.
+- Team coordination.
+
+### Turf tactics
+
+- Batting order.
+- Bowling rotation.
+- Chasing targets.
+- Defending totals.
+- Last-over strategy.
+- Player roles.
+- Opponent weaknesses.
+
+### Custom turf rules
+
+Allow users to configure:
+
+- Number of players.
+- Pitch length.
+- Overs.
+- Ball type.
+- Boundary dimensions.
+- Side-wall rules.
+- Bonus runs.
+- Dismissal rules.
+- Team composition.
+- Scoring rules.
+
+The AI tactical recommendations must use the configured local rules.
+
+==================================================
+22. MATCH IQ — CRICKET INTELLIGENCE
+==================================================
+
+Build a match analysis module.
+
+Allow:
+- Manual score entry.
+- Scorecard upload.
+- CSV upload where supported.
+- Match details.
+- Team information.
+- Player information.
+- Match format.
+
+Calculate where source data permits:
+
+- Runs.
+- Balls.
+- Strike rate.
+- Batting average.
+- Fours and sixes.
+- Overs.
+- Wickets.
+- Runs conceded.
+- Economy.
+- Bowling average.
+- Scoring patterns.
+- Dismissal patterns.
+
+Provide:
+- Player performance.
+- Team performance.
+- Opponent analysis.
+- Tactical advice.
+- Field placement education.
+- Powerplay strategy.
+- Middle-over strategy.
+- Death-over strategy.
+- Chasing and defending plans.
+
+Never invent missing scorecard data.
+
+==================================================
+23. WHY DID I GET OUT?
+==================================================
+
+Create a separate dismissal analysis feature.
+
+Allow users to:
+
+- Select dismissal type.
+- Upload relevant video.
+- Add scorecard context.
+- Select technique.
+- Add notes.
+
+Analyse only available evidence.
+
+Report:
+- What was observed.
+- Possible reason for dismissal.
+- Supporting video timestamp.
+- Confidence.
+- Technical explanation.
+- Correction.
+- Recommended exercises.
+- Related tutorial.
+
+Clearly distinguish actual observations from possible explanations.
+
+==================================================
+24. DAILY CRICKET TIPS AND TRICKS
+==================================================
+
+Create a dedicated daily tips section.
+
+Categories:
+
+- Batting.
+- Bowling.
+- Fielding.
+- Wicketkeeping.
+- Fitness.
+- Match tactics.
+- Mental preparation.
+- Turf cricket.
+
+Features:
+
+- Daily featured tip.
+- Search.
+- Category filters.
+- Skill-level filters.
+- Bookmarks.
+- Related lessons.
+- Related exercises.
+- Recommended next steps.
+
+Every tip must be accurate, detailed and practical.
+
+==================================================
+25. CRICKET QUIZ AND CHALLENGE MODE
+==================================================
+
+Create interactive cricket learning challenges.
+
+Topics:
+- Cricket rules.
+- Batting.
+- Bowling.
+- Fielding.
+- Match situations.
+- Tactical decisions.
+- Turf cricket.
+
+Difficulty:
+- Beginner.
+- Intermediate.
+- Advanced.
+
+Show:
+- Questions.
+- Multiple-choice answers.
+- Correct answer.
+- Explanation.
+- Score.
+- Feedback.
+- Learning progress.
+
+==================================================
+26. MULTILINGUAL COACHING
+==================================================
+
+Support English, Tamil and Hindi, and additional languages where supported.
+
+Allow users to:
+- Ask cricket questions in their chosen language.
+- Receive explanations in that language.
+- Switch language.
+- Understand technical cricket terminology through simple explanations.
+
+Maintain accurate cricket terminology.
+
+==================================================
+27. PLAYER PROGRESS PASSPORT
+==================================================
+
+Create a personal cricket development dashboard.
+
+Track:
+
+- Player level.
+- Cricket role.
+- Lessons completed.
+- Tutorials saved.
+- Exercises completed.
+- Practice time.
+- Weekly sessions.
+- Video analysis reports.
+- Personal goals.
+- Training consistency.
+- Improvement history.
+- Achievements.
+
+Use actual saved information.
+
+Clearly label any demonstration data.
+
+==================================================
+28. COACH AND ACADEMY MODE
+==================================================
+
+Create an optional coach experience.
+
+Features:
+
+- Coach profile.
+- Player management.
+- Assign exercises.
+- Assign lessons.
+- Review player videos.
+- View analysis reports.
+- Track progress.
+- Manage groups.
+- Provide feedback.
+
+Use proper access controls and consent for player videos and records.
+
+==================================================
+29. TECHNICAL ARCHITECTURE
+==================================================
+
+Use the existing project's architecture where possible.
+
+Suggested frontend:
+
+- React.
+- TypeScript.
+- Vite.
+- Tailwind CSS.
+- Recharts where useful.
+
+Suggested backend:
+
+- Python FastAPI if a separate backend is required.
+- Gemini API through a secure backend.
+- OpenCV.
+- MediaPipe Pose Landmarker.
+- NumPy.
+- Pandas.
+
+Suggested database:
+
+- Supabase PostgreSQL or another suitable database.
+
+Storage:
+- Private video storage.
+- Access-controlled user records.
+- Saved reports.
+- Exercise completion records.
+- Training history.
+
+Do not assume Google AI Studio automatically hosts a separate Python backend. If necessary, create a separate backend service and connect it through secure API endpoints.
+
+Never expose private API keys in frontend code.
+
+==================================================
+30. DATA QUALITY, PRIVACY AND SAFETY
+==================================================
+
+- Use accurate cricket education.
+- Do not fabricate professional coaching credentials.
+- Do not invent YouTube videos.
+- Do not invent video analysis results.
+- Do not present demo data as real user data.
+- Do not claim unsupported computer vision capabilities.
+- Keep private videos protected.
+- Allow users to delete their uploads and saved records.
+- Explain camera permissions.
+- Show honest processing and error states.
+
+Fitness safety:
+- Include appropriate warm-ups and cool-downs.
+- Progress training gradually.
+- Include rest and recovery.
+- Adapt exercise recommendations to age group and experience.
+- Avoid excessive bowling and sprint workloads.
+- Do not diagnose injuries or prescribe medical rehabilitation.
+- Advise users to stop when experiencing pain, dizziness or unusual symptoms and seek qualified guidance.
+
+==================================================
+31. FUNCTIONAL REQUIREMENTS
+==================================================
+
+Every button and interactive element must work.
+
+Examples:
+
+- Navigation opens correct pages.
+- Lesson cards open complete content.
+- Search returns relevant results.
+- Filters work.
+- YouTube videos play where supported.
+- Camera capture works where supported.
+- Video upload works.
+- Analysis uses real processing.
+- Reports save.
+- Exercises can be completed.
+- Training plans can be edited.
+- Progress updates.
+- Profile settings save.
+- Mobile navigation works.
+
+Provide:
+- Loading states.
+- Empty states.
+- Form validation.
+- Error messages.
+- Success feedback.
+- Permission explanations.
+- Retry actions.
+
+Do not leave dead buttons, fake links or non-functional controls.
+
+==================================================
+32. IMPLEMENTATION PRIORITIES
+==================================================
+
+First inspect the complete existing project.
+
+Identify:
+- Current components.
+- Existing routes.
+- Working backend APIs.
+- Current database.
+- Video upload and camera functionality.
+- AI integration.
+- Existing computer vision functionality.
+- Missing features.
+
+Preserve existing working functionality.
+
+Implement in these phases:
+
+PHASE 1 — DESIGN AND FOUNDATION:
+- Premium design system.
+- Branding.
+- Navigation.
+- Landing page.
+- Onboarding.
+- Dashboard.
+
+PHASE 2 — COMPLETE CRICKET EDUCATION:
+- Cricket Academy.
+- Beginner, intermediate and advanced lessons.
+- Batting Academy.
+- Bowling Academy.
+- Fielding Academy.
+- Tips and tricks.
+- Verified YouTube tutorials.
+
+PHASE 3 — TRAINING:
+- Batting exercises.
+- Bowling exercises.
+- Fielding exercises.
+- Cricket fitness.
+- Exercise detail pages.
+- Training planner.
+- Progress tracking.
+
+PHASE 4 — AI:
+- AI Cricket Coach.
+- Coaching history.
+- Personalised advice.
+- Multilingual support.
+
+PHASE 5 — VIDEO:
+- Camera recording.
+- Video upload.
+- Real analysis.
+- Evidence-based reports.
+- Mistake-to-exercise recommendations.
+
+PHASE 6 — ADVANCED:
+- Turf IQ.
+- Match IQ.
+- Why Did I Get Out?
+- Progress Passport.
+- Coach mode.
+
+Do not stop after creating the homepage.
+
+Do not replace real integrations with static demo cards.
+
+If a feature cannot be completely implemented with available services, build a functional foundation and clearly explain what still requires configuration.
+
+==================================================
+33. FINAL USER JOURNEY TESTING
+==================================================
+
+Test all of these end-to-end journeys.
+
+### BATTING
+
+Open Batting → Explore Grip → Learn detailed instructions → Watch a genuine tutorial → Practise a drill → Upload batting video → Receive genuine analysis → Understand corrections → Start recommended exercises → Track progress.
+
+### BOWLING
+
+Open Bowling → Learn Yorker → Watch tutorial → Practise target bowling → Upload bowling video → Receive genuine analysis → Understand corrections → Follow bowling training plan.
+
+### FIELDING
+
+Open Fielding → Learn Catching → Watch tutorial → Perform catching drills → Upload fielding video → Receive genuine analysis → Get correction exercises.
+
+### FITNESS
+
+Open Training Centre → Select fitness goal → Generate daily routine → Complete exercises → Save session → Track weekly progress.
+
+### AI COACH
+
+Ask a cricket question without video → Receive detailed coaching → Ask follow-up questions → Get exercises and relevant lessons.
+
+### TURF PLAYER
+
+Configure local turf rules → Learn turf techniques → Get tactical recommendations → Practise suitable drills.
+
+==================================================
+34. FINAL PRODUCT EXPECTATION
+==================================================
+
+PITCHIQ must feel like a complete professional cricket academy, personal AI coach, cricket training centre and video analysis platform in one application.
+
+A beginner should be able to learn cricket from zero.
+
+An intermediate player should be able to understand and correct weaknesses.
+
+An advanced player should be able to improve techniques and tactics.
+
+A turf player should receive specialised coaching.
+
+A player uploading a video should receive honest, evidence-based feedback.
+
+A player should be able to understand exactly which exercises to perform, how to perform them, how many repetitions to do and how to track improvement.
+
+The application must be:
+
+- Visually impressive.
+- Cinematic.
+- Premium.
+- Cricket-themed.
+- Educationally detailed.
+- Interactive.
+- Functional.
+- Mobile responsive.
+- Easy to understand.
+- Genuinely useful.
+
+FINAL INSTRUCTION:
+
+Do not build a generic dashboard.
+
+Do not build a basic cricket information website.
+
+Do not build only a chatbot.
+
+Build PITCHIQ as a complete AI-powered digital cricket academy where players can LEARN, WATCH, PRACTISE, RECORD, ANALYSE, CORRECT AND IMPROVE.
+
+Prioritise actual educational value, working functionality, evidence-based AI analysis and a distinctive premium cricket experience.
+
+Make every page feel like a professional cricket product.
+
+This is the complete vision of PITCHIQ.`}

@@ -1,0 +1,481 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Hardened Primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isVerifiedUser() && request.auth.uid == userId;
+    }
+
+    function hasParentWorkspace(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId));
+    }
+
+    function isBoundedStringList(arr, maxLen) {
+      return arr is list && arr.size() <= maxLen && (arr.size() == 0 || arr[0] is string);
+    }
+
+    function isValidCreateTimestamps(data) {
+      return data.createdAt is timestamp
+        && data.updatedAt is timestamp
+        && data.createdAt == request.time
+        && data.updatedAt == request.time;
+    }
+
+    function isValidUpdateTimestamps() {
+      return incoming().createdAt is timestamp
+        && incoming().updatedAt is timestamp
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().ownerId == existing().ownerId;
+    }
+
+    // 3. Entity Validation Blueprints (Synchronized with firebase-blueprint.json)
+    function isValidUserWorkspace(data, userId) {
+      return data.keys().hasAll([
+          'ownerId', 'name', 'email', 'avatarUrl', 'ageGroup', 'experience', 'skillLevel',
+          'role', 'battingHand', 'bowlingStyle', 'ballType', 'environment', 'goals',
+          'dailyMinutes', 'trainingDaysPerWeek', 'language', 'equipment', 'onboardingCompleted',
+          'completedLessonIds', 'completedExerciseIds', 'savedExerciseIds', 'savedTutorialIds',
+          'bookmarkedTipIds', 'completedChallenges', 'exerciseNotes', 'quizHighScores',
+          'turfRules', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'name', 'email', 'avatarUrl', 'ageGroup', 'experience', 'skillLevel',
+          'role', 'battingHand', 'bowlingStyle', 'ballType', 'environment', 'goals',
+          'dailyMinutes', 'trainingDaysPerWeek', 'language', 'equipment', 'onboardingCompleted',
+          'completedLessonIds', 'completedExerciseIds', 'savedExerciseIds', 'savedTutorialIds',
+          'bookmarkedTipIds', 'completedChallenges', 'exerciseNotes', 'quizHighScores',
+          'turfRules', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && data.ownerId == userId
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 80
+        && data.email is string && data.email.size() <= 160
+        && data.avatarUrl is string && data.avatarUrl.size() <= 512
+        && data.ageGroup in ['Under-14', '14-18', '19-25', '26-35', '35+']
+        && data.experience is string && data.experience.size() <= 160
+        && data.skillLevel in ['Beginner', 'Intermediate', 'Advanced', 'Competitive']
+        && data.role in ['Batter', 'Fast Bowler', 'Spin Bowler', 'All-Rounder', 'Wicketkeeper']
+        && data.battingHand in ['Right-handed', 'Left-handed']
+        && data.bowlingStyle in ['Fast', 'Medium Pace', 'Off-Spin', 'Leg-Spin', 'None']
+        && data.ballType in ['Leather Ball', 'Tennis Ball', 'Both']
+        && data.environment in ['Regular Cricket', 'Turf / Box Cricket', 'Both']
+        && isBoundedStringList(data.goals, 12)
+        && data.dailyMinutes is number && data.dailyMinutes >= 5 && data.dailyMinutes <= 360
+        && data.trainingDaysPerWeek is number && data.trainingDaysPerWeek >= 1 && data.trainingDaysPerWeek <= 7
+        && data.language in ['English', 'Tamil', 'Hindi']
+        && isBoundedStringList(data.equipment, 20)
+        && data.onboardingCompleted is bool
+        && isBoundedStringList(data.completedLessonIds, 200)
+        && isBoundedStringList(data.completedExerciseIds, 300)
+        && isBoundedStringList(data.savedExerciseIds, 300)
+        && isBoundedStringList(data.savedTutorialIds, 200)
+        && isBoundedStringList(data.bookmarkedTipIds, 200)
+        && isBoundedStringList(data.completedChallenges, 100)
+        && data.exerciseNotes is map && data.exerciseNotes.size() <= 200
+        && data.quizHighScores is map && data.quizHighScores.size() <= 40
+        && data.turfRules is map && data.turfRules.size() <= 20
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidVideoReport(data, userId) {
+      return data.keys().hasAll([
+          'ownerId', 'clientCreatedAt', 'title', 'skillCategory', 'technique', 'skillLevel',
+          'handedness', 'cameraAngle', 'playerNotes', 'insufficientEvidence', 'summary',
+          'cameraAngleNotes', 'observedStrengths', 'areasToImprove', 'observations',
+          'recommendedExerciseIds', 'recommendedTutorialIds', 'personalImprovementPlan',
+          'limitationsNotice', 'frames', 'poseSummary', 'coachFeedback', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'clientCreatedAt', 'title', 'skillCategory', 'technique', 'skillLevel',
+          'handedness', 'cameraAngle', 'playerNotes', 'insufficientEvidence', 'summary',
+          'cameraAngleNotes', 'observedStrengths', 'areasToImprove', 'observations',
+          'recommendedExerciseIds', 'recommendedTutorialIds', 'personalImprovementPlan',
+          'limitationsNotice', 'frames', 'poseSummary', 'coachFeedback', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && data.ownerId == userId
+        && data.clientCreatedAt is string && data.clientCreatedAt.size() <= 64
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 160
+        && data.skillCategory in ['Batting', 'Bowling', 'Fielding']
+        && data.technique is string && data.technique.size() >= 1 && data.technique.size() <= 120
+        && data.skillLevel in ['Beginner', 'Intermediate', 'Advanced', 'Competitive']
+        && data.handedness in ['Right-handed', 'Left-handed']
+        && data.cameraAngle is string && data.cameraAngle.size() <= 80
+        && data.playerNotes is string && data.playerNotes.size() <= 2000
+        && data.insufficientEvidence is bool
+        && data.summary is string && data.summary.size() >= 1 && data.summary.size() <= 4000
+        && data.cameraAngleNotes is string && data.cameraAngleNotes.size() <= 1000
+        && isBoundedStringList(data.observedStrengths, 20)
+        && isBoundedStringList(data.areasToImprove, 20)
+        && data.observations is list && data.observations.size() <= 20 && (data.observations.size() == 0 || data.observations[0] is map)
+        && isBoundedStringList(data.recommendedExerciseIds, 10)
+        && isBoundedStringList(data.recommendedTutorialIds, 10)
+        && isBoundedStringList(data.personalImprovementPlan, 20)
+        && data.limitationsNotice is string && data.limitationsNotice.size() <= 1500
+        && data.frames is list && data.frames.size() <= 8 && (data.frames.size() == 0 || data.frames[0] is map)
+        && data.poseSummary is map && data.poseSummary.size() <= 20
+        && data.coachFeedback is string && data.coachFeedback.size() <= 3000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidSavedVideo(data, userId) {
+      return data.keys().hasAll([
+          'ownerId', 'clientCreatedAt', 'title', 'skillCategory', 'technique',
+          'durationSec', 'thumbnailDataUrl', 'reportId', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'clientCreatedAt', 'title', 'skillCategory', 'technique',
+          'durationSec', 'thumbnailDataUrl', 'reportId', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && data.ownerId == userId
+        && data.clientCreatedAt is string && data.clientCreatedAt.size() <= 64
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 160
+        && data.skillCategory in ['Batting', 'Bowling', 'Fielding']
+        && data.technique is string && data.technique.size() >= 1 && data.technique.size() <= 120
+        && data.durationSec is number && data.durationSec >= 0 && data.durationSec <= 1800
+        && data.thumbnailDataUrl is string && data.thumbnailDataUrl.size() <= 200000
+        && data.reportId is string && data.reportId.size() <= 128
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidCoachMessage(data, userId) {
+      return data.keys().hasAll([
+          'ownerId', 'role', 'content', 'clientTimestamp', 'language',
+          'linkedReportId', 'recommendedExerciseIds', 'recommendedLessonIds',
+          'recommendedTutorialIds', 'saved', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'role', 'content', 'clientTimestamp', 'language',
+          'linkedReportId', 'recommendedExerciseIds', 'recommendedLessonIds',
+          'recommendedTutorialIds', 'saved', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && data.ownerId == userId
+        && data.role in ['user', 'assistant']
+        && data.content is string && data.content.size() >= 1 && data.content.size() <= 12000
+        && data.clientTimestamp is string && data.clientTimestamp.size() <= 64
+        && data.language in ['English', 'Tamil', 'Hindi']
+        && data.linkedReportId is string && data.linkedReportId.size() <= 128
+        && isBoundedStringList(data.recommendedExerciseIds, 10)
+        && isBoundedStringList(data.recommendedLessonIds, 10)
+        && isBoundedStringList(data.recommendedTutorialIds, 10)
+        && data.saved is bool
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidTrainingPlan(data, userId) {
+      return data.keys().hasAll([
+          'ownerId', 'clientCreatedAt', 'goal', 'dailyMinutes', 'daysPerWeek',
+          'workloadNote', 'dailyRoutine', 'weeklySchedule', 'isActive', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'clientCreatedAt', 'goal', 'dailyMinutes', 'daysPerWeek',
+          'workloadNote', 'dailyRoutine', 'weeklySchedule', 'isActive', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && data.ownerId == userId
+        && data.clientCreatedAt is string && data.clientCreatedAt.size() <= 64
+        && data.goal is string && data.goal.size() >= 1 && data.goal.size() <= 200
+        && data.dailyMinutes is number && data.dailyMinutes >= 5 && data.dailyMinutes <= 360
+        && data.daysPerWeek is number && data.daysPerWeek >= 1 && data.daysPerWeek <= 7
+        && data.workloadNote is string && data.workloadNote.size() <= 2000
+        && data.dailyRoutine is list && data.dailyRoutine.size() <= 20 && (data.dailyRoutine.size() == 0 || data.dailyRoutine[0] is map)
+        && data.weeklySchedule is list && data.weeklySchedule.size() <= 7 && (data.weeklySchedule.size() == 0 || data.weeklySchedule[0] is map)
+        && data.isActive is bool
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidTrainingHistory(data, userId) {
+      return data.keys().hasAll([
+          'ownerId', 'clientDate', 'title', 'durationMinutes',
+          'exercisesCompleted', 'notes', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'clientDate', 'title', 'durationMinutes',
+          'exercisesCompleted', 'notes', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && data.ownerId == userId
+        && data.clientDate is string && data.clientDate.size() <= 64
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 160
+        && data.durationMinutes is number && data.durationMinutes >= 1 && data.durationMinutes <= 600
+        && isBoundedStringList(data.exercisesCompleted, 50)
+        && data.notes is string && data.notes.size() <= 2000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidMatchAnalysis(data, userId) {
+      return data.keys().hasAll([
+          'ownerId', 'matchFormat', 'teamName', 'opponentName',
+          'battingRows', 'bowlingRows', 'notes', 'analysis', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'matchFormat', 'teamName', 'opponentName',
+          'battingRows', 'bowlingRows', 'notes', 'analysis', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && data.ownerId == userId
+        && data.matchFormat is string && data.matchFormat.size() >= 1 && data.matchFormat.size() <= 64
+        && data.teamName is string && data.teamName.size() >= 1 && data.teamName.size() <= 80
+        && data.opponentName is string && data.opponentName.size() >= 1 && data.opponentName.size() <= 80
+        && data.battingRows is list && data.battingRows.size() <= 22 && (data.battingRows.size() == 0 || data.battingRows[0] is map)
+        && data.bowlingRows is list && data.bowlingRows.size() <= 22 && (data.bowlingRows.size() == 0 || data.bowlingRows[0] is map)
+        && data.notes is string && data.notes.size() <= 2000
+        && data.analysis is map && data.analysis.size() <= 15
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidSquadPlayer(data, userId) {
+      return data.keys().hasAll([
+          'ownerId', 'name', 'role', 'level', 'group', 'consentGranted',
+          'assignedLessonIds', 'assignedExerciseIds', 'notes', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'name', 'role', 'level', 'group', 'consentGranted',
+          'assignedLessonIds', 'assignedExerciseIds', 'notes', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && data.ownerId == userId
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 80
+        && data.role in ['Batter', 'Fast Bowler', 'Spin Bowler', 'All-Rounder', 'Wicketkeeper']
+        && data.level in ['Beginner', 'Intermediate', 'Advanced', 'Competitive']
+        && data.group is string && data.group.size() <= 80
+        && data.consentGranted is bool
+        && isBoundedStringList(data.assignedLessonIds, 100)
+        && isBoundedStringList(data.assignedExerciseIds, 100)
+        && data.notes is string && data.notes.size() <= 2000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidPlayZoneSession(data, userId) {
+      return data.keys().hasAll([
+          'ownerId', 'clientCreatedAt', 'gameType', 'challengeBalls', 'difficulty',
+          'totalRuns', 'ballsFaced', 'successfulShots', 'missedDeliveries', 'wickets',
+          'timingScore', 'suggestedDrillId', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId', 'clientCreatedAt', 'gameType', 'challengeBalls', 'difficulty',
+          'totalRuns', 'ballsFaced', 'successfulShots', 'missedDeliveries', 'wickets',
+          'timingScore', 'suggestedDrillId', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.ownerId)
+        && data.ownerId == userId
+        && data.clientCreatedAt is string && data.clientCreatedAt.size() <= 64
+        && data.gameType in ['batting_challenge']
+        && data.challengeBalls in [6, 12]
+        && data.difficulty in ['Beginner', 'Intermediate', 'Pro']
+        && data.totalRuns is number && data.totalRuns >= 0 && data.totalRuns <= 200
+        && data.ballsFaced is number && data.ballsFaced >= 0 && data.ballsFaced <= 24
+        && data.successfulShots is number && data.successfulShots >= 0 && data.successfulShots <= 24
+        && data.missedDeliveries is number && data.missedDeliveries >= 0 && data.missedDeliveries <= 24
+        && data.wickets is number && data.wickets >= 0 && data.wickets <= 10
+        && data.timingScore is number && data.timingScore >= 0 && data.timingScore <= 100
+        && data.suggestedDrillId is string && data.suggestedDrillId.size() <= 128
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // 4. Collection Rules (Zero-Trust Owner Isolation + Action-Based Updates)
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isOwner(userId) && (resource == null || resource.data.ownerId == request.auth.uid);
+      allow list: if false;
+      allow create: if isValidId(userId)
+        && isOwner(userId)
+        && isValidUserWorkspace(incoming(), userId)
+        && isValidCreateTimestamps(incoming());
+      allow update: if isValidId(userId)
+        && isOwner(userId)
+        && isValidUserWorkspace(incoming(), userId)
+        && isValidUpdateTimestamps()
+        && (
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'name', 'email', 'avatarUrl', 'ageGroup', 'experience', 'skillLevel',
+            'role', 'battingHand', 'bowlingStyle', 'ballType', 'environment', 'goals',
+            'dailyMinutes', 'trainingDaysPerWeek', 'language', 'equipment', 'onboardingCompleted',
+            'updatedAt'
+          ]) ||
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'completedLessonIds', 'completedExerciseIds', 'savedExerciseIds', 'savedTutorialIds',
+            'bookmarkedTipIds', 'completedChallenges', 'exerciseNotes', 'quizHighScores',
+            'turfRules', 'updatedAt'
+          ]) ||
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'name', 'email', 'avatarUrl', 'ageGroup', 'experience', 'skillLevel',
+            'role', 'battingHand', 'bowlingStyle', 'ballType', 'environment', 'goals',
+            'dailyMinutes', 'trainingDaysPerWeek', 'language', 'equipment', 'onboardingCompleted',
+            'completedLessonIds', 'completedExerciseIds', 'savedExerciseIds', 'savedTutorialIds',
+            'bookmarkedTipIds', 'completedChallenges', 'exerciseNotes', 'quizHighScores',
+            'turfRules', 'updatedAt'
+          ])
+        );
+      allow delete: if isValidId(userId) && isOwner(userId) && existing().ownerId == request.auth.uid;
+
+      match /reports/{reportId} {
+        allow get: if isValidId(userId) && isValidId(reportId) && isOwner(userId) && (resource == null || resource.data.ownerId == request.auth.uid);
+        allow list: if isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(reportId)
+          && isOwner(userId)
+          && isValidVideoReport(incoming(), userId)
+          && isValidCreateTimestamps(incoming())
+          && hasParentWorkspace(userId);
+        allow update: if isValidId(userId) && isValidId(reportId)
+          && isOwner(userId)
+          && isValidVideoReport(incoming(), userId)
+          && isValidUpdateTimestamps()
+          && hasParentWorkspace(userId)
+          && incoming().diff(existing()).affectedKeys().hasOnly(['coachFeedback', 'title', 'playerNotes', 'updatedAt']);
+        allow delete: if isValidId(userId) && isValidId(reportId) && isOwner(userId) && existing().ownerId == request.auth.uid;
+      }
+
+      match /savedVideos/{videoId} {
+        allow get: if isValidId(userId) && isValidId(videoId) && isOwner(userId) && (resource == null || resource.data.ownerId == request.auth.uid);
+        allow list: if isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(videoId)
+          && isOwner(userId)
+          && isValidSavedVideo(incoming(), userId)
+          && isValidCreateTimestamps(incoming())
+          && hasParentWorkspace(userId);
+        allow update: if isValidId(userId) && isValidId(videoId)
+          && isOwner(userId)
+          && isValidSavedVideo(incoming(), userId)
+          && isValidUpdateTimestamps()
+          && hasParentWorkspace(userId)
+          && incoming().diff(existing()).affectedKeys().hasOnly(['title', 'reportId', 'updatedAt']);
+        allow delete: if isValidId(userId) && isValidId(videoId) && isOwner(userId) && existing().ownerId == request.auth.uid;
+      }
+
+      match /coachMessages/{messageId} {
+        allow get: if isValidId(userId) && isValidId(messageId) && isOwner(userId) && (resource == null || resource.data.ownerId == request.auth.uid);
+        allow list: if isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(messageId)
+          && isOwner(userId)
+          && isValidCoachMessage(incoming(), userId)
+          && isValidCreateTimestamps(incoming())
+          && hasParentWorkspace(userId);
+        allow update: if isValidId(userId) && isValidId(messageId)
+          && isOwner(userId)
+          && isValidCoachMessage(incoming(), userId)
+          && isValidUpdateTimestamps()
+          && hasParentWorkspace(userId)
+          && incoming().diff(existing()).affectedKeys().hasOnly(['saved', 'updatedAt']);
+        allow delete: if isValidId(userId) && isValidId(messageId) && isOwner(userId) && existing().ownerId == request.auth.uid;
+      }
+
+      match /trainingPlans/{planId} {
+        allow get: if isValidId(userId) && isValidId(planId) && isOwner(userId) && (resource == null || resource.data.ownerId == request.auth.uid);
+        allow list: if isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(planId)
+          && isOwner(userId)
+          && isValidTrainingPlan(incoming(), userId)
+          && isValidCreateTimestamps(incoming())
+          && hasParentWorkspace(userId);
+        allow update: if isValidId(userId) && isValidId(planId)
+          && isOwner(userId)
+          && isValidTrainingPlan(incoming(), userId)
+          && isValidUpdateTimestamps()
+          && hasParentWorkspace(userId)
+          && incoming().diff(existing()).affectedKeys().hasOnly(['isActive', 'dailyRoutine', 'weeklySchedule', 'updatedAt']);
+        allow delete: if isValidId(userId) && isValidId(planId) && isOwner(userId) && existing().ownerId == request.auth.uid;
+      }
+
+      match /trainingHistory/{entryId} {
+        allow get: if isValidId(userId) && isValidId(entryId) && isOwner(userId) && (resource == null || resource.data.ownerId == request.auth.uid);
+        allow list: if isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(entryId)
+          && isOwner(userId)
+          && isValidTrainingHistory(incoming(), userId)
+          && isValidCreateTimestamps(incoming())
+          && hasParentWorkspace(userId);
+        allow update: if isValidId(userId) && isValidId(entryId)
+          && isOwner(userId)
+          && isValidTrainingHistory(incoming(), userId)
+          && isValidUpdateTimestamps()
+          && hasParentWorkspace(userId)
+          && incoming().diff(existing()).affectedKeys().hasOnly(['notes', 'updatedAt']);
+        allow delete: if isValidId(userId) && isValidId(entryId) && isOwner(userId) && existing().ownerId == request.auth.uid;
+      }
+
+      match /matchAnalyses/{matchId} {
+        allow get: if isValidId(userId) && isValidId(matchId) && isOwner(userId) && (resource == null || resource.data.ownerId == request.auth.uid);
+        allow list: if isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(matchId)
+          && isOwner(userId)
+          && isValidMatchAnalysis(incoming(), userId)
+          && isValidCreateTimestamps(incoming())
+          && hasParentWorkspace(userId);
+        allow update: if isValidId(userId) && isValidId(matchId)
+          && isOwner(userId)
+          && isValidMatchAnalysis(incoming(), userId)
+          && isValidUpdateTimestamps()
+          && hasParentWorkspace(userId)
+          && incoming().diff(existing()).affectedKeys().hasOnly(['notes', 'analysis', 'battingRows', 'bowlingRows', 'updatedAt']);
+        allow delete: if isValidId(userId) && isValidId(matchId) && isOwner(userId) && existing().ownerId == request.auth.uid;
+      }
+
+      match /squadPlayers/{playerId} {
+        allow get: if isValidId(userId) && isValidId(playerId) && isOwner(userId) && (resource == null || resource.data.ownerId == request.auth.uid);
+        allow list: if isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(playerId)
+          && isOwner(userId)
+          && isValidSquadPlayer(incoming(), userId)
+          && isValidCreateTimestamps(incoming())
+          && hasParentWorkspace(userId);
+        allow update: if isValidId(userId) && isValidId(playerId)
+          && isOwner(userId)
+          && isValidSquadPlayer(incoming(), userId)
+          && isValidUpdateTimestamps()
+          && hasParentWorkspace(userId)
+          && incoming().diff(existing()).affectedKeys().hasOnly(['role', 'level', 'group', 'consentGranted', 'assignedLessonIds', 'assignedExerciseIds', 'notes', 'updatedAt']);
+        allow delete: if isValidId(userId) && isValidId(playerId) && isOwner(userId) && existing().ownerId == request.auth.uid;
+      }
+
+      match /playzoneSessions/{sessionId} {
+        allow get: if isValidId(userId) && isValidId(sessionId) && isOwner(userId) && (resource == null || resource.data.ownerId == request.auth.uid);
+        allow list: if isOwner(userId) && resource.data.ownerId == request.auth.uid;
+        allow create: if isValidId(userId) && isValidId(sessionId)
+          && isOwner(userId)
+          && isValidPlayZoneSession(incoming(), userId)
+          && isValidCreateTimestamps(incoming())
+          && hasParentWorkspace(userId);
+        allow update: if false;
+        allow delete: if isValidId(userId) && isValidId(sessionId) && isOwner(userId) && existing().ownerId == request.auth.uid;
+      }
+    }
+  }
+}
