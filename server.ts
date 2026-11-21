@@ -3,7 +3,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { createServer as createViteServer } from 'vite';
 import { GenerateContentParameters, GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
 import { getApp, getApps, initializeApp } from 'firebase-admin/app';
 import { DecodedIdToken, getAuth as getFirebaseAdminAuth } from 'firebase-admin/auth';
@@ -12,12 +11,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: '25mb' }));
 app.use('/mediapipe-wasm', express.static(path.resolve(__dirname, 'node_modules/@mediapipe/tasks-vision/wasm')));
 
-const DATA_DIR = path.resolve(__dirname, 'data');
+const DATA_DIR = process.env.VERCEL ? path.join('/tmp', 'crickify-data') : path.resolve(__dirname, 'data');
 const STORE_PATH = path.join(DATA_DIR, 'pitchiq-store.json');
 
 // Initialize Firebase Admin Auth solely with projectId for verifyIdToken (requires no IAM role)
@@ -102,15 +101,19 @@ const DEPRECATED_MODELS = new Set([
   'gemini-2.0-flash-thinking',
 ]);
 
-const DEFAULT_PRIMARY_MODEL = 'gemini-4-hydrogen';
-const DEFAULT_FALLBACK_MODEL = 'gemini-3.1-flash-lite';
+const DEFAULT_PRIMARY_MODEL = 'gemini-3.1-flash-lite';
+const DEFAULT_FALLBACK_MODEL = 'gemini-4-hydrogen';
 const PRIMARY_MAX_ATTEMPTS = 2;
-const FALLBACK_MAX_ATTEMPTS = 3;
+const FALLBACK_MAX_ATTEMPTS = 2;
 const BASE_BACKOFF_MS = 650;
 const TEXT_PRIMARY_TIMEOUT_MS = 10000;
-const TEXT_FALLBACK_TIMEOUT_MS = 16000;
+const TEXT_FALLBACK_TIMEOUT_MS = 22000;
 const MULTIMODAL_PRIMARY_TIMEOUT_MS = 18000;
-const MULTIMODAL_FALLBACK_TIMEOUT_MS = 26000;
+const MULTIMODAL_FALLBACK_TIMEOUT_MS = 30000;
+const TRANSIENT_COOLDOWN_MS = 5 * 60 * 1000;
+const HARD_UNAVAILABLE_COOLDOWN_MS = 15 * 60 * 1000;
+
+const modelCooldownUntil = new Map<string, number>();
 
 function getConfiguredModels(): string[] {
   const rawPrimary = process.env.GEMINI_PRIMARY_MODEL?.trim() || DEFAULT_PRIMARY_MODEL;
@@ -124,6 +127,34 @@ function getConfiguredModels(): string[] {
     (m) => m && !DEPRECATED_MODELS.has(m)
   );
   return Array.from(new Set(candidates.length > 0 ? candidates : [DEFAULT_PRIMARY_MODEL, DEFAULT_FALLBACK_MODEL]));
+}
+
+function getEffectiveModels(): string[] {
+  const configured = getConfiguredModels();
+  const now = Date.now();
+  const healthy: string[] = [];
+  const coolingDown: Array<{ model: string; until: number }> = [];
+
+  for (const model of configured) {
+    const until = modelCooldownUntil.get(model);
+    if (until && until > now) {
+      coolingDown.push({ model, until });
+    } else {
+      if (until) modelCooldownUntil.delete(model);
+      healthy.push(model);
+    }
+  }
+
+  coolingDown.sort((a, b) => a.until - b.until);
+  return [...healthy, ...coolingDown.map((entry) => entry.model)];
+}
+
+function markModelCooldown(model: string, code: GeminiErrorCode) {
+  const durationMs =
+    code === 'QUOTA_EXHAUSTED' || code === 'UNSUPPORTED_MODEL'
+      ? HARD_UNAVAILABLE_COOLDOWN_MS
+      : TRANSIENT_COOLDOWN_MS;
+  modelCooldownUntil.set(model, Date.now() + durationMs);
 }
 
 function getUserStorePath(uid: string) {
@@ -433,42 +464,57 @@ async function generateJsonWithGemini<T extends Record<string, unknown>>({
   fallbackTimeoutMs?: number;
 }): Promise<{ data: T; modelUsed: string }> {
   const ai = getGeminiClient();
-  const models = getConfiguredModels();
+  const models = getEffectiveModels();
   let lastError: GeminiClassifiedError | null = null;
 
   for (let mIdx = 0; mIdx < models.length; mIdx++) {
     const model = models[mIdx];
     const hasNextModel = mIdx < models.length - 1;
-    const attemptTimeoutMs = mIdx === 0 ? primaryTimeoutMs : fallbackTimeoutMs;
+    const attemptTimeoutMs = hasNextModel ? primaryTimeoutMs : fallbackTimeoutMs;
     const maxAttemptsForModel = mIdx === 0 && hasNextModel ? PRIMARY_MAX_ATTEMPTS : FALLBACK_MAX_ATTEMPTS;
 
     for (let attempt = 0; attempt < maxAttemptsForModel; attempt++) {
       const controller = new AbortController();
-      const timeoutHandle = setTimeout(() => controller.abort(), attemptTimeoutMs);
+      let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
       const startedAt = Date.now();
 
       try {
-        const response = await ai.models.generateContent({
-          model,
-          contents,
-          config: buildConfigForModel(model, config, controller.signal),
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          timeoutHandle = setTimeout(() => {
+            controller.abort();
+            reject(
+              new GeminiClassifiedError(
+                504,
+                'TIMEOUT_OR_NETWORK',
+                true,
+                'The AI coaching request timed out or encountered a temporary network issue. Please tap Retry.'
+              )
+            );
+          }, attemptTimeoutMs);
         });
-        clearTimeout(timeoutHandle);
 
+        const response = await Promise.race([
+          ai.models.generateContent({
+            model,
+            contents,
+            config: buildConfigForModel(model, config, controller.signal),
+          }),
+          timeoutPromise,
+        ]);
+
+        modelCooldownUntil.delete(model);
         const data = safeParseJsonResponse<T>(response.text, requiredKeys, nonEmptyStringKeys);
         console.log(`[Gemini] model=${model} succeeded in ${Date.now() - startedAt}ms`);
         return { data, modelUsed: model };
       } catch (err) {
-        clearTimeout(timeoutHandle);
         const elapsedMs = Date.now() - startedAt;
         const timedOut = controller.signal.aborted;
         const classified = classifyGeminiError(err);
         lastError = classified;
 
-        const safeSnippet = (err instanceof Error ? err.message : String(err)).replace(/AIza[0-9A-Za-z_-]+/g, '[REDACTED]').slice(0, 180);
-        console.warn(
-          `[Gemini] model=${model} attempt=${attempt + 1}/${maxAttemptsForModel} failed in ${elapsedMs}ms: code=${classified.code} status=${classified.status} timedOut=${timedOut} detail=${safeSnippet}`
-        );
+        const safeSnippet = (err instanceof Error ? err.message : String(err))
+          .replace(/AIza[0-9A-Za-z_-]+/g, '[REDACTED]')
+          .slice(0, 180);
 
         // Immediately fail on non-retryable auth/missing-key/bad-request errors
         if (
@@ -476,7 +522,39 @@ async function generateJsonWithGemini<T extends Record<string, unknown>>({
           classified.code === 'INVALID_API_KEY' ||
           classified.code === 'BAD_REQUEST'
         ) {
+          console.error(
+            `[Gemini] model=${model} non-retryable error in ${elapsedMs}ms: code=${classified.code} status=${classified.status} detail=${safeSnippet}`
+          );
           throw classified;
+        }
+
+        const hasMoreAttemptsOnModel = attempt < maxAttemptsForModel - 1;
+        const willSwitchImmediately =
+          classified.code === 'QUOTA_EXHAUSTED' ||
+          classified.code === 'UNSUPPORTED_MODEL' ||
+          (timedOut && hasNextModel);
+
+        if ((hasMoreAttemptsOnModel && !willSwitchImmediately) || hasNextModel) {
+          console.log(
+            `[Gemini] model=${model} attempt=${attempt + 1}/${maxAttemptsForModel} switching/retrying after ${elapsedMs}ms (code=${classified.code}, timedOut=${timedOut})`
+          );
+        } else {
+          console.error(
+            `[Gemini] model=${model} final attempt failed in ${elapsedMs}ms: code=${classified.code} status=${classified.status} timedOut=${timedOut} detail=${safeSnippet}`
+          );
+        }
+
+        // Cool down unhealthy models when another model is available so subsequent requests stay fast
+        if (
+          models.length > 1 &&
+          (timedOut ||
+            classified.code === 'TIMEOUT_OR_NETWORK' ||
+            classified.code === 'MODEL_UNAVAILABLE' ||
+            classified.code === 'RATE_LIMITED' ||
+            classified.code === 'QUOTA_EXHAUSTED' ||
+            classified.code === 'UNSUPPORTED_MODEL')
+        ) {
+          markModelCooldown(model, classified.code);
         }
 
         // If quota exhausted or model unsupported (404), move straight to fallback model
@@ -490,7 +568,6 @@ async function generateJsonWithGemini<T extends Record<string, unknown>>({
         }
 
         // Retry with bounded exponential backoff + jitter on transient errors (503, 429, 5xx, network)
-        const hasMoreAttemptsOnModel = attempt < maxAttemptsForModel - 1;
         if (classified.retryable && hasMoreAttemptsOnModel) {
           const jitter = Math.floor(Math.random() * 250);
           const delayMs = BASE_BACKOFF_MS * Math.pow(2, attempt) + jitter;
@@ -500,6 +577,10 @@ async function generateJsonWithGemini<T extends Record<string, unknown>>({
 
         // Otherwise break to switch to fallback model
         break;
+      } finally {
+        if (timeoutHandle) {
+          clearTimeout(timeoutHandle);
+        }
       }
     }
   }
@@ -521,6 +602,7 @@ app.get('/api/health', (_req, res) => {
     service: 'CRICKIFY API',
     authProvider: 'firebase',
     models: getConfiguredModels(),
+    activeOrder: getEffectiveModels(),
   });
 });
 
@@ -1244,6 +1326,7 @@ app.use('/api', (err: unknown, _req: Request, res: Response, _next: NextFunction
 
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -1262,4 +1345,9 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export { app };
+export default app;

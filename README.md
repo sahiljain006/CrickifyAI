@@ -202,54 +202,61 @@ Deployment| Vercel
 
 🚀 Getting Started
 
-Want to explore the project locally? Follow these steps.
+Want to run or deploy CRICKIFY locally or on Vercel? Follow these steps.
 
 Prerequisites
 
-- Node.js installed
+- Node.js 20+ (tested on Node v22)
 - npm package manager
-- Git
-- Google Gemini API key
-- Firebase project configuration
+- Google Gemini API key (`GEMINI_API_KEY`)
+- Firebase configuration (`firebase-applet-config.json`, included for the CRICKIFY Firebase project)
 
 1. Clone the repository
 
+```bash
 git clone YOUR_GITHUB_REPOSITORY_URL
 cd YOUR_PROJECT_FOLDER
+```
 
 2. Install dependencies
 
+```bash
 npm install
+```
 
 3. Configure environment variables
 
-Create a ".env.local" file in the project root.
+Create a `.env.local` file in the project root (based on `.env.example`):
 
-Refer to ".env.example" for the exact variable names and configure the required credentials.
+- `GEMINI_API_KEY` — Required for `/api/coach/chat`, `/api/analysis/video`, `/api/analysis/dismissal`, `/api/planner/generate`, `/api/turf/tactics`, and `/api/match/analyze`.
+- `GEMINI_PRIMARY_MODEL` / `GEMINI_FALLBACK_MODEL` — Optional model overrides.
+- `YOUTUBE_API_KEY` — Optional key for `/api/youtube/search`.
 
-Typical configuration includes:
+Security: Never commit `.env` or `.env.local` files or expose private API keys in client code.
 
-- Gemini API configuration.
-- Firebase project configuration.
-- Backend service configuration, if required.
+4. Start the local development server (Vite + Express API on port 3000)
 
-Security: Never upload API keys, passwords, or private credentials to a public repository.
-
-4. Start the development server
-
+```bash
 npm run dev
+```
 
-Open the local URL displayed in your terminal.
+Open `http://localhost:3000`.
 
-5. Build the application
+5. Build & verify
 
+```bash
+npm run lint
 npm run build
+```
 
-To preview the production build:
+6. Deploy to Vercel
 
-npm run preview
+CRICKIFY includes `vercel.json` and `api/index.ts` so both the Vite SPA (`dist/`) and Express `/api/*` endpoints deploy seamlessly on Vercel:
 
-For projects with a separate backend package, follow its own installation and startup instructions.
+1. Push the full repository (including `src/data/` and `firebase-applet-config.json`) to GitHub.
+2. Import the project in Vercel (Framework Preset: **Vite**, Build Command: `npm run build`, Output Directory: `dist`).
+3. Add `GEMINI_API_KEY` (and optional `YOUTUBE_API_KEY`) in **Vercel Project Settings -> Environment Variables**.
+4. Add your Vercel deployment domain (e.g., `crickify-ai.vercel.app`) to **Firebase Console -> Authentication -> Settings -> Authorized domains** so Google Sign-In works in production.
 
 ---
 
