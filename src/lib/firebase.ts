@@ -129,7 +129,21 @@ export function extractAuthUserSummary(user: User | null): AuthUserSummary | nul
   };
 }
 
-export async function signInWithGoogle(): Promise<{ user: AuthUserSummary | null; error: string | null }> {
+export interface GoogleSignInResult {
+  user: AuthUserSummary | null;
+  error: string | null;
+  errorCode?: string;
+  unauthorizedHostname?: string;
+}
+
+export function getCurrentBrowserHostname(): string {
+  if (typeof window === 'undefined' || !window.location?.hostname) {
+    return '';
+  }
+  return window.location.hostname;
+}
+
+export async function signInWithGoogle(): Promise<GoogleSignInResult> {
   if (!isFirebaseConfigured) {
     return {
       user: null,
@@ -145,23 +159,33 @@ export async function signInWithGoogle(): Promise<{ user: AuthUserSummary | null
   } catch (err) {
     const code = (err as { code?: string })?.code || '';
     if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
-      return { user: null, error: 'Google sign-in was cancelled. You can try again or continue as Guest.' };
+      return {
+        user: null,
+        errorCode: code,
+        error: 'Google sign-in was cancelled. You can try again or continue as Guest.',
+      };
     }
     if (code === 'auth/popup-blocked') {
       return {
         user: null,
+        errorCode: code,
         error: 'Your browser blocked the Google sign-in popup. Please allow popups for this site and retry.',
       };
     }
     if (code === 'auth/unauthorized-domain') {
+      const hostname = getCurrentBrowserHostname();
       return {
         user: null,
-        error:
-          'This domain is not yet authorized in Firebase Authentication > Settings > Authorized domains. Add this preview domain or continue as Guest.',
+        errorCode: code,
+        unauthorizedHostname: hostname || undefined,
+        error: hostname
+          ? `This preview domain (${hostname}) is not yet authorized in Firebase Authentication > Settings > Authorized domains. Add "${hostname}" manually in Firebase Console (${firebaseConfig.projectId}) or continue as Guest.`
+          : 'This domain is not yet authorized in Firebase Authentication > Settings > Authorized domains. Add this preview domain manually in Firebase Console or continue as Guest.',
       };
     }
     return {
       user: null,
+      errorCode: code || undefined,
       error: err instanceof Error ? err.message : 'Unable to complete Google sign-in.',
     };
   }

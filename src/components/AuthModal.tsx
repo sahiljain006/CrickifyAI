@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, CheckCircle2, Info, Loader2, ShieldCheck, X } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Check, Copy, Info, Loader2, X } from 'lucide-react';
 import { isFirebaseConfigured, signInWithGoogle } from '../lib/firebase';
 import { CRICKIFY_IMAGES } from '../utils/assets';
 
@@ -18,14 +18,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 }) => {
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [unauthorizedHostname, setUnauthorizedHostname] = useState<string | null>(null);
+  const [copiedDomain, setCopiedDomain] = useState(false);
 
   const handleGoogleLogin = async () => {
     setErrorMsg(null);
+    setUnauthorizedHostname(null);
+    setCopiedDomain(false);
     setLoadingGoogle(true);
     try {
-      const { user, error } = await signInWithGoogle();
+      const { user, error, errorCode, unauthorizedHostname: detectedHostname } = await signInWithGoogle();
       if (error) {
         setErrorMsg(error);
+        if (errorCode === 'auth/unauthorized-domain' && detectedHostname) {
+          setUnauthorizedHostname(detectedHostname);
+        }
       } else if (user) {
         onAuthSuccess();
       }
@@ -33,6 +40,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setErrorMsg('Unable to complete Google sign-in. Please try again or continue as Guest.');
     } finally {
       setLoadingGoogle(false);
+    }
+  };
+
+  const handleCopyHostname = async () => {
+    if (!unauthorizedHostname) return;
+    try {
+      await navigator.clipboard.writeText(unauthorizedHostname);
+      setCopiedDomain(true);
+      window.setTimeout(() => setCopiedDomain(false), 2000);
+    } catch {
+      setCopiedDomain(false);
     }
   };
 
@@ -145,33 +163,45 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </button>
           </div>
 
-          {errorMsg && (
-            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-800">
+          {unauthorizedHostname ? (
+            <div className="p-3.5 rounded-2xl bg-[#FFF7ED] border border-[#FF941F]/40 text-xs text-[#7C2D12] space-y-2.5">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="font-bold text-[#9A3412]">Preview Domain Not Authorized in Firebase</p>
+                  <p className="leading-relaxed">
+                    Add this current preview hostname to <strong>Firebase Authentication → Settings → Authorized domains</strong>, or choose <strong>Continue as Guest</strong> above.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-2 rounded-xl bg-white border border-[#FF941F]/30 px-2.5 py-2">
+                <code className="text-[11px] font-mono text-[#17251A] truncate select-all">
+                  {unauthorizedHostname}
+                </code>
+                <button
+                  type="button"
+                  onClick={handleCopyHostname}
+                  className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#EDF3E8] hover:bg-[#dfe9d6] text-[#24552E] text-[11px] font-bold transition-colors"
+                >
+                  {copiedDomain ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-[#397B32]" />
+                      <span>Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          ) : errorMsg ? (
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-800 leading-relaxed">
               {errorMsg}
             </div>
-          )}
-
-          {/* Account Benefits & Privacy Guarantee */}
-          <div className="rounded-2xl bg-[#F7FAF3] border border-[#397B32]/12 p-4 space-y-2.5">
-            <div className="flex items-center gap-2 text-xs font-bold text-[#24552E]">
-              <ShieldCheck className="w-4 h-4 text-[#397B32]" />
-              <span>Private Cloud Sync with Google Account</span>
-            </div>
-            <ul className="space-y-1.5 text-xs text-[#68766A]">
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#397B32] shrink-0" />
-                <span>Save video analysis reports &amp; AI Coach conversations</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#397B32] shrink-0" />
-                <span>Keep training schedules, Match IQ scorecards &amp; Turf rules</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#397B32] shrink-0" />
-                <span>Protected by owner-only Firebase security rules</span>
-              </li>
-            </ul>
-          </div>
+          ) : null}
         </div>
       </div>
     </div>
