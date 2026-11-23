@@ -808,7 +808,7 @@ export const PlayZoneView: React.FC<PlayZoneViewProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#B7F34A]">
               <Gamepad2 className="w-4 h-4" />
-              <span>CRICKIFY AI PlayZone · Batting Challenge</span>
+              <span>CRICKIFY AI PlayNets · Batting Challenge</span>
             </div>
             <button
               type="button"
@@ -1062,7 +1062,7 @@ export const PlayZoneView: React.FC<PlayZoneViewProps> = ({
               clearTimers();
               setScreenPhase('instructions');
             }}
-            aria-label="Back to PlayZone setup"
+            aria-label="Back to PlayNets setup"
             className="min-h-[38px] min-w-[38px] sm:min-h-[42px] px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold inline-flex items-center justify-center gap-1 shrink-0"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -1070,7 +1070,7 @@ export const PlayZoneView: React.FC<PlayZoneViewProps> = ({
           </button>
           <div className="min-w-0">
             <div className="font-display text-base sm:text-lg font-bold leading-none text-white truncate">
-              CRICKIFY AI PLAYZONE
+              CRICKIFY AI PLAYNETS
             </div>
             <div className="text-[10px] font-mono uppercase tracking-wider text-[#B7F34A] truncate">
               {mode} · {difficulty}
@@ -1173,7 +1173,7 @@ export const PlayZoneView: React.FC<PlayZoneViewProps> = ({
               preserveAspectRatio="xMidYMid meet"
               className="h-full w-auto max-w-full lg:w-full lg:max-w-[440px] lg:max-h-[430px]"
               role="img"
-              aria-label="PlayZone cricket stadium playing field"
+              aria-label="PlayNets cricket stadium playing field"
             >
               <defs>
                 <radialGradient id="pz-arena-turf" cx="50%" cy="48%" r="58%">
@@ -1569,7 +1569,7 @@ export const PlayZoneView: React.FC<PlayZoneViewProps> = ({
         <div className="fixed inset-0 z-50 bg-[#0A1610]/70 backdrop-blur-xs p-4 flex items-center justify-center">
           <div className="w-full max-w-md bg-gradient-to-b from-[#E1F4E5] to-[#D1ECD7] rounded-3xl border border-[#B7F34A]/45 p-6 space-y-4 shadow-2xl text-[#102419]">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-2xl font-bold">How to Play PlayZone</h2>
+              <h2 className="font-display text-2xl font-bold">How to Play PlayNets</h2>
               <button
                 type="button"
                 onClick={() => setHelpOpen(false)}

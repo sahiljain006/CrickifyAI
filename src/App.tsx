@@ -189,10 +189,10 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    group: 'PLAYZONE',
+    group: 'PLAYNETS',
     icon: Gamepad2,
     items: [
-      { id: 'playzone-batting', label: 'PlayZone Batting Challenge' },
+      { id: 'playzone-batting', label: 'PlayNets Batting Challenge' },
     ],
   },
 ];
@@ -937,7 +937,7 @@ export default function App() {
               { id: 'home-landing', label: 'Home', active: activeSection === 'home-landing' },
               { id: 'dashboard', label: 'Dashboard', active: activeSection === 'dashboard' || activeSection === 'journey' || activeSection === 'daily-tips' },
               { id: 'academy-batting', label: 'Academy', active: isAcademyFamily },
-              { id: 'playzone-batting', label: 'PlayZone', active: activeSection === 'playzone-batting' },
+              { id: 'playzone-batting', label: 'PlayNets', active: activeSection === 'playzone-batting' },
               { id: 'coach-chat', label: 'AI Coach', active: isCoachFamily },
               { id: 'practice-upload', label: 'Video Analysis', active: isAnalyseFamily },
               { id: 'training-planner', label: 'Training', active: isTrainingFamily },
@@ -1149,7 +1149,7 @@ export default function App() {
               {
                 heading: 'EXPLORE',
                 items: [
-                  { id: 'playzone-batting' as NavSectionId, label: 'PlayZone' },
+                  { id: 'playzone-batting' as NavSectionId, label: 'PlayNets' },
                   { id: 'turf-academy' as NavSectionId, label: 'Turf IQ' },
                   { id: 'match-scorecard' as NavSectionId, label: 'Match IQ' },
                 ],

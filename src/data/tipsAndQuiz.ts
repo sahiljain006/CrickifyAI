@@ -326,10 +326,10 @@ export const PITCHIQ_CHALLENGES = [
   },
   {
     id: 'chal-playzone-60',
-    title: 'PlayZone Timing Streak',
-    description: 'Complete a Batting Challenge in CRICKIFY PlayZone with 60%+ timing accuracy.',
+    title: 'PlayNets Timing Streak',
+    description: 'Complete a Batting Challenge in CRICKIFY PlayNets with 60%+ timing accuracy.',
     targetCount: 1,
-    category: 'PlayZone',
+    category: 'PlayNets',
   },
 ];
 

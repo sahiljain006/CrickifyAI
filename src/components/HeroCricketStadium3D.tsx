@@ -740,6 +740,177 @@ export const HeroCricketStadium3D: React.FC<HeroCricketStadium3DProps> = ({
     frontArm.elbow.add(batGroup);
     scene.add(batsmanRoot);
 
+    // 5b. Articulated 3D Bowler at Bowler's End (Runs up, bowls over the wicket, follows through)
+    const bowlerJerseyMat = trackMat(
+      new THREE.MeshStandardMaterial({ color: 0x183454, roughness: 0.54, metalness: 0.08 })
+    );
+    const bowlerTrouserMat = trackMat(
+      new THREE.MeshStandardMaterial({ color: 0x112238, roughness: 0.64, metalness: 0.05 })
+    );
+    const bowlerAccentMat = trackMat(
+      new THREE.MeshStandardMaterial({
+        color: 0xff941f,
+        emissive: 0x5c2c00,
+        emissiveIntensity: 0.35,
+        roughness: 0.42,
+      })
+    );
+    const bowlerHairMat = trackMat(
+      new THREE.MeshStandardMaterial({ color: 0x1b1714, roughness: 0.78 })
+    );
+
+    const bowlerRoot = new THREE.Group();
+    bowlerRoot.position.set(0.56, 0.015, -14.2);
+
+    const bowlerPelvis = new THREE.Group();
+    bowlerPelvis.position.y = 0.94;
+    bowlerRoot.add(bowlerPelvis);
+
+    const bowlerPelvisMesh = new THREE.Mesh(
+      trackGeo(new THREE.CylinderGeometry(0.158, 0.148, 0.18, 12)),
+      bowlerTrouserMat
+    );
+    bowlerPelvisMesh.castShadow = renderer.shadowMap.enabled;
+    bowlerPelvis.add(bowlerPelvisMesh);
+
+    const buildBowlerLeg = (sideX: -1 | 1) => {
+      const hip = new THREE.Group();
+      hip.position.set(sideX * 0.105, -0.04, 0);
+
+      const thigh = new THREE.Mesh(
+        trackGeo(new THREE.CylinderGeometry(0.082, 0.068, 0.42, 10)),
+        bowlerTrouserMat
+      );
+      thigh.position.y = -0.21;
+      thigh.castShadow = renderer.shadowMap.enabled;
+      hip.add(thigh);
+
+      const knee = new THREE.Group();
+      knee.position.y = -0.43;
+      hip.add(knee);
+
+      const shin = new THREE.Mesh(
+        trackGeo(new THREE.CylinderGeometry(0.066, 0.05, 0.43, 10)),
+        bowlerTrouserMat
+      );
+      shin.position.y = -0.21;
+      shin.castShadow = renderer.shadowMap.enabled;
+      knee.add(shin);
+
+      const bowlerShoe = new THREE.Mesh(
+        trackGeo(new THREE.BoxGeometry(0.105, 0.08, 0.21)),
+        padMat
+      );
+      bowlerShoe.position.set(0, -0.445, 0.03);
+      bowlerShoe.castShadow = renderer.shadowMap.enabled;
+      knee.add(bowlerShoe);
+
+      return { hip, knee };
+    };
+
+    // Facing +Z: local -X is bowler's right side, +X is bowler's left side
+    const bowlerRightLeg = buildBowlerLeg(-1);
+    const bowlerLeftLeg = buildBowlerLeg(1);
+    bowlerPelvis.add(bowlerRightLeg.hip, bowlerLeftLeg.hip);
+
+    const bowlerTorso = new THREE.Group();
+    bowlerTorso.position.y = 0.09;
+    bowlerPelvis.add(bowlerTorso);
+
+    const bowlerChest = new THREE.Mesh(
+      trackGeo(new THREE.CylinderGeometry(0.198, 0.158, 0.5, 14)),
+      bowlerJerseyMat
+    );
+    bowlerChest.position.y = 0.25;
+    bowlerChest.castShadow = renderer.shadowMap.enabled;
+    bowlerTorso.add(bowlerChest);
+
+    const bowlerChestStripe = new THREE.Mesh(
+      trackGeo(new THREE.BoxGeometry(0.31, 0.04, 0.27)),
+      bowlerAccentMat
+    );
+    bowlerChestStripe.position.set(0, 0.37, 0);
+    bowlerTorso.add(bowlerChestStripe);
+
+    const bowlerHead = new THREE.Group();
+    bowlerHead.position.y = 0.54;
+    bowlerTorso.add(bowlerHead);
+
+    const bowlerNeck = new THREE.Mesh(
+      trackGeo(new THREE.CylinderGeometry(0.056, 0.062, 0.11, 10)),
+      skinMat
+    );
+    bowlerNeck.position.y = 0.04;
+    bowlerHead.add(bowlerNeck);
+
+    const bowlerSkull = new THREE.Mesh(
+      trackGeo(new THREE.SphereGeometry(0.11, 16, 16)),
+      skinMat
+    );
+    bowlerSkull.position.y = 0.16;
+    bowlerSkull.castShadow = renderer.shadowMap.enabled;
+    bowlerHead.add(bowlerSkull);
+
+    const bowlerHair = new THREE.Mesh(
+      trackGeo(new THREE.SphereGeometry(0.116, 14, 12, 0, Math.PI * 2, 0, Math.PI * 0.55)),
+      bowlerHairMat
+    );
+    bowlerHair.position.set(0, 0.172, -0.01);
+    bowlerHead.add(bowlerHair);
+
+    const bowlerHeadband = new THREE.Mesh(
+      trackGeo(new THREE.CylinderGeometry(0.115, 0.115, 0.026, 16, 1, true)),
+      bowlerAccentMat
+    );
+    bowlerHeadband.position.set(0, 0.19, 0);
+    bowlerHead.add(bowlerHeadband);
+
+    const buildBowlerArm = (sideX: -1 | 1) => {
+      const shoulder = new THREE.Group();
+      shoulder.position.set(sideX * 0.22, 0.45, 0);
+
+      const upperArm = new THREE.Mesh(
+        trackGeo(new THREE.CylinderGeometry(0.052, 0.044, 0.28, 10)),
+        bowlerJerseyMat
+      );
+      upperArm.position.y = -0.14;
+      upperArm.castShadow = renderer.shadowMap.enabled;
+      shoulder.add(upperArm);
+
+      const elbow = new THREE.Group();
+      elbow.position.y = -0.28;
+      shoulder.add(elbow);
+
+      const forearm = new THREE.Mesh(
+        trackGeo(new THREE.CylinderGeometry(0.043, 0.036, 0.26, 10)),
+        skinMat
+      );
+      forearm.position.y = -0.13;
+      elbow.add(forearm);
+
+      const wristBand = new THREE.Mesh(
+        trackGeo(new THREE.CylinderGeometry(0.042, 0.042, 0.045, 10)),
+        bowlerAccentMat
+      );
+      wristBand.position.y = -0.22;
+      elbow.add(wristBand);
+
+      const hand = new THREE.Mesh(
+        trackGeo(new THREE.SphereGeometry(0.042, 10, 10)),
+        skinMat
+      );
+      hand.position.y = -0.265;
+      elbow.add(hand);
+
+      return { shoulder, elbow };
+    };
+
+    const bowlerRightArm = buildBowlerArm(-1);
+    const bowlerLeftArm = buildBowlerArm(1);
+    bowlerTorso.add(bowlerRightArm.shoulder, bowlerLeftArm.shoulder);
+
+    scene.add(bowlerRoot);
+
     // 6. Red Stitched Cricket Ball + Sweet-Spot Impact Burst
     const ballGroup = new THREE.Group();
     const ballMesh = new THREE.Mesh(
@@ -871,6 +1042,114 @@ export const HeroCricketStadium3D: React.FC<HeroCricketStadium3DProps> = ({
         impactRingMat.opacity = 0;
       }
 
+      // Bowler animation synchronized to ball release at phaseSeconds = 0.13
+      const releaseTime = 0.13;
+      const runStart = 4.25;
+      const runDuration = LOOP_DURATION - runStart + releaseTime; // 1.28s
+
+      if (phaseSeconds >= runStart || phaseSeconds <= releaseTime) {
+        const elapsedRun = phaseSeconds >= runStart ? phaseSeconds - runStart : LOOP_DURATION - runStart + phaseSeconds;
+        const p = Math.max(0, Math.min(1, elapsedRun / runDuration));
+        const gather = smoothstep(0.68, 1.0, p);
+        const strideWave = Math.sin(p * Math.PI * 3.5) * (1 - gather * 0.45);
+
+        bowlerRoot.position.z = THREE.MathUtils.lerp(-14.2, -9.35, easeInOutQuad(p));
+        bowlerRoot.position.x = THREE.MathUtils.lerp(0.56, 0.41, p);
+        bowlerRoot.rotation.y = gather * -0.18;
+
+        bowlerPelvis.position.y = 0.94 - gather * 0.08 + Math.abs(strideWave) * 0.03;
+        bowlerTorso.rotation.x = 0.14 + gather * 0.1;
+        bowlerTorso.rotation.y = gather * -0.25;
+        bowlerHead.rotation.y = gather * 0.2;
+
+        bowlerRightLeg.hip.rotation.x = strideWave * 0.55 - gather * 0.38;
+        bowlerRightLeg.knee.rotation.x = -Math.max(0, -strideWave) * 0.55 - gather * 0.25;
+        bowlerLeftLeg.hip.rotation.x = -strideWave * 0.55 + gather * 0.52;
+        bowlerLeftLeg.knee.rotation.x = -Math.max(0, strideWave) * 0.55 - gather * 0.18;
+
+        // Bowling right arm sweeps back and overhead to -PI right at releaseTime
+        const armWind = smoothstep(0.55, 1.0, p);
+        bowlerRightArm.shoulder.rotation.x = THREE.MathUtils.lerp(strideWave * 0.55, -Math.PI, armWind);
+        bowlerRightArm.shoulder.rotation.z = -0.1 - armWind * 0.08;
+        bowlerRightArm.elbow.rotation.x = 0.25 * (1 - armWind);
+
+        bowlerLeftArm.shoulder.rotation.x = THREE.MathUtils.lerp(-strideWave * 0.55, -1.05, armWind);
+        bowlerLeftArm.elbow.rotation.x = 0.42;
+      } else if (phaseSeconds <= 1.25) {
+        const p = (phaseSeconds - releaseTime) / (1.25 - releaseTime);
+        const settle = smoothstep(0.5, 1.0, p);
+        const followSwing = easeOutCubic(Math.min(1, p / 0.58));
+
+        bowlerRoot.position.z = THREE.MathUtils.lerp(-9.35, -7.55, easeOutCubic(p));
+        bowlerRoot.position.x = THREE.MathUtils.lerp(0.41, 0.65, easeOutCubic(p));
+        bowlerRoot.rotation.y = THREE.MathUtils.lerp(-0.18, 0.08, settle);
+
+        bowlerPelvis.position.y = 0.94 - (1 - settle) * 0.08;
+        bowlerTorso.rotation.x = THREE.MathUtils.lerp(0.24, 0.08, settle);
+        bowlerTorso.rotation.y = THREE.MathUtils.lerp(-0.25, 0.22, followSwing) * (1 - settle * 0.6);
+        bowlerHead.rotation.y = THREE.MathUtils.lerp(0.2, -0.1, settle);
+
+        const stepWave = Math.sin(p * Math.PI * 2) * (1 - settle);
+        bowlerRightLeg.hip.rotation.x = stepWave * 0.45;
+        bowlerRightLeg.knee.rotation.x = -Math.abs(stepWave) * 0.35;
+        bowlerLeftLeg.hip.rotation.x = -stepWave * 0.45;
+        bowlerLeftLeg.knee.rotation.x = -Math.abs(stepWave) * 0.25;
+
+        const whipArm = THREE.MathUtils.lerp(-Math.PI, -Math.PI * 1.85, followSwing);
+        bowlerRightArm.shoulder.rotation.x = THREE.MathUtils.lerp(whipArm, -0.15, settle);
+        bowlerRightArm.shoulder.rotation.z = THREE.MathUtils.lerp(-0.18, -0.1, settle);
+        bowlerRightArm.elbow.rotation.x = settle * 0.35;
+
+        bowlerLeftArm.shoulder.rotation.x = THREE.MathUtils.lerp(-1.05, 0.22, settle);
+        bowlerLeftArm.elbow.rotation.x = 0.42;
+      } else if (phaseSeconds <= 2.75) {
+        const watchTurn = smoothstep(2.1, 2.55, phaseSeconds) * (1 - smoothstep(2.55, 2.75, phaseSeconds));
+        bowlerRoot.position.z = -7.55;
+        bowlerRoot.position.x = 0.65;
+        bowlerRoot.rotation.y = 0.08 * (1 - smoothstep(2.45, 2.75, phaseSeconds));
+
+        bowlerPelvis.position.y = 0.94;
+        bowlerTorso.rotation.x = 0.08 * (1 - smoothstep(2.45, 2.75, phaseSeconds));
+        bowlerTorso.rotation.y = 0.088 - watchTurn * 0.32;
+        bowlerHead.rotation.y = -0.1 - watchTurn * 0.35;
+
+        bowlerRightLeg.hip.rotation.x = 0;
+        bowlerRightLeg.knee.rotation.x = 0;
+        bowlerLeftLeg.hip.rotation.x = 0;
+        bowlerLeftLeg.knee.rotation.x = 0;
+
+        bowlerRightArm.shoulder.rotation.x = -0.15 * (1 - smoothstep(2.45, 2.75, phaseSeconds));
+        bowlerRightArm.shoulder.rotation.z = -0.1;
+        bowlerRightArm.elbow.rotation.x = 0.35;
+        bowlerLeftArm.shoulder.rotation.x = 0.22 * (1 - smoothstep(2.45, 2.75, phaseSeconds));
+        bowlerLeftArm.elbow.rotation.x = 0.42;
+      } else {
+        const p = (phaseSeconds - 2.75) / (runStart - 2.75);
+        const env = Math.sin(p * Math.PI);
+        const turnBack = smoothstep(0.0, 0.22, p) * (1 - smoothstep(0.78, 1.0, p));
+        const jogStride = Math.sin(p * Math.PI * 4.0) * env;
+
+        bowlerRoot.position.z = THREE.MathUtils.lerp(-7.55, -14.2, easeInOutQuad(p));
+        bowlerRoot.position.x = THREE.MathUtils.lerp(0.65, 0.56, p);
+        bowlerRoot.rotation.y = turnBack * Math.PI;
+
+        bowlerPelvis.position.y = 0.94 + Math.abs(jogStride) * 0.025;
+        bowlerTorso.rotation.x = 0.1 * env + (1 - env) * (p > 0.5 ? 0.14 : 0);
+        bowlerTorso.rotation.y = (1 - p) * 0.088 * (1 - turnBack);
+        bowlerHead.rotation.y = -0.1 * (1 - turnBack) * (1 - p);
+
+        bowlerRightLeg.hip.rotation.x = jogStride * 0.42;
+        bowlerRightLeg.knee.rotation.x = -Math.max(0, -jogStride) * 0.42;
+        bowlerLeftLeg.hip.rotation.x = -jogStride * 0.42;
+        bowlerLeftLeg.knee.rotation.x = -Math.max(0, jogStride) * 0.42;
+
+        bowlerRightArm.shoulder.rotation.x = -jogStride * 0.42;
+        bowlerRightArm.shoulder.rotation.z = -0.1;
+        bowlerRightArm.elbow.rotation.x = 0.32;
+        bowlerLeftArm.shoulder.rotation.x = jogStride * 0.42;
+        bowlerLeftArm.elbow.rotation.x = 0.38;
+      }
+
       const swoop = prefersReducedMotion ? 1 : easeOutCubic(Math.min(1, totalSeconds / 2.2));
       const compact = compactRef.current;
 
@@ -887,7 +1166,7 @@ export const HeroCricketStadium3D: React.FC<HeroCricketStadium3DProps> = ({
           THREE.MathUtils.lerp(5.8, 2.55, swoop) - pointerSmooth.y * 0.24,
           THREE.MathUtils.lerp(19.2, 13.4, swoop)
         );
-        camLookTarget.set(-1.35, 1.15, 5.4);
+        camLookTarget.set(-1.85, 1.12, 5.8);
       }
 
       camera.position.copy(camTargetPos);

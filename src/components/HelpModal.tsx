@@ -31,10 +31,10 @@ export const HelpModal: React.FC<HelpModalProps> = ({ onClose, onNavigate }) => 
       target: 'practice-upload' as NavSectionId,
     },
     {
-      title: '4. PlayZone Batting Challenge Controls',
+      title: '4. PlayNets Batting Challenge Controls',
       icon: Gamepad2,
       body: 'Choose 6-Ball or 12-Ball mode and difficulty (Beginner, Intermediate, Pro). Watch the ball approach the glowing crease ring, pick a shot direction (or swipe/tap PLAY SHOT / Spacebar) at peak timing to smash Fours and Sixes.',
-      actionLabel: 'Launch PlayZone',
+      actionLabel: 'Launch PlayNets',
       target: 'playzone-batting' as NavSectionId,
     },
   ];

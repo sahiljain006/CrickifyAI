@@ -71,7 +71,7 @@ const SMART_ENTRY_PATHS: Array<{
     icon: Camera,
   },
   {
-    title: 'Enter PlayZone',
+    title: 'Enter PlayNets',
     desc: 'Step up to the crease and smash boundaries in timing mode.',
     cta: 'Play Now',
     target: 'playzone-batting',
@@ -168,7 +168,7 @@ export const LandingHomeView: React.FC<LandingHomeViewProps> = ({
       {isGuest && onOpenAuth && (
         <section className="athletic-card rounded-2xl px-4 py-3.5 sm:px-6 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <p className="text-xs sm:text-sm font-semibold text-[#183827]">
-            Sign in with Google to save your lessons, video feedback, and PlayZone scores across devices.
+            Sign in with Google to save your lessons, video feedback, and PlayNets scores across devices.
           </p>
           <button
             type="button"
@@ -474,7 +474,7 @@ export const LandingHomeView: React.FC<LandingHomeViewProps> = ({
                 TRACK EVERY MILESTONE
               </h2>
               <p className="text-sm text-[#395543]">
-                Every lesson, drill, video report, and PlayZone match updates your live progress.
+                Every lesson, drill, video report, and PlayNets match updates your live progress.
               </p>
             </div>
             <button
@@ -527,7 +527,7 @@ export const LandingHomeView: React.FC<LandingHomeViewProps> = ({
               <div className="font-mono text-2xl font-bold text-[#0F766E] tabular-nums">
                 {(state.playzoneSessions || []).length}
               </div>
-              <div className="text-[11px] text-[#17415A] font-bold">PlayZone</div>
+              <div className="text-[11px] text-[#17415A] font-bold">PlayNets</div>
               <div className="h-1.5 rounded-full bg-[#CDEAE2] overflow-hidden">
                 <div
                   className="h-full rounded-full bg-[#0D9488] transition-all duration-700 ease-out"
@@ -808,7 +808,7 @@ export const LandingHomeView: React.FC<LandingHomeViewProps> = ({
               Cricket Rules
             </button>
             <button type="button" onClick={() => onNavigate('playzone-batting')} className="hover:text-[#087F55] font-semibold transition-colors">
-              PlayZone
+              PlayNets
             </button>
             <button type="button" onClick={() => onNavigate('fitness-recovery')} className="hover:text-[#087F55] font-semibold transition-colors">
               Safety &amp; Recovery
