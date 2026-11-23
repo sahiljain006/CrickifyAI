@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { motion } from 'motion/react';
 import {
   ArrowRight,
+  ArrowUpRight,
   BarChart3,
   BookOpen,
   Bot,
@@ -774,43 +775,51 @@ export const LandingHomeView: React.FC<LandingHomeViewProps> = ({
       </section>
 
       {/* 10. High-Contrast CRICKIFY AI Footer */}
-      <footer className="border-t border-[#087F55]/18 pt-6 flex flex-col lg:flex-row items-center justify-between gap-4 text-xs text-[#3E5847]">
-        <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2.5 text-center sm:text-left">
-          <div className="flex flex-wrap items-baseline justify-center sm:justify-start gap-x-2">
-            <span className="font-display text-base font-bold text-[#102419]">
-              CRICKIFY <span className="text-[#087F55]">AI</span>
+      <footer className="border-t border-[#087F55]/20 pt-6 flex flex-col gap-5 text-xs text-[#3E5847]">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
+            <div className="flex flex-wrap items-baseline justify-center sm:justify-start gap-x-2">
+              <span className="font-display text-lg font-extrabold tracking-wide text-[#102419]">
+                CRICKIFY <span className="text-[#087F55]">AI</span>
+              </span>
+              <span className="font-semibold tracking-wider text-[11px] sm:text-xs text-[#2E4B3A] uppercase">
+                OWN THE CREASE. MASTER THE GAME.
+              </span>
+            </div>
+
+            <span className="hidden sm:inline text-[#087F55]/45" aria-hidden="true">·</span>
+
+            <span className="font-display text-xs sm:text-[13px] font-bold tracking-[0.12em] uppercase text-[#2E4B3A]">
+              AN INITIATIVE BY{' '}
+              <a
+                href="https://www.linkedin.com/in/sahiljain0006/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-0.5 font-extrabold text-[#087F55] hover:text-[#102419] underline decoration-[#087F55]/60 underline-offset-4 hover:decoration-[#102419] transition-colors"
+              >
+                <span>SAHIL JAIN</span>
+                <ArrowUpRight className="w-3.5 h-3.5 text-[#FF941F] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0" />
+              </a>
             </span>
-            <span className="font-medium tracking-wide">OWN THE CREASE. MASTER THE GAME.</span>
           </div>
-          <span className="hidden sm:inline text-[#087F55]/45" aria-hidden="true">·</span>
-          <span className="text-[11px] sm:text-xs text-[#3E5847]">
-            An initiative by{' '}
-            <a
-              href="https://www.linkedin.com/in/sahiljain0006/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold text-[#103B2A] underline decoration-[#087F55]/50 underline-offset-2 hover:text-[#087F55] hover:decoration-[#087F55] transition-colors"
-            >
-              Sahil Jain
-            </a>
-          </span>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          <button type="button" onClick={() => onNavigate('academy-rules')} className="hover:text-[#087F55] font-semibold transition-colors">
-            Cricket Rules
-          </button>
-          <button type="button" onClick={() => onNavigate('playzone-batting')} className="hover:text-[#087F55] font-semibold transition-colors">
-            PlayZone
-          </button>
-          <button type="button" onClick={() => onNavigate('fitness-recovery')} className="hover:text-[#087F55] font-semibold transition-colors">
-            Safety &amp; Recovery
-          </button>
-          <button type="button" onClick={() => onNavigate('coach-academy-mode')} className="hover:text-[#087F55] font-semibold transition-colors">
-            Coach Mode
-          </button>
-          <button type="button" onClick={() => onNavigate('dev-profile')} className="hover:text-[#087F55] font-semibold transition-colors">
-            Profile Settings
-          </button>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+            <button type="button" onClick={() => onNavigate('academy-rules')} className="hover:text-[#087F55] font-semibold transition-colors">
+              Cricket Rules
+            </button>
+            <button type="button" onClick={() => onNavigate('playzone-batting')} className="hover:text-[#087F55] font-semibold transition-colors">
+              PlayZone
+            </button>
+            <button type="button" onClick={() => onNavigate('fitness-recovery')} className="hover:text-[#087F55] font-semibold transition-colors">
+              Safety &amp; Recovery
+            </button>
+            <button type="button" onClick={() => onNavigate('coach-academy-mode')} className="hover:text-[#087F55] font-semibold transition-colors">
+              Coach Mode
+            </button>
+            <button type="button" onClick={() => onNavigate('dev-profile')} className="hover:text-[#087F55] font-semibold transition-colors">
+              Profile Settings
+            </button>
+          </div>
         </div>
       </footer>
     </div>
