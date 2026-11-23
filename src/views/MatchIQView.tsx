@@ -228,9 +228,10 @@ export const MatchIQView: React.FC<MatchIQViewProps> = ({
       {/* Broadcast Match-Centre Scoreboard Header */}
       <div className="relative rounded-3xl overflow-hidden scoreboard-dark-panel text-white p-7 md:p-10 shadow-xl">
         <img
-          src={CRICKIFY_IMAGES.cricketPitch}
-          alt="Cricket pitch match analytics"
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          src={CRICKIFY_IMAGES.matchPlayerScoreboard}
+          alt="Cricket player stats card and live match scoreboard analytics"
+          referrerPolicy="no-referrer"
+          className="absolute inset-0 w-full h-full object-cover opacity-30"
         />
         <div
           className="absolute inset-0"
@@ -637,7 +638,7 @@ export const MatchIQView: React.FC<MatchIQViewProps> = ({
                   key={ph}
                   onClick={() => setFieldPhase(ph)}
                   className={`min-h-[36px] px-3 py-1 rounded-lg text-xs font-bold capitalize transition-colors ${
-                    fieldPhase === ph ? 'bg-white text-[#24552E]' : 'text-white/90 hover:text-white'
+                    fieldPhase === ph ? 'bg-[#B7F34A] text-[#071A11]' : 'text-white/90 hover:text-white'
                   }`}
                 >
                   {ph}

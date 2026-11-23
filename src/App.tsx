@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import {
   Activity,
+  ArrowLeft,
   BarChart3,
   BookOpen,
   Camera,
@@ -71,6 +73,7 @@ import {
   toggleCoachMessageSavedInFirestore,
 } from './lib/firestoreRepo';
 import { CRICKIFY_IMAGES } from './utils/assets';
+import { CricketBackdropAtmosphere } from './components/CricketBackdropAtmosphere';
 
 const STORAGE_KEY = 'crickify_state_v1';
 const LEGACY_STORAGE_KEY = 'pitchiq_state_v1';
@@ -86,7 +89,7 @@ const NAV_GROUPS: NavGroup[] = [
     group: 'HOME',
     icon: Home,
     items: [
-      { id: 'home-landing', label: 'CRICKIFY Home' },
+      { id: 'home-landing', label: 'CRICKIFY AI Home' },
       { id: 'dashboard', label: 'Dashboard' },
       { id: 'journey', label: 'My Cricket Journey' },
       { id: 'daily-tips', label: 'Daily Cricket Tip' },
@@ -194,6 +197,16 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
+const SECTION_LABELS: Record<NavSectionId, string> = NAV_GROUPS.reduce(
+  (acc, grp) => {
+    for (const item of grp.items) {
+      acc[item.id] = item.id === 'home-landing' ? 'Home' : item.label;
+    }
+    return acc;
+  },
+  {} as Record<NavSectionId, string>
+);
+
 export default function App() {
   const [state, setState] = useState<PitchIQState>(() => {
     try {
@@ -206,6 +219,8 @@ export default function App() {
   });
 
   const [activeSection, setActiveSection] = useState<NavSectionId>('home-landing');
+  const [navHistory, setNavHistory] = useState<NavSectionId[]>(['home-landing']);
+  const navHistoryRef = useRef<NavSectionId[]>(['home-landing']);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [desktopMoreOpen, setDesktopMoreOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
@@ -220,6 +235,57 @@ export default function App() {
   const [authPromptMessage, setAuthPromptMessage] = useState<string | null>(null);
   const [guestSaveBannerVisible, setGuestSaveBannerVisible] = useState(false);
   const [playZoneActiveGameplay, setPlayZoneActiveGameplay] = useState(false);
+
+  // Sync browser/phone hardware Back gesture & swipe-back with recent website sections
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!window.history.state || typeof window.history.state.crickifySection !== 'string') {
+      window.history.replaceState({ crickifySection: 'home-landing', crickifyIdx: 0 }, '');
+    }
+
+    const handlePopState = (event: PopStateEvent) => {
+      setDesktopMoreOpen(false);
+      setAccountMenuOpen(false);
+      setMobileMenuOpen(false);
+      setActiveLessonId(null);
+      setActiveExerciseId(null);
+      setOnboardingOpen(false);
+      setHelpOpen(false);
+      setAuthModalOpen(false);
+
+      const stateSec = event.state?.crickifySection as NavSectionId | undefined;
+      const stateIdx = typeof event.state?.crickifyIdx === 'number' ? event.state.crickifyIdx : undefined;
+
+      let targetSec: NavSectionId = 'home-landing';
+      let nextStack: NavSectionId[] = ['home-landing'];
+
+      if (stateSec && stateSec in SECTION_LABELS) {
+        targetSec = stateSec;
+        const curr = navHistoryRef.current;
+        if (typeof stateIdx === 'number' && stateIdx >= 0 && stateIdx < curr.length) {
+          nextStack = curr.slice(0, stateIdx + 1);
+          nextStack[nextStack.length - 1] = targetSec;
+        } else {
+          const prevPopped = curr.length > 1 ? curr.slice(0, -1) : ['home-landing' as NavSectionId];
+          nextStack = prevPopped[prevPopped.length - 1] === targetSec ? prevPopped : [...prevPopped, targetSec];
+        }
+      } else if (navHistoryRef.current.length > 1) {
+        nextStack = navHistoryRef.current.slice(0, -1);
+        targetSec = nextStack[nextStack.length - 1] || 'home-landing';
+      }
+
+      navHistoryRef.current = nextStack;
+      setNavHistory(nextStack);
+      if (targetSec !== 'playzone-batting') {
+        setPlayZoneActiveGameplay(false);
+      }
+      setActiveSection(targetSec);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Verify Firestore connectivity on boot & sync Firebase Auth session (persisted in local browser storage)
   useEffect(() => {
@@ -306,8 +372,59 @@ export default function App() {
       setOnboardingOpen(true);
       return;
     }
-    setActiveSection(sec);
+    if (sec !== activeSection) {
+      const nextStack = [...navHistoryRef.current, sec];
+      navHistoryRef.current = nextStack;
+      setNavHistory(nextStack);
+      if (typeof window !== 'undefined') {
+        window.history.pushState(
+          { crickifySection: sec, crickifyIdx: nextStack.length - 1 },
+          ''
+        );
+      }
+      setActiveSection(sec);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleGoBack = () => {
+    setDesktopMoreOpen(false);
+    setAccountMenuOpen(false);
+    setMobileMenuOpen(false);
+
+    if (
+      typeof window !== 'undefined' &&
+      navHistoryRef.current.length > 1 &&
+      typeof window.history.state?.crickifyIdx === 'number' &&
+      window.history.state.crickifyIdx > 0
+    ) {
+      window.history.back();
+      return;
+    }
+
+    if (navHistoryRef.current.length > 1) {
+      const nextStack = navHistoryRef.current.slice(0, -1);
+      const prevSec = nextStack[nextStack.length - 1] || 'home-landing';
+      navHistoryRef.current = nextStack;
+      setNavHistory(nextStack);
+      if (prevSec !== 'playzone-batting') {
+        setPlayZoneActiveGameplay(false);
+      }
+      setActiveSection(prevSec);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (activeSection !== 'home-landing') {
+      navHistoryRef.current = ['home-landing'];
+      setNavHistory(['home-landing']);
+      setPlayZoneActiveGameplay(false);
+      setActiveSection('home-landing');
+      if (typeof window !== 'undefined') {
+        window.history.replaceState({ crickifySection: 'home-landing', crickifyIdx: 0 }, '');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleSaveProfile = (updated: PlayerProfile) => {
@@ -605,6 +722,7 @@ export default function App() {
       return (
         <PlayZoneView
           onNavigate={navigate}
+          onBack={handleGoBack}
           onSaveSession={savePlayZoneSession}
           onActiveGameplayChange={setPlayZoneActiveGameplay}
         />
@@ -771,31 +889,24 @@ export default function App() {
     );
   };
 
-  return (
-    <div className="min-h-screen cricket-turf-canvas text-[#17251A] flex flex-col relative overflow-x-hidden">
-      {/* Subtle Sunlit Natural Outfield Atmosphere at Top of Viewport */}
-      <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 top-0 h-96 overflow-hidden z-0">
-        <img
-          src={CRICKIFY_IMAGES.sunlitOutfieldBg}
-          alt=""
-          className="w-full h-full object-cover opacity-18"
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(180deg, rgba(244, 247, 239, 0.3) 0%, rgba(244, 247, 239, 0.85) 65%, #F4F7EF 100%)',
-          }}
-        />
-      </div>
+  const previousSectionId: NavSectionId =
+    navHistory.length > 1 ? navHistory[navHistory.length - 2] : 'home-landing';
+  const previousSectionLabel = SECTION_LABELS[previousSectionId] || 'Home';
+  const currentSectionLabel = SECTION_LABELS[activeSection] || 'CRICKIFY AI';
 
-      {/* Warm White Translucent Sports Top Bar (Single Row) */}
-      <header className="sticky top-0 z-40 h-14 lg:h-16 bg-white/94 backdrop-blur-md border-b border-[#087F55]/14 px-3 sm:px-4 xl:px-6 flex items-center justify-between gap-2 xl:gap-3 shadow-2xs">
+  return (
+    <div className="min-h-screen cricket-turf-canvas text-[#102419] flex flex-col relative overflow-x-hidden">
+      {/* Animated Sporty Cricket Turf, Floodlights & Floating Cricket Icons */}
+      <CricketBackdropAtmosphere />
+
+      {/* Contrasting Deep Forest Green Top Navigation Bar */}
+      <header className="sticky top-0 z-40 h-14 lg:h-16 bg-[#061D14]/95 backdrop-blur-md border-b border-[#B7F34A]/30 px-3 sm:px-4 xl:px-6 flex items-center justify-between gap-2 xl:gap-3 shadow-[0_10px_30px_-10px_rgba(2,10,6,0.75)]">
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <button
             type="button"
             onClick={() => setMobileMenuOpen((o) => !o)}
             aria-label="Open navigation menu"
-            className="lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-[#17251A] hover:bg-[#EDF5EE] transition-colors"
+            className="lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-[#D9EEDB] hover:text-white hover:bg-[#103D2B] transition-colors"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -806,18 +917,20 @@ export default function App() {
             className="flex items-center gap-2 whitespace-nowrap shrink-0 focus:outline-none min-h-[44px]"
           >
             <svg viewBox="0 0 36 36" className="w-8 h-8 shrink-0" aria-hidden="true">
-              <rect width="36" height="36" rx="10" fill="#103B2A" />
+              <rect width="36" height="36" rx="10" fill="#0F4630" stroke="#B7F34A" strokeOpacity="0.45" strokeWidth="1.2" />
               <line x1="13" y1="9" x2="13" y2="27" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" />
               <line x1="18" y1="9" x2="18" y2="27" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" />
               <line x1="23" y1="9" x2="23" y2="27" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" />
               <line x1="12" y1="9" x2="24" y2="9" stroke="#FF941F" strokeWidth="2.2" strokeLinecap="round" />
               <path d="M7 22 Q18 11 29 18" fill="none" stroke="#B7F34A" strokeWidth="2" strokeLinecap="round" />
             </svg>
-            <span className="font-display text-2xl font-bold tracking-wider text-[#17251A]">CRICKIFY</span>
+            <span className="font-display text-2xl font-bold tracking-wider text-white">
+              CRICKIFY <span className="text-[#B7F34A]">AI</span>
+            </span>
           </button>
         </div>
 
-        {/* Clean Desktop Horizontal Navigation */}
+        {/* High-Contrast Desktop Horizontal Navigation */}
         <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 text-sm font-semibold">
           {(
             [
@@ -836,15 +949,15 @@ export default function App() {
               onClick={() => navigate(navItem.id)}
               className={`px-2 xl:px-3.5 py-2 rounded-xl text-xs font-bold transition-colors whitespace-nowrap shrink-0 ${
                 navItem.active
-                  ? 'bg-[#EDF3E8] text-[#397B32]'
-                  : 'text-[#68766A] hover:text-[#17251A] hover:bg-[#F7FAF3]'
+                  ? 'bg-[#B7F34A] text-[#071A11] shadow-sm'
+                  : 'text-[#D3EBD7] hover:text-white hover:bg-[#103D2B]'
               }`}
             >
               {navItem.label}
             </button>
           ))}
 
-          {/* More Modules Menu Dropdown (Turf IQ, Match IQ, Wicketkeeping, Rules, Coaching History, Settings) */}
+          {/* More Modules Menu Dropdown */}
           <div className="relative">
             <button
               type="button"
@@ -854,8 +967,8 @@ export default function App() {
               }}
               className={`px-2 xl:px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1 transition-colors whitespace-nowrap shrink-0 ${
                 desktopMoreOpen || activeSection.startsWith('turf-') || activeSection.startsWith('match-') || activeSection.startsWith('dev-')
-                  ? 'bg-[#EDF3E8] text-[#397B32]'
-                  : 'text-[#68766A] hover:text-[#17251A] hover:bg-[#F7FAF3]'
+                  ? 'bg-[#B7F34A] text-[#071A11] shadow-sm'
+                  : 'text-[#D3EBD7] hover:text-white hover:bg-[#103D2B]'
               }`}
             >
               <span>All Modules</span>
@@ -863,12 +976,12 @@ export default function App() {
             </button>
 
             {desktopMoreOpen && (
-              <div className="absolute right-0 xl:left-1/2 xl:-translate-x-1/2 top-12 z-50 w-[640px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-5.5rem)] overflow-y-auto bg-white rounded-3xl border border-[#397B32]/15 shadow-2xl p-5 grid grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="absolute right-0 xl:left-1/2 xl:-translate-x-1/2 top-12 z-50 w-[640px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-5.5rem)] overflow-y-auto bg-[#0A271B] rounded-3xl border border-[#B7F34A]/30 shadow-2xl p-5 grid grid-cols-2 lg:grid-cols-3 gap-4 text-white">
                 {NAV_GROUPS.map((grp) => {
                   const Icon = grp.icon;
                   return (
                     <div key={grp.group} className="space-y-1.5">
-                      <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-[#397B32]">
+                      <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-[#B7F34A]">
                         <Icon className="w-3.5 h-3.5" />
                         <span>{grp.group}</span>
                       </div>
@@ -880,8 +993,8 @@ export default function App() {
                             onClick={() => navigate(item.id)}
                             className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs transition-colors truncate ${
                               activeSection === item.id
-                                ? 'bg-[#397B32] text-white font-semibold'
-                                : 'text-[#17251A] hover:bg-[#EDF3E8]'
+                                ? 'bg-[#B7F34A] text-[#071A11] font-bold'
+                                : 'text-[#DCEEE0] hover:bg-[#13422F] hover:text-white'
                             }`}
                           >
                             {item.label}
@@ -901,7 +1014,7 @@ export default function App() {
           <button
             type="button"
             onClick={() => navigate('practice-upload')}
-            className="hidden sm:inline-flex items-center gap-1.5 min-h-[40px] px-3 xl:px-4 py-2 rounded-xl bg-[#A8D94E] hover:bg-[#b8e465] text-[#17251A] text-xs font-bold transition-colors whitespace-nowrap shrink-0"
+            className="hidden sm:inline-flex items-center gap-1.5 min-h-[40px] px-3 xl:px-4 py-2 rounded-xl bg-[#FF941F] hover:bg-[#ffa442] text-[#0A1610] text-xs font-extrabold transition-colors whitespace-nowrap shrink-0 shadow-sm"
           >
             <Video className="w-3.5 h-3.5" />
             <span>Analyse</span>
@@ -915,7 +1028,7 @@ export default function App() {
                   setAccountMenuOpen((o) => !o);
                   setDesktopMoreOpen(false);
                 }}
-                className="min-h-[42px] pl-1.5 pr-3 py-1 rounded-2xl bg-[#EDF3E8] hover:bg-[#dfe9d6] flex items-center gap-2 transition-colors"
+                className="min-h-[42px] pl-1.5 pr-3 py-1 rounded-2xl bg-[#103D2B] hover:bg-[#17513A] border border-[#B7F34A]/25 flex items-center gap-2 transition-colors"
               >
                 <img
                   src={avatarSrc}
@@ -923,35 +1036,35 @@ export default function App() {
                   referrerPolicy="no-referrer"
                   className="w-7 h-7 rounded-xl object-cover"
                 />
-                <span className="hidden sm:inline text-xs font-bold text-[#17251A] max-w-[110px] truncate">
+                <span className="hidden sm:inline text-xs font-bold text-white max-w-[110px] truncate">
                   {state.profile.name || authUser.displayName}
                 </span>
               </button>
 
               {accountMenuOpen && (
-                <div className="absolute right-0 top-12 z-50 w-60 bg-white rounded-2xl border border-[#397B32]/15 shadow-xl p-3 space-y-1.5">
-                  <div className="px-2.5 py-1.5 border-b border-[#17251A]/10">
-                    <div className="text-xs font-bold text-[#17251A] truncate">{state.profile.name}</div>
-                    <div className="text-[11px] text-[#68766A] truncate">{authUser.email}</div>
+                <div className="absolute right-0 top-12 z-50 w-60 bg-[#0A271B] rounded-2xl border border-[#B7F34A]/30 shadow-xl p-3 space-y-1.5 text-white">
+                  <div className="px-2.5 py-1.5 border-b border-white/15">
+                    <div className="text-xs font-bold text-white truncate">{state.profile.name}</div>
+                    <div className="text-[11px] text-[#B8D7BE] truncate">{authUser.email}</div>
                   </div>
                   <button
                     type="button"
                     onClick={() => navigate('dev-profile')}
-                    className="w-full min-h-[40px] px-2.5 py-2 rounded-xl text-left text-xs font-semibold text-[#17251A] hover:bg-[#EDF3E8] flex items-center gap-2"
+                    className="w-full min-h-[40px] px-2.5 py-2 rounded-xl text-left text-xs font-semibold text-[#E2F3E5] hover:bg-[#144430] flex items-center gap-2"
                   >
-                    <User className="w-4 h-4 text-[#397B32]" /> Player Profile &amp; Settings
+                    <User className="w-4 h-4 text-[#B7F34A]" /> Player Profile &amp; Settings
                   </button>
                   <button
                     type="button"
                     onClick={() => navigate('dev-progress')}
-                    className="w-full min-h-[40px] px-2.5 py-2 rounded-xl text-left text-xs font-semibold text-[#17251A] hover:bg-[#EDF3E8] flex items-center gap-2"
+                    className="w-full min-h-[40px] px-2.5 py-2 rounded-xl text-left text-xs font-semibold text-[#E2F3E5] hover:bg-[#144430] flex items-center gap-2"
                   >
                     <Trophy className="w-4 h-4 text-[#FF941F]" /> Learning Progress
                   </button>
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="w-full min-h-[40px] px-2.5 py-2 rounded-xl text-left text-xs font-semibold text-red-700 hover:bg-red-50 flex items-center gap-2"
+                    className="w-full min-h-[40px] px-2.5 py-2 rounded-xl text-left text-xs font-semibold text-[#FCA5A5] hover:bg-red-950/50 flex items-center gap-2"
                   >
                     <LogOut className="w-4 h-4" /> Sign Out
                   </button>
@@ -962,7 +1075,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => openAuthPrompt()}
-              className="min-h-[42px] px-3.5 py-2 rounded-xl bg-[#397B32] hover:bg-[#24552E] text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
+              className="min-h-[42px] px-3.5 py-2 rounded-xl bg-[#B7F34A] hover:bg-[#c8f96b] text-[#071A11] text-xs font-extrabold inline-flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
             >
               <LogIn className="w-3.5 h-3.5" />
               <span>Sign In</span>
@@ -971,42 +1084,44 @@ export default function App() {
         </div>
       </header>
 
-      {/* Clean, Uncluttered 4-Group Mobile Hamburger Drawer */}
+      {/* Rich Dark-Emerald 4-Group Mobile Hamburger Drawer */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           <div
             aria-hidden="true"
             onClick={() => setMobileMenuOpen(false)}
-            className="fixed inset-0 bg-[#0A1610]/55 backdrop-blur-xs"
+            className="fixed inset-0 bg-[#04100A]/75 backdrop-blur-xs"
           />
           <aside
             aria-label="Mobile navigation drawer"
-            className="relative z-10 w-[86%] max-w-[340px] h-full bg-[#F7FAF3] text-[#17251A] shadow-2xl overflow-y-auto p-4 pb-10 space-y-4 animate-drawer-in"
+            className="relative z-10 w-[86%] max-w-[340px] h-full bg-[#072016] text-white shadow-2xl overflow-y-auto p-4 pb-10 space-y-4 animate-drawer-in border-r border-[#B7F34A]/25"
           >
             {/* Drawer Header with Close Button */}
-            <div className="flex items-center justify-between border-b border-[#087F55]/12 pb-3">
-              <span className="font-display text-xl font-bold tracking-wider text-[#103B2A]">CRICKIFY MENU</span>
+            <div className="flex items-center justify-between border-b border-white/15 pb-3">
+              <span className="font-display text-xl font-bold tracking-wider text-white">
+                CRICKIFY <span className="text-[#B7F34A]">AI</span> MENU
+              </span>
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-label="Close navigation menu"
-                className="min-h-[42px] min-w-[42px] rounded-xl bg-white border border-[#087F55]/15 flex items-center justify-center text-[#17251A]"
+                className="min-h-[42px] min-w-[42px] rounded-xl bg-[#113D2B] border border-[#B7F34A]/25 flex items-center justify-center text-white"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Compact Player Card */}
-            <div className="bg-white rounded-2xl border border-[#087F55]/15 p-3.5 flex items-center gap-3">
+            <div className="bg-[#0E3324] rounded-2xl border border-[#B7F34A]/25 p-3.5 flex items-center gap-3">
               <img
                 src={avatarSrc}
                 alt={state.profile.name}
                 referrerPolicy="no-referrer"
-                className="w-10 h-10 rounded-xl object-cover border border-[#087F55]/30 shrink-0"
+                className="w-10 h-10 rounded-xl object-cover border border-[#B7F34A]/40 shrink-0"
               />
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-bold text-[#17251A] truncate">{state.profile.name}</div>
-                <div className="text-[11px] text-[#5C6B5F] truncate">
+                <div className="text-sm font-bold text-white truncate">{state.profile.name}</div>
+                <div className="text-[11px] text-[#B8D7BE] truncate">
                   {authUser ? authUser.email : 'Guest Mode · Free Access'}
                 </div>
               </div>
@@ -1040,8 +1155,8 @@ export default function App() {
                 ],
               },
             ].map((section) => (
-              <div key={section.heading} className="bg-white rounded-2xl border border-[#087F55]/12 p-3.5 space-y-2">
-                <div className="text-[11px] font-extrabold tracking-wider text-[#087F55] px-1">
+              <div key={section.heading} className="bg-[#0D2E20] rounded-2xl border border-white/12 p-3.5 space-y-2">
+                <div className="text-[11px] font-extrabold tracking-wider text-[#B7F34A] px-1">
                   {section.heading}
                 </div>
                 <div className="space-y-1">
@@ -1054,12 +1169,12 @@ export default function App() {
                         onClick={() => navigate(item.id)}
                         className={`w-full min-h-[44px] px-3 py-2 rounded-xl text-left text-xs font-bold flex items-center justify-between transition-colors ${
                           isActive
-                            ? 'bg-[#103B2A] text-white'
-                            : 'text-[#17251A] hover:bg-[#EDF5EE]'
+                            ? 'bg-[#B7F34A] text-[#071A11]'
+                            : 'text-[#DCEEE0] hover:bg-[#154531] hover:text-white'
                         }`}
                       >
                         <span>{item.label}</span>
-                        {isActive && <span className="w-2 h-2 rounded-full bg-[#B7F34A]" aria-hidden="true" />}
+                        {isActive && <span className="w-2 h-2 rounded-full bg-[#071A11]" aria-hidden="true" />}
                       </button>
                     );
                   })}
@@ -1068,14 +1183,14 @@ export default function App() {
             ))}
 
             {/* 4th Group: ACCOUNT */}
-            <div className="bg-white rounded-2xl border border-[#087F55]/12 p-3.5 space-y-1">
-              <div className="text-[11px] font-extrabold tracking-wider text-[#087F55] px-1 pb-1">
+            <div className="bg-[#0D2E20] rounded-2xl border border-white/12 p-3.5 space-y-1">
+              <div className="text-[11px] font-extrabold tracking-wider text-[#FF941F] px-1 pb-1">
                 ACCOUNT
               </div>
               <button
                 type="button"
                 onClick={() => navigate('dev-profile')}
-                className="w-full min-h-[44px] px-3 py-2 rounded-xl text-left text-xs font-bold text-[#17251A] hover:bg-[#EDF5EE]"
+                className="w-full min-h-[44px] px-3 py-2 rounded-xl text-left text-xs font-bold text-[#DCEEE0] hover:bg-[#154531] hover:text-white"
               >
                 Profile
               </button>
@@ -1085,7 +1200,7 @@ export default function App() {
                   setMobileMenuOpen(false);
                   setOnboardingOpen(true);
                 }}
-                className="w-full min-h-[44px] px-3 py-2 rounded-xl text-left text-xs font-bold text-[#17251A] hover:bg-[#EDF5EE]"
+                className="w-full min-h-[44px] px-3 py-2 rounded-xl text-left text-xs font-bold text-[#DCEEE0] hover:bg-[#154531] hover:text-white"
               >
                 Settings
               </button>
@@ -1095,7 +1210,7 @@ export default function App() {
                   setMobileMenuOpen(false);
                   setHelpOpen(true);
                 }}
-                className="w-full min-h-[44px] px-3 py-2 rounded-xl text-left text-xs font-bold text-[#17251A] hover:bg-[#EDF5EE]"
+                className="w-full min-h-[44px] px-3 py-2 rounded-xl text-left text-xs font-bold text-[#DCEEE0] hover:bg-[#154531] hover:text-white"
               >
                 Help
               </button>
@@ -1103,7 +1218,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={handleSignOut}
-                  className="w-full min-h-[44px] px-3 py-2 rounded-xl text-left text-xs font-bold text-red-700 hover:bg-red-50"
+                  className="w-full min-h-[44px] px-3 py-2 rounded-xl text-left text-xs font-bold text-[#FCA5A5] hover:bg-red-950/50"
                 >
                   Sign Out
                 </button>
@@ -1111,7 +1226,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => openAuthPrompt()}
-                  className="w-full min-h-[44px] px-3 py-2 rounded-xl text-left text-xs font-bold text-[#087F55] hover:bg-[#EDF5EE]"
+                  className="w-full min-h-[44px] px-3 py-2 rounded-xl text-left text-xs font-bold text-[#B7F34A] hover:bg-[#154531]"
                 >
                   Sign In with Google
                 </button>
@@ -1130,16 +1245,33 @@ export default function App() {
         }`}
       >
         <div className="max-w-6xl mx-auto">
+          {/* Universal Section Back Bar (visible on all sections except Home & active PlayZone gameplay) */}
+          {activeSection !== 'home-landing' && !(activeSection === 'playzone-batting' && playZoneActiveGameplay) && (
+            <div className="mb-4 flex items-center justify-between gap-2 bg-[#FAFDFA]/90 backdrop-blur-sm border border-[#087F55]/20 rounded-2xl px-3 py-2 shadow-xs">
+              <button
+                type="button"
+                onClick={handleGoBack}
+                className="min-h-[40px] px-3.5 py-1.5 rounded-xl bg-[#E7F5E6] hover:bg-[#D5EED6] active:scale-[0.98] border border-[#087F55]/25 text-[#103B2A] text-xs font-extrabold inline-flex items-center gap-1.5 transition-all"
+              >
+                <ArrowLeft className="w-4 h-4 text-[#087F55]" />
+                <span>Back to {previousSectionLabel}</span>
+              </button>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#087F55] truncate px-2">
+                {currentSectionLabel}
+              </span>
+            </div>
+          )}
+
           {guestSaveBannerVisible && !authUser && !(activeSection === 'playzone-batting' && playZoneActiveGameplay) && (
-            <div className="mb-5 bg-white rounded-2xl border border-[#087F55]/25 px-4 py-3 shadow-sm flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs sm:text-sm font-semibold text-[#17251A]">
-                Create your free CRICKIFY account and save your cricket journey.
+            <div className="mb-5 bg-gradient-to-r from-[#0C3424] via-[#134832] to-[#1D4B2B] rounded-2xl border border-[#B7F34A]/35 px-4 py-3 shadow-md flex flex-wrap items-center justify-between gap-3">
+              <p className="text-xs sm:text-sm font-semibold text-white">
+                Create your free CRICKIFY AI account and save your cricket journey.
               </p>
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={() => openAuthPrompt()}
-                  className="min-h-[38px] px-3.5 py-1.5 rounded-xl bg-[#397B32] text-white text-xs font-bold hover:bg-[#24552E]"
+                  className="min-h-[38px] px-3.5 py-1.5 rounded-xl bg-[#B7F34A] text-[#071A11] text-xs font-extrabold hover:bg-[#c8f96b]"
                 >
                   Continue with Google
                 </button>
@@ -1147,7 +1279,7 @@ export default function App() {
                   type="button"
                   onClick={() => setGuestSaveBannerVisible(false)}
                   aria-label="Dismiss save prompt"
-                  className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl text-[#68766A] hover:bg-[#EDF3E8]"
+                  className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl text-[#D3EBD7] hover:bg-[#164A34]"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1158,11 +1290,11 @@ export default function App() {
         </div>
       </main>
 
-      {/* Fixed Mobile Bottom Navigation: Hidden during active PlayZone match gameplay */}
+      {/* Fixed Dark-Green Mobile Bottom Navigation */}
       {!(activeSection === 'playzone-batting' && playZoneActiveGameplay) && (
         <nav
           aria-label="Mobile primary navigation"
-          className="lg:hidden fixed bottom-0 inset-x-0 z-40 h-14 bg-white/95 backdrop-blur-lg border-t border-[#397B32]/15 flex items-center justify-around px-1 shadow-[0_-6px_20px_-8px_rgba(23,37,26,0.12)]"
+          className="lg:hidden fixed bottom-0 inset-x-0 z-40 h-14 bg-[#061D14]/96 backdrop-blur-lg border-t border-[#B7F34A]/25 flex items-center justify-around px-1 shadow-[0_-8px_24px_-8px_rgba(2,10,6,0.65)]"
         >
           {(
             [
@@ -1180,7 +1312,7 @@ export default function App() {
                 type="button"
                 onClick={() => navigate(tab.id)}
                 className={`min-h-[44px] flex-1 flex flex-col items-center justify-center gap-0.5 rounded-xl mx-0.5 transition-colors ${
-                  tab.active ? 'text-[#397B32] bg-[#EDF3E8]/80 font-bold' : 'text-[#68766A] font-medium'
+                  tab.active ? 'text-[#071A11] bg-[#B7F34A] font-extrabold' : 'text-[#CFE5D3] font-medium hover:text-white'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -1245,6 +1377,10 @@ export default function App() {
           onNavigate={navigate}
         />
       )}
+      <Analytics
+        route={activeSection === 'home-landing' ? '/' : `/${activeSection}`}
+        path={activeSection === 'home-landing' ? '/' : `/${activeSection}`}
+      />
     </div>
   );
 }

@@ -163,26 +163,46 @@ export const TrainingCentreView: React.FC<TrainingCentreViewProps> = ({
     const plan = state.activeTrainingPlan;
     return (
       <div className="space-y-8">
-        <div className="rounded-3xl bg-[#F8FAF2] border-2 border-[#397B32]/20 p-7 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
-          <div className="max-w-2xl space-y-2">
-            <div className="text-xs font-bold text-[#397B32] uppercase tracking-wider">
+        <div className="training-clean-surface rounded-3xl p-7 md:p-10 grid lg:grid-cols-12 gap-6 items-center shadow-xs">
+          <div className="lg:col-span-7 space-y-2.5">
+            <div className="text-xs font-bold text-[#087F55] uppercase tracking-wider">
               Athletic Calendar · Daily &amp; Weekly Routine
             </div>
             <h1 className="font-display text-3xl md:text-5xl font-extrabold text-[#17251A]">
               Personal AI Training Planner
             </h1>
-            <p className="text-sm text-[#68766A]">
+            <p className="text-sm text-[#5C6B5F]">
               Generates realistic routines matching your age group ({state.profile.ageGroup}), role ({state.profile.role}), equipment, workload, and recovery days.
             </p>
-          </div>
-          <div className="bg-white border border-[#397B32]/15 rounded-2xl p-4 grid grid-cols-2 gap-4 shrink-0">
-            <div>
-              <div className="text-[11px] font-bold uppercase text-[#68766A]">Target / Day</div>
-              <div className="font-mono text-2xl font-bold text-[#397B32] tabular-nums">{dailyMinutes}m</div>
+            <div className="flex flex-wrap items-center gap-4 pt-1 text-xs font-semibold text-[#17251A]">
+              <span>1. Set Schedule &amp; Focus</span>
+              <span aria-hidden="true" className="text-[#087F55]">·</span>
+              <span>2. Generate Weekly Plan</span>
+              <span aria-hidden="true" className="text-[#087F55]">·</span>
+              <span>3. Track Daily Blocks</span>
             </div>
-            <div>
-              <div className="text-[11px] font-bold uppercase text-[#68766A]">Weekly Cadence</div>
-              <div className="font-mono text-2xl font-bold text-[#17251A] tabular-nums">{daysPerWeek}d</div>
+          </div>
+          <div className="lg:col-span-5 space-y-3">
+            <div className="relative aspect-[16/9] rounded-2xl overflow-hidden border border-[#087F55]/18 bg-[#103B2A]">
+              <img
+                src={CRICKIFY_IMAGES.fitnessSpeedAgility}
+                alt="Cricket weekly training and agility routine"
+                className="w-full h-full object-cover"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-gradient-to-t from-[#0A1610]/75 via-transparent to-transparent"
+              />
+            </div>
+            <div className="bg-[#ECFAEE] border border-[#087F55]/25 rounded-2xl p-3.5 grid grid-cols-2 gap-4">
+              <div>
+                <div className="text-[11px] font-bold uppercase text-[#68766A]">Target / Day</div>
+                <div className="font-mono text-2xl font-bold text-[#397B32] tabular-nums">{dailyMinutes}m</div>
+              </div>
+              <div>
+                <div className="text-[11px] font-bold uppercase text-[#68766A]">Weekly Cadence</div>
+                <div className="font-mono text-2xl font-bold text-[#17251A] tabular-nums">{daysPerWeek}d</div>
+              </div>
             </div>
           </div>
         </div>
@@ -320,7 +340,7 @@ export const TrainingCentreView: React.FC<TrainingCentreViewProps> = ({
                     {block.exerciseId && CRICKET_EXERCISES.some((e) => e.id === block.exerciseId) && (
                       <button
                         onClick={() => onOpenExercise(block.exerciseId!)}
-                        className="px-3.5 py-2 rounded-xl bg-white border border-[#17251A]/12 text-xs font-semibold text-[#17251A] hover:bg-[#EDF1E7] whitespace-nowrap shrink-0"
+                        className="px-3.5 py-2 rounded-xl bg-[#ECFAEE] border border-[#087F55]/25 text-xs font-semibold text-[#102419] hover:bg-[#D5F1DC] whitespace-nowrap shrink-0"
                       >
                         View Exercise Guide
                       </button>
@@ -448,7 +468,7 @@ export const TrainingCentreView: React.FC<TrainingCentreViewProps> = ({
       <div className="training-clean-surface rounded-3xl p-7 md:p-10 grid lg:grid-cols-12 gap-6 items-center shadow-xs">
         <div className="lg:col-span-8 space-y-2.5">
           <div className="text-xs font-bold text-[#087F55] uppercase tracking-wider">
-            CRICKIFY Cricket Training Centre
+            CRICKIFY AI Cricket Training Centre
           </div>
           <h1 className="font-display text-3xl md:text-5xl font-extrabold text-[#17251A]">
             Skill Drills &amp; Cricket Physical Conditioning
@@ -501,7 +521,7 @@ export const TrainingCentreView: React.FC<TrainingCentreViewProps> = ({
       </div>
 
       {/* Category Filter */}
-      <div className="flex flex-wrap gap-1.5 bg-white p-2 rounded-2xl border border-[#17251A]/10">
+      <div className="flex flex-wrap gap-1.5 bg-[#D4F0DC] p-2 rounded-2xl border border-[#087F55]/25">
         {categories.map((cat) => (
           <button
             key={cat}

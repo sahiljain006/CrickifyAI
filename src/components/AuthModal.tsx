@@ -67,13 +67,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(160deg, rgba(36, 85, 46, 0.55) 0%, rgba(57, 123, 50, 0.45) 45%, rgba(247, 250, 243, 0.72) 100%)',
+              'linear-gradient(160deg, rgba(6, 26, 18, 0.85) 0%, rgba(12, 46, 31, 0.78) 45%, rgba(8, 31, 22, 0.88) 100%)',
           }}
         />
       </div>
 
-      {/* Clean White Rounded Sports-App Panel */}
-      <div className="relative z-10 w-full max-w-md bg-white rounded-3xl border border-[#397B32]/15 shadow-2xl overflow-hidden my-auto">
+      {/* Colorful Sports-App Panel */}
+      <div className="relative z-10 w-full max-w-md bg-gradient-to-b from-[#E3F5E6] to-[#D4EED8] rounded-3xl border border-[#B7F34A]/45 shadow-2xl overflow-hidden my-auto">
         {onClose && (
           <button
             type="button"
@@ -96,10 +96,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <line x1="12" y1="9" x2="24" y2="9" stroke="#FF941F" strokeWidth="2.4" strokeLinecap="round" />
               <path d="M7 22 Q18 11 29 18" fill="none" stroke="#69A83F" strokeWidth="2.2" strokeLinecap="round" />
             </svg>
-            <span className="font-display text-2xl font-bold tracking-wider text-white">CRICKIFY</span>
+            <span className="font-display text-2xl font-bold tracking-wider text-white">CRICKIFY AI</span>
           </div>
           <h2 className="font-display text-3xl font-bold tracking-tight text-white">
-            WELCOME TO CRICKIFY
+            WELCOME TO CRICKIFY AI
           </h2>
           <p className="text-sm text-white/90 mt-1 leading-relaxed">
             Your game. Your home. Your AI coach. Learn, analyse, play Batting Challenge, and track your cricket journey.
@@ -126,7 +126,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               type="button"
               onClick={handleGoogleLogin}
               disabled={loadingGoogle}
-              className="w-full min-h-[48px] px-4 py-3 rounded-2xl bg-white border-2 border-[#397B32]/25 hover:border-[#397B32] hover:bg-[#F7FAF3] text-[#17251A] text-sm font-bold flex items-center justify-center gap-3 shadow-xs transition-colors disabled:opacity-60"
+              className="w-full min-h-[48px] px-4 py-3 rounded-2xl bg-[#F0F9F2] border-2 border-[#087F55]/35 hover:border-[#087F55] hover:bg-[#DCF4E0] text-[#102419] text-sm font-bold flex items-center justify-center gap-3 shadow-xs transition-colors disabled:opacity-60"
             >
               {loadingGoogle ? (
                 <Loader2 className="w-4 h-4 animate-spin text-[#397B32]" />
@@ -174,7 +174,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-between gap-2 rounded-xl bg-white border border-[#FF941F]/30 px-2.5 py-2">
+              <div className="flex items-center justify-between gap-2 rounded-xl bg-[#FFFDF4] border border-[#FF941F]/35 px-2.5 py-2">
                 <code className="text-[11px] font-mono text-[#17251A] truncate select-all">
                   {unauthorizedHostname}
                 </code>

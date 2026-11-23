@@ -24,11 +24,11 @@ export const HomepageHero: React.FC<HomepageHeroProps> = ({ onNavigate }) => {
 
   return (
     <section
-      aria-label="CRICKIFY 3D Stadium Hero"
-      className="relative rounded-3xl overflow-hidden bg-[#07120C] text-white border border-[#B7F34A]/25 shadow-2xl min-h-[540px] sm:min-h-[580px] lg:min-h-[560px] flex flex-col justify-end lg:justify-center"
+      aria-label="CRICKIFY AI 3D Stadium Hero"
+      className="relative rounded-3xl overflow-hidden bg-[#07120C] text-white border border-[#087F55]/30 shadow-2xl min-h-[480px] sm:min-h-[550px] lg:min-h-[540px] flex flex-col justify-end lg:justify-center"
     >
       {/* Full-Bleed Real-Time Three.js 3D Cricket Stadium Scene */}
-      <div className="absolute inset-x-0 top-0 h-[320px] sm:h-[380px] lg:inset-0 lg:h-full">
+      <div className="absolute inset-x-0 top-0 h-[280px] sm:h-[360px] lg:inset-0 lg:h-full">
         <HeroCricketStadium3D isCompactViewport={isCompactViewport} />
       </div>
 
@@ -38,7 +38,7 @@ export const HomepageHero: React.FC<HomepageHeroProps> = ({ onNavigate }) => {
         className="pointer-events-none absolute inset-0 lg:hidden"
         style={{
           background:
-            'linear-gradient(180deg, rgba(7, 18, 12, 0.08) 0%, rgba(7, 18, 12, 0.35) 38%, rgba(7, 18, 12, 0.92) 58%, #07120C 74%)',
+            'linear-gradient(180deg, rgba(7, 18, 12, 0.08) 0%, rgba(7, 18, 12, 0.35) 36%, rgba(7, 18, 12, 0.92) 56%, #07120C 72%)',
         }}
       />
       <div
@@ -57,26 +57,17 @@ export const HomepageHero: React.FC<HomepageHeroProps> = ({ onNavigate }) => {
       />
 
       {/* Compact Top Spacer on Mobile/Tablet so 3D Batsman & Pitch Action Stays Unobstructed */}
-      <div className="h-[215px] sm:h-[255px] lg:hidden pointer-events-none" aria-hidden="true" />
+      <div className="h-[190px] sm:h-[245px] lg:hidden pointer-events-none" aria-hidden="true" />
 
       {/* Semantic Foreground Typography & Three Working CTAs */}
-      <div className="relative z-10 px-5 pb-6 pt-2 sm:px-8 sm:pb-8 lg:px-12 lg:py-12">
-        <div className="max-w-[580px] space-y-3 sm:space-y-4">
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
-            className="text-xs sm:text-sm font-extrabold tracking-[0.24em] uppercase text-[#B7F34A]"
-          >
-            CRICKIFY
-          </motion.div>
-
+      <div className="relative z-10 px-4 pb-5 pt-2 sm:px-8 sm:pb-8 lg:px-12 lg:py-12">
+        <div className="max-w-[580px] space-y-2.5 sm:space-y-4">
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.44, delay: 0.06, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.44, delay: 0.04, ease: [0.16, 1, 0.3, 1] }}
             className="font-display font-extrabold tracking-tight text-white leading-[0.92] uppercase"
-            style={{ fontSize: 'clamp(2.35rem, 5.2vw, 4.75rem)' }}
+            style={{ fontSize: 'clamp(2.25rem, 5.2vw, 4.75rem)' }}
           >
             THE FUTURE OF
             <br />
@@ -87,9 +78,12 @@ export const HomepageHero: React.FC<HomepageHeroProps> = ({ onNavigate }) => {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.42, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-            className="text-xs sm:text-base font-bold tracking-[0.16em] uppercase text-[#B7F34A]"
+            className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs sm:text-base font-extrabold tracking-[0.16em] uppercase"
           >
-            LEARN. TRAIN. ANALYSE. EVOLVE.
+            <span className="text-[#38BDF8]">LEARN.</span>
+            <span className="text-[#FF941F]">TRAIN.</span>
+            <span className="text-[#B7F34A]">ANALYSE.</span>
+            <span className="text-[#FDE047]">EVOLVE.</span>
           </motion.p>
 
           <motion.p

@@ -71,12 +71,12 @@ export const TutorialCard: React.FC<TutorialCardProps> = ({ tutorial, isSaved, o
         </div>
       </div>
 
-      <div className="px-5 py-3.5 border-t border-[#17251A]/8 flex items-center justify-between gap-2 bg-[#F7FAF3]">
+      <div className="px-5 py-3.5 border-t border-[#087F55]/18 flex items-center justify-between gap-2 bg-[#D7F0DC]">
         <button
           onClick={() => setPlaying((p) => !p)}
-          className="min-h-[44px] px-4 py-2 rounded-xl bg-[#397B32] text-white text-xs font-bold hover:bg-[#24552E] transition-colors whitespace-nowrap shrink-0"
+          className="min-h-[44px] px-4 py-2 rounded-xl bg-[#087F55] text-white text-xs font-bold hover:bg-[#103B2A] transition-colors whitespace-nowrap shrink-0"
         >
-          {playing ? 'Show Thumbnail' : 'Watch Inside CRICKIFY'}
+          {playing ? 'Show Thumbnail' : 'Watch Inside CRICKIFY AI'}
         </button>
 
         <div className="flex items-center gap-2">
@@ -85,8 +85,8 @@ export const TutorialCard: React.FC<TutorialCardProps> = ({ tutorial, isSaved, o
             aria-label={isSaved ? 'Remove tutorial from saved' : 'Save tutorial'}
             className={`min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-2 rounded-xl border text-xs transition-colors ${
               isSaved
-                ? 'bg-[#A8D94E]/25 border-[#397B32] text-[#24552E]'
-                : 'bg-white border-[#17251A]/12 text-[#68766A] hover:text-[#17251A]'
+                ? 'bg-[#B7F34A]/35 border-[#087F55] text-[#102419]'
+                : 'bg-[#ECFAEE] border-[#087F55]/25 text-[#2B4234] hover:text-[#102419]'
             }`}
           >
             <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
@@ -95,7 +95,7 @@ export const TutorialCard: React.FC<TutorialCardProps> = ({ tutorial, isSaved, o
             href={youtubeUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="min-h-[44px] inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#17251A]/12 text-xs font-semibold text-[#17251A] hover:bg-[#EDF3E8] transition-colors whitespace-nowrap shrink-0"
+            className="min-h-[44px] inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#ECFAEE] border border-[#087F55]/25 text-xs font-semibold text-[#102419] hover:bg-[#C6EBD0] transition-colors whitespace-nowrap shrink-0"
           >
             YouTube <ExternalLink className="w-3.5 h-3.5" />
           </a>

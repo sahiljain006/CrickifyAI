@@ -478,7 +478,7 @@ export const VideoAnalysisStudioView: React.FC<VideoAnalysisStudioViewProps> = (
           <div className="text-xs font-bold text-[#FF941F] uppercase tracking-wider mb-1">Dismissal Diagnostics Lab</div>
           <h1 className="font-display text-3xl md:text-4xl font-bold">Why Did I Get Out?</h1>
           <p className="text-sm text-[#C7D7C9] mt-1 max-w-2xl">
-            Combine your dismissal type, scorecard context, and optional practice/match video. CRICKIFY strictly separates observed evidence from possible technical reasons.
+            Combine your dismissal type, scorecard context, and optional practice/match video. CRICKIFY AI strictly separates observed evidence from possible technical reasons.
           </p>
         </div>
 
@@ -611,21 +611,15 @@ export const VideoAnalysisStudioView: React.FC<VideoAnalysisStudioViewProps> = (
       {/* Dark Technical Biomechanics Studio Header */}
       <div className="relative rounded-3xl overflow-hidden studio-dark-panel text-white p-7 md:p-10 shadow-xl">
         <img
-          src={
-            skillCategory === 'Bowling'
-              ? CRICKIFY_IMAGES.fastBowling
-              : skillCategory === 'Fielding'
-                ? CRICKIFY_IMAGES.fieldingDive
-                : CRICKIFY_IMAGES.battingDrive
-          }
-          alt="Cricket pose and biomechanics studio"
-          className="absolute inset-0 w-full h-full object-cover opacity-22"
+          src={CRICKIFY_IMAGES.videoPracticeCapture}
+          alt="Cricketer practicing technique being captured on video"
+          className="absolute inset-0 w-full h-full object-cover opacity-55"
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(108deg, rgba(10, 17, 14, 0.94) 0%, rgba(16, 28, 22, 0.88) 55%, rgba(20, 42, 30, 0.52) 100%)',
+              'linear-gradient(108deg, rgba(10, 17, 14, 0.94) 0%, rgba(16, 28, 22, 0.80) 55%, rgba(20, 42, 30, 0.32) 100%)',
           }}
         />
         <div className="relative z-10 max-w-3xl space-y-2.5">
@@ -858,13 +852,13 @@ export const VideoAnalysisStudioView: React.FC<VideoAnalysisStudioViewProps> = (
                     <button
                       type="button"
                       onClick={cancelVideoAnalysis}
-                      className="px-2.5 py-1 rounded-lg border border-[#17251A]/15 bg-white text-[11px] font-semibold text-[#17251A] hover:bg-red-50 hover:text-red-800"
+                      className="px-2.5 py-1 rounded-lg border border-[#087F55]/25 bg-[#E6F5E8] text-[11px] font-semibold text-[#102419] hover:bg-red-50 hover:text-red-800"
                     >
                       Cancel
                     </button>
                   </div>
                 </div>
-                <div className="h-2.5 rounded-full bg-white overflow-hidden">
+                <div className="h-2.5 rounded-full bg-[#C2E6CA] overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-[#397B32] to-[#A8D94E] transition-all duration-200"
                     style={{ width: `${progressPct}%` }}
@@ -905,7 +899,7 @@ export const VideoAnalysisStudioView: React.FC<VideoAnalysisStudioViewProps> = (
                   className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-colors ${
                     activeReport?.id === rep.id
                       ? 'bg-[#397B32] text-white border-[#397B32]'
-                      : 'bg-white text-[#17251A] border-[#17251A]/12 hover:bg-[#EDF1E7]'
+                      : 'bg-[#D7F0DC] text-[#102419] border-[#087F55]/20 hover:bg-[#C2E7C9]'
                   }`}
                 >
                   {rep.technique} · {new Date(rep.createdAt).toLocaleDateString()}
@@ -1084,7 +1078,7 @@ export const VideoAnalysisStudioView: React.FC<VideoAnalysisStudioViewProps> = (
                     <button
                       key={ex.id}
                       onClick={() => onOpenExercise(ex.id)}
-                      className="text-left p-4 rounded-2xl bg-white text-[#17251A] hover:bg-[#F7FAF3] transition-colors space-y-1 shadow-xs"
+                      className="text-left p-4 rounded-2xl bg-[#E1F4E5] text-[#102419] hover:bg-[#CBEBD2] border border-[#087F55]/20 transition-colors space-y-1 shadow-xs"
                     >
                       <div className="text-[11px] font-bold text-[#397B32]">{ex.category}</div>
                       <div className="font-display text-lg font-bold text-[#17251A]">{ex.name}</div>

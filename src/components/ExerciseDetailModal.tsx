@@ -252,7 +252,7 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
               </span>
               <button
                 onClick={handleSaveNote}
-                className="px-4 py-2 rounded-xl border border-[#17251A]/15 bg-white text-xs font-semibold text-[#17251A] hover:bg-[#EDF1E7] transition-colors"
+                className="px-4 py-2 rounded-xl border border-[#087F55]/25 bg-[#ECFAEE] text-xs font-semibold text-[#102419] hover:bg-[#D5F1DC] transition-colors"
               >
                 Save Notes
               </button>
@@ -265,8 +265,8 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
               onClick={() => onToggleSave(exercise.id)}
               className={`min-h-[44px] inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-colors ${
                 isSaved
-                  ? 'bg-[#A8D94E]/25 border-[#397B32] text-[#24552E]'
-                  : 'bg-white border-[#17251A]/15 text-[#17251A] hover:bg-[#EDF3E8]'
+                  ? 'bg-[#A8D94E]/35 border-[#087F55] text-[#102419]'
+                  : 'bg-[#ECFAEE] border-[#087F55]/25 text-[#102419] hover:bg-[#D5F1DC]'
               }`}
             >
               <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />

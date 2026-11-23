@@ -73,12 +73,28 @@ export const DevelopmentAndCoachView: React.FC<DevelopmentAndCoachViewProps> = (
   if (section === 'dev-quiz') {
     return (
       <div className="space-y-6">
-        <div className="stadium-dark-panel text-white rounded-3xl p-7 md:p-9 shadow-xl">
-          <div className="text-xs font-bold text-[#A8D94E] uppercase tracking-wider mb-1">Interactive Knowledge Challenge</div>
-          <h1 className="font-display text-3xl md:text-4xl font-bold">Cricket Quiz &amp; Tactical Checks</h1>
-          <p className="text-sm text-[#D7E4D8] mt-1">
-            Test rules, batting technique, bowling tactics, fielding instincts, and turf cricket strategy.
-          </p>
+        <div className="relative rounded-3xl overflow-hidden stadium-dark-panel text-white p-7 md:p-9 shadow-xl">
+          <img
+            src={CRICKIFY_IMAGES.cricketQuizRules}
+            alt="Cricket rules handbook and quiz champion challenge"
+            referrerPolicy="no-referrer"
+            className="absolute inset-0 w-full h-full object-cover opacity-35"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(105deg, rgba(10, 31, 18, 0.94) 0%, rgba(16, 52, 30, 0.84) 55%, rgba(16, 48, 28, 0.55) 100%)',
+            }}
+          />
+          <div className="relative z-10 max-w-2xl space-y-2">
+            <div className="text-xs font-bold text-[#A8D94E] uppercase tracking-wider">Interactive Knowledge Challenge</div>
+            <h1 className="font-display text-3xl md:text-4xl font-bold">Cricket Quiz &amp; Tactical Checks</h1>
+            <p className="text-sm text-[#D7E4D8]">
+              Test rules, batting technique, bowling tactics, fielding instincts, and turf cricket strategy.
+            </p>
+          </div>
         </div>
 
         <div className="athletic-card rounded-2xl p-4 flex flex-wrap gap-3 items-center justify-between">
@@ -112,9 +128,13 @@ export const DevelopmentAndCoachView: React.FC<DevelopmentAndCoachViewProps> = (
               <option value="Advanced">Advanced</option>
             </select>
           </div>
-          {quizSubmitted && (
+          {quizSubmitted ? (
             <div className="font-mono text-sm font-bold text-[#397B32] tabular-nums">
               Score: {quizScore}% ({filteredQuiz.filter((q) => quizAnswers[q.id] === q.correctIndex).length}/{filteredQuiz.length})
+            </div>
+          ) : (
+            <div className="font-mono text-xs font-semibold text-[#68766A] tabular-nums">
+              Answered: {filteredQuiz.filter((q) => quizAnswers[q.id] !== undefined).length}/{filteredQuiz.length}
             </div>
           )}
         </div>
@@ -173,7 +193,7 @@ export const DevelopmentAndCoachView: React.FC<DevelopmentAndCoachViewProps> = (
               setQuizAnswers({});
               setQuizSubmitted(false);
             }}
-            className="px-5 py-3 rounded-xl border border-[#17251A]/15 bg-white text-xs font-semibold text-[#17251A]"
+            className="px-5 py-3 rounded-xl border border-[#087F55]/25 bg-[#ECFAEE] text-xs font-semibold text-[#102419] hover:bg-[#D5F1DC]"
           >
             Reset
           </button>
@@ -188,12 +208,27 @@ export const DevelopmentAndCoachView: React.FC<DevelopmentAndCoachViewProps> = (
 
     return (
       <div className="space-y-8">
-        <div className="scoreboard-dark-panel text-white rounded-3xl p-7 md:p-9 shadow-xl">
-          <div className="text-xs font-bold text-[#A8D94E] uppercase tracking-wider mb-1">Academy &amp; Group Coaching</div>
-          <h1 className="font-display text-3xl md:text-4xl font-bold">Coach &amp; Academy Management Mode</h1>
-          <p className="text-sm text-[#D7E4D8] mt-1 max-w-2xl">
-            Manage player groups, assign lessons and drills, review consent-granted video analysis reports, and record technical feedback. Sample squad entries are clearly labelled.
-          </p>
+        <div className="relative rounded-3xl overflow-hidden scoreboard-dark-panel text-white p-7 md:p-9 shadow-xl">
+          <img
+            src={CRICKIFY_IMAGES.heroSunlitGround}
+            alt="Cricket academy squad practice ground"
+            className="absolute inset-0 w-full h-full object-cover opacity-28"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(108deg, rgba(16, 23, 26, 0.94) 0%, rgba(23, 35, 38, 0.86) 55%, rgba(18, 33, 28, 0.6) 100%)',
+            }}
+          />
+          <div className="relative z-10 max-w-2xl space-y-2">
+            <div className="text-xs font-bold text-[#A8D94E] uppercase tracking-wider">Academy &amp; Group Coaching</div>
+            <h1 className="font-display text-3xl md:text-4xl font-bold">Coach &amp; Academy Squad Mode</h1>
+            <p className="text-sm text-[#D7E4D8]">
+              Manage player groups, assign lessons and drills, review consent-granted video analysis reports, and record technical feedback. Sample squad entries are clearly labelled.
+            </p>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-12 gap-6">
@@ -428,7 +463,7 @@ export const DevelopmentAndCoachView: React.FC<DevelopmentAndCoachViewProps> = (
             src={state.profile.avatarUrl || CRICKIFY_IMAGES.playerAvatar}
             alt={state.profile.name}
             referrerPolicy="no-referrer"
-            className="w-16 h-16 rounded-2xl object-cover border-2 border-[#A8D94E] shrink-0 bg-white"
+            className="w-16 h-16 rounded-2xl object-cover border-2 border-[#A8D94E] shrink-0 bg-[#0B3020]"
           />
           <div>
             <div className="text-xs font-bold text-[#A8D94E] uppercase tracking-wider mb-0.5">Player Progress Summary</div>

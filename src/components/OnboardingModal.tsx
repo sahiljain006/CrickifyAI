@@ -88,22 +88,22 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#17251A]/50 backdrop-blur-sm overflow-y-auto p-3 sm:p-4 md:p-8">
-      <div className="max-w-3xl mx-auto bg-[#F7FAF3] rounded-3xl border border-[#397B32]/20 shadow-2xl overflow-hidden">
-        <div className="bg-gradient-to-r from-[#69A83F] via-[#397B32] to-[#24552E] text-white px-6 py-5 flex items-center justify-between gap-4">
+    <div className="fixed inset-0 z-50 bg-[#05140D]/75 backdrop-blur-sm overflow-y-auto p-3 sm:p-4 md:p-8">
+      <div className="max-w-3xl mx-auto bg-gradient-to-b from-[#E1F4E5] to-[#D1ECD7] rounded-3xl border border-[#B7F34A]/45 shadow-2xl overflow-hidden">
+        <div className="bg-gradient-to-r from-[#0B3020] via-[#134B33] to-[#1D5B39] text-white px-6 py-5 flex items-center justify-between gap-4 border-b border-[#B7F34A]/25">
           <div className="flex items-center gap-3.5 min-w-0">
             <img
               src={effectiveAvatar}
               alt="Player portrait"
               referrerPolicy="no-referrer"
-              className="w-14 h-14 rounded-2xl object-cover border-2 border-[#A8D94E] shrink-0 bg-white"
+              className="w-14 h-14 rounded-2xl object-cover border-2 border-[#B7F34A] shrink-0 bg-[#0B3020]"
             />
             <div className="min-w-0">
-              <div className="text-xs font-semibold text-[#A8D94E] mb-0.5">
+              <div className="text-xs font-semibold text-[#B7F34A] mb-0.5">
                 Player Profile &amp; Academy Personalisation
               </div>
               <h2 className="font-display text-2xl sm:text-3xl font-bold text-white truncate">
-                Your CRICKIFY Player Profile
+                Your CRICKIFY AI Player Profile
               </h2>
               {authEmail && (
                 <div className="text-[11px] text-white/85 truncate">Signed in as {authEmail}</div>
@@ -124,7 +124,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-5 sm:p-6 md:p-8 space-y-6">
           {/* Player Profile Photo Upload & Crop */}
-          <div className="bg-white rounded-2xl border border-[#397B32]/15 p-4 sm:p-5 space-y-3">
+          <div className="bg-[#ECFAEE] rounded-2xl border border-[#087F55]/25 p-4 sm:p-5 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3.5">
                 <img
@@ -168,7 +168,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                           : 'Custom photo removed.'
                       );
                     }}
-                    className="min-h-[40px] px-3.5 py-2 rounded-xl bg-white border border-red-200 text-red-700 text-xs font-semibold hover:bg-red-50 inline-flex items-center gap-1.5 transition-colors"
+                    className="min-h-[40px] px-3.5 py-2 rounded-xl bg-[#ECFAEE] border border-red-200 text-red-700 text-xs font-semibold hover:bg-red-50 inline-flex items-center gap-1.5 transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Remove Custom Photo</span>
@@ -226,7 +226,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="e.g. Arjun Kumar"
-                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-white text-sm text-[#17251A] focus:outline-none focus:ring-2 focus:ring-[#397B32]"
+                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-[#ECFAEE] text-sm text-[#17251A] focus:outline-none focus:ring-2 focus:ring-[#397B32]"
               />
             </div>
             <div>
@@ -234,7 +234,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <select
                 value={form.ageGroup}
                 onChange={(e) => setForm({ ...form, ageGroup: e.target.value as PlayerProfile['ageGroup'] })}
-                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-white text-sm text-[#17251A]"
+                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-[#ECFAEE] text-sm text-[#17251A]"
               >
                 {['Under-14', '14-18', '19-25', '26-35', '35+'].map((a) => (
                   <option key={a} value={a}>{a}</option>
@@ -248,7 +248,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 value={form.experience}
                 onChange={(e) => setForm({ ...form, experience: e.target.value })}
                 placeholder="e.g. Complete beginner / 2 years club"
-                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-white text-sm text-[#17251A]"
+                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-[#ECFAEE] text-sm text-[#17251A]"
               />
             </div>
             <div>
@@ -256,7 +256,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <select
                 value={form.skillLevel}
                 onChange={(e) => setForm({ ...form, skillLevel: e.target.value as SkillLevel })}
-                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-white text-sm text-[#17251A]"
+                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-[#ECFAEE] text-sm text-[#17251A]"
               >
                 {['Beginner', 'Intermediate', 'Advanced', 'Competitive'].map((s) => (
                   <option key={s} value={s}>{s}</option>
@@ -268,7 +268,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <select
                 value={form.role}
                 onChange={(e) => setForm({ ...form, role: e.target.value as CricketRole })}
-                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-white text-sm text-[#17251A]"
+                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-[#ECFAEE] text-sm text-[#17251A]"
               >
                 {['Batter', 'Fast Bowler', 'Spin Bowler', 'All-Rounder', 'Wicketkeeper'].map((r) => (
                   <option key={r} value={r}>{r}</option>
@@ -280,7 +280,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <select
                 value={form.battingHand}
                 onChange={(e) => setForm({ ...form, battingHand: e.target.value as Handedness })}
-                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-white text-sm text-[#17251A]"
+                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-[#ECFAEE] text-sm text-[#17251A]"
               >
                 <option value="Right-handed">Right-handed</option>
                 <option value="Left-handed">Left-handed</option>
@@ -291,7 +291,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <select
                 value={form.bowlingStyle}
                 onChange={(e) => setForm({ ...form, bowlingStyle: e.target.value as BowlingStyle })}
-                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-white text-sm text-[#17251A]"
+                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-[#ECFAEE] text-sm text-[#17251A]"
               >
                 {['Fast', 'Medium Pace', 'Off-Spin', 'Leg-Spin', 'None'].map((b) => (
                   <option key={b} value={b}>{b}</option>
@@ -303,7 +303,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <select
                 value={form.ballType}
                 onChange={(e) => setForm({ ...form, ballType: e.target.value as BallType })}
-                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-white text-sm text-[#17251A]"
+                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-[#ECFAEE] text-sm text-[#17251A]"
               >
                 <option value="Leather Ball">Leather Ball</option>
                 <option value="Tennis Ball">Tennis Ball</option>
@@ -315,7 +315,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <select
                 value={form.environment}
                 onChange={(e) => setForm({ ...form, environment: e.target.value as EnvironmentType })}
-                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-white text-sm text-[#17251A]"
+                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-[#ECFAEE] text-sm text-[#17251A]"
               >
                 <option value="Regular Cricket">Regular Cricket</option>
                 <option value="Turf / Box Cricket">Turf / Box Cricket</option>
@@ -327,7 +327,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <select
                 value={form.language}
                 onChange={(e) => setForm({ ...form, language: e.target.value as LanguageChoice })}
-                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-white text-sm text-[#17251A]"
+                className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#17251A]/15 bg-[#ECFAEE] text-sm text-[#17251A]"
               >
                 <option value="English">English</option>
                 <option value="Tamil">Tamil (தமிழ்)</option>
@@ -377,7 +377,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     className={`flex items-center justify-between min-h-[42px] px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition-colors text-left ${
                       active
                         ? 'bg-[#397B32] text-white border-[#397B32]'
-                        : 'bg-white text-[#17251A] border-[#17251A]/12 hover:bg-[#EDF3E8]'
+                        : 'bg-[#ECFAEE] text-[#17251A] border-[#17251A]/12 hover:bg-[#EDF3E8]'
                     }`}
                   >
                     <span>{g}</span>
@@ -401,7 +401,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     className={`min-h-[40px] px-3 py-2 rounded-xl border text-xs font-semibold transition-colors text-left ${
                       active
                         ? 'bg-[#24552E] text-[#A8D94E] border-[#24552E]'
-                        : 'bg-white text-[#17251A] border-[#17251A]/12 hover:bg-[#EDF3E8]'
+                        : 'bg-[#ECFAEE] text-[#17251A] border-[#17251A]/12 hover:bg-[#EDF3E8]'
                     }`}
                   >
                     {eq}
@@ -416,7 +416,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="min-h-[44px] px-5 py-2.5 rounded-xl border border-[#17251A]/15 bg-white text-sm font-semibold text-[#17251A] hover:bg-[#EDF3E8]"
+                className="min-h-[44px] px-5 py-2.5 rounded-xl border border-[#17251A]/15 bg-[#ECFAEE] text-sm font-semibold text-[#17251A] hover:bg-[#EDF3E8]"
               >
                 Cancel
               </button>

@@ -253,7 +253,7 @@ export const DashboardAndJourneyView: React.FC<DashboardAndJourneyViewProps> = (
             </button>
             <button
               onClick={() => onOpenLesson(dailyFeaturedTip.relatedLessonId)}
-              className="min-h-[44px] px-5 py-2.5 rounded-2xl bg-white text-[#143622] text-xs font-bold hover:bg-[#F7FAF3]"
+              className="min-h-[44px] px-5 py-2.5 rounded-2xl bg-[#DFF4E3] text-[#102419] text-xs font-bold hover:bg-[#CBEBD2]"
             >
               Open Related Lesson
             </button>
@@ -353,8 +353,8 @@ export const DashboardAndJourneyView: React.FC<DashboardAndJourneyViewProps> = (
         </div>
 
         {expandedTip && (
-          <div className="fixed inset-0 z-50 bg-[#17251A]/50 backdrop-blur-sm overflow-y-auto p-4 md:p-8">
-            <div className="max-w-2xl mx-auto bg-white rounded-3xl border border-[#397B32]/20 overflow-hidden shadow-2xl">
+          <div className="fixed inset-0 z-50 bg-[#05140D]/70 backdrop-blur-sm overflow-y-auto p-4 md:p-8">
+            <div className="max-w-2xl mx-auto bg-gradient-to-b from-[#E1F4E5] to-[#D1ECD7] rounded-3xl border border-[#B7F34A]/45 overflow-hidden shadow-2xl">
               <div className="bg-gradient-to-r from-[#69A83F] via-[#397B32] to-[#24552E] text-white p-6 flex items-start justify-between gap-4">
                 <div>
                   <div className="text-xs text-[#A8D94E] font-semibold mb-1">
@@ -526,13 +526,13 @@ export const DashboardAndJourneyView: React.FC<DashboardAndJourneyViewProps> = (
           <button
             type="button"
             onClick={onOpenOnboarding}
-            className="min-h-[44px] px-4 py-2.5 rounded-2xl border border-[#397B32]/20 bg-white text-[#17251A] text-xs font-bold hover:bg-[#EDF3E8] transition-colors"
+            className="min-h-[44px] px-4 py-2.5 rounded-2xl border border-[#B7F34A]/40 bg-[#DFF4E3] text-[#102419] text-xs font-bold hover:bg-[#CBEBD2] transition-colors"
           >
             Edit Profile
           </button>
 
           {notificationsOpen && (
-            <div className="absolute left-0 sm:left-auto sm:right-0 top-13 z-30 w-[min(22rem,calc(100vw-3.25rem))] sm:w-96 bg-white rounded-2xl border border-[#397B32]/20 p-4 shadow-2xl space-y-3">
+            <div className="absolute left-0 sm:left-auto sm:right-0 top-13 z-30 w-[min(22rem,calc(100vw-3.25rem))] sm:w-96 bg-[#E1F4E5] rounded-2xl border border-[#087F55]/30 p-4 shadow-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <div className="text-xs font-bold uppercase tracking-wider text-[#397B32]">Training Reminders</div>
                 <button
@@ -573,7 +573,7 @@ export const DashboardAndJourneyView: React.FC<DashboardAndJourneyViewProps> = (
         <div className="rounded-2xl bg-[#EDF5EE] border border-[#087F55]/20 px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 text-xs sm:text-sm font-medium text-[#17251A]">
             <UserPlus className="w-4 h-4 text-[#087F55] shrink-0" />
-            <span>Create your free CRICKIFY account and save your cricket journey.</span>
+            <span>Create your free CRICKIFY AI account and save your cricket journey.</span>
           </div>
           <button
             type="button"
@@ -586,7 +586,7 @@ export const DashboardAndJourneyView: React.FC<DashboardAndJourneyViewProps> = (
       )}
 
       {/* CRICKIFY Improvement Loop Indicator */}
-      <div className="rounded-2xl bg-white border border-[#087F55]/15 p-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="rounded-2xl bg-gradient-to-r from-[#D5F2DF] via-[#E1F5D6] to-[#FDECCB] border border-[#087F55]/25 p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
         <div className="text-xs font-bold uppercase tracking-wider text-[#087F55]">
           Your Cricket Loop
         </div>
@@ -670,11 +670,11 @@ export const DashboardAndJourneyView: React.FC<DashboardAndJourneyViewProps> = (
       {/* 3. Photographic Practice Modes */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-[#17251A]">Practice Modes</h2>
+          <h2 className="font-display text-2xl md:text-3xl font-extrabold text-[#102419]">Practice Modes</h2>
           <button
             type="button"
             onClick={() => onNavigate('practice-upload')}
-            className="text-xs font-bold text-[#397B32] hover:underline"
+            className="text-xs font-bold text-[#087F55] hover:underline"
           >
             Video Analysis Studio →
           </button>
@@ -812,7 +812,7 @@ export const DashboardAndJourneyView: React.FC<DashboardAndJourneyViewProps> = (
                   <span>Academy Progress</span>
                   <span className="font-mono tabular-nums text-[#24552E]">{lessonCompletionPct}%</span>
                 </div>
-                <div className="h-2 rounded-full bg-white overflow-hidden">
+                <div className="h-2 rounded-full bg-[#C3E6CA] overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-[#397B32] to-[#A8D94E] rounded-full transition-all duration-300"
                     style={{ width: `${Math.max(lessonCompletionPct, 4)}%` }}
@@ -868,8 +868,8 @@ export const DashboardAndJourneyView: React.FC<DashboardAndJourneyViewProps> = (
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-2xl font-bold text-[#17251A]">Recommended Next Lessons</h2>
-            <button onClick={() => onNavigate('academy-beginner')} className="text-xs font-bold text-[#397B32] hover:underline">
+            <h2 className="font-display text-2xl font-extrabold text-[#102419]">Recommended Next Lessons</h2>
+            <button onClick={() => onNavigate('academy-beginner')} className="text-xs font-bold text-[#087F55] hover:underline">
               View All Lessons →
             </button>
           </div>
@@ -927,7 +927,7 @@ export const DashboardAndJourneyView: React.FC<DashboardAndJourneyViewProps> = (
             <button
               type="button"
               onClick={() => onNavigate('daily-tips')}
-              className="min-h-[44px] w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-white text-[#24552E] text-xs font-bold hover:bg-[#F7FAF3] inline-flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+              className="min-h-[44px] w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-[#B7F34A] text-[#071A11] text-xs font-extrabold hover:bg-[#c8f96b] inline-flex items-center justify-center gap-1.5 shadow-sm transition-colors"
             >
               Explore Training Tips <ArrowRight className="w-3.5 h-3.5" />
             </button>

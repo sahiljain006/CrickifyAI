@@ -44,15 +44,15 @@ export class ErrorBoundary extends React.Component<
     }
 
     return (
-      <div className="min-h-screen bg-[#F7FAF3] flex items-center justify-center p-6 text-[#17251A]">
-        <div className="max-w-lg w-full bg-white rounded-3xl border border-[#397B32]/20 p-7 shadow-xl space-y-4">
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#FF941F] flex items-center justify-center">
+      <div className="min-h-screen bg-[#081F16] flex items-center justify-center p-6 text-[#102419]">
+        <div className="max-w-lg w-full bg-gradient-to-b from-[#E1F4E5] to-[#D1ECD7] rounded-3xl border border-[#B7F34A]/40 p-7 shadow-xl space-y-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#FDE7BE] text-[#D96B00] flex items-center justify-center">
             <AlertTriangle className="w-6 h-6" />
           </div>
-          <h2 className="font-display text-2xl font-bold text-[#17251A]">
+          <h2 className="font-display text-2xl font-bold text-[#102419]">
             {this.state.isQuotaError ? 'Firestore Daily Quota Reached' : 'Something Needs Attention'}
           </h2>
-          <p className="text-sm text-[#68766A] leading-relaxed">
+          <p className="text-sm text-[#2B4234] leading-relaxed">
             {this.state.isQuotaError
               ? 'Your Firebase Firestore free-tier daily quota has been reached. Quota resets tomorrow, or you can review your Spark/Blaze usage in the Firebase Console.'
               : this.state.message}
@@ -60,9 +60,9 @@ export class ErrorBoundary extends React.Component<
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="min-h-[44px] inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#397B32] text-white text-sm font-bold hover:bg-[#24552E] transition-colors"
+            className="min-h-[44px] inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#087F55] text-white text-sm font-bold hover:bg-[#103B2A] transition-colors"
           >
-            <RefreshCw className="w-4 h-4" /> Reload CRICKIFY
+            <RefreshCw className="w-4 h-4" /> Reload CRICKIFY AI
           </button>
         </div>
       </div>

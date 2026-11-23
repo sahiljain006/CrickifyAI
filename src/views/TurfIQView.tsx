@@ -396,21 +396,21 @@ export const TurfIQView: React.FC<TurfIQViewProps> = ({ section, state, onSaveTu
           <div className="bg-[#EDF3E8] rounded-2xl p-5 border border-[#397B32]/20 space-y-4">
             <p className="text-sm text-[#17251A] font-medium">{tactics.tacticalSummary}</p>
             <div className="grid md:grid-cols-2 gap-4 text-xs">
-              <div className="bg-white rounded-xl p-4">
-                <div className="font-bold text-[#397B32] mb-1.5">Batting Plan</div>
-                <ul className="space-y-1 text-[#17251A]">{tactics.battingPlan.map((p, i) => <li key={i}>• {p}</li>)}</ul>
+              <div className="bg-[#D5F3DC] border border-[#087F55]/20 rounded-xl p-4">
+                <div className="font-bold text-[#075E3F] mb-1.5">Batting Plan</div>
+                <ul className="space-y-1 text-[#102419]">{tactics.battingPlan.map((p, i) => <li key={i}>• {p}</li>)}</ul>
               </div>
-              <div className="bg-white rounded-xl p-4">
-                <div className="font-bold text-[#397B32] mb-1.5">Bowling Rotation &amp; Lines</div>
-                <ul className="space-y-1 text-[#17251A]">{tactics.bowlingPlan.map((p, i) => <li key={i}>• {p}</li>)}</ul>
+              <div className="bg-[#E4F6C8] border border-[#4D7C0F]/20 rounded-xl p-4">
+                <div className="font-bold text-[#365314] mb-1.5">Bowling Rotation &amp; Lines</div>
+                <ul className="space-y-1 text-[#102419]">{tactics.bowlingPlan.map((p, i) => <li key={i}>• {p}</li>)}</ul>
               </div>
-              <div className="bg-white rounded-xl p-4">
-                <div className="font-bold text-[#FF941F] mb-1.5">Box Field Setup</div>
-                <ul className="space-y-1 text-[#17251A]">{tactics.fieldingSetup.map((p, i) => <li key={i}>• {p}</li>)}</ul>
+              <div className="bg-[#FDE9C2] border border-[#D96B00]/20 rounded-xl p-4">
+                <div className="font-bold text-[#9A4200] mb-1.5">Box Field Setup</div>
+                <ul className="space-y-1 text-[#102419]">{tactics.fieldingSetup.map((p, i) => <li key={i}>• {p}</li>)}</ul>
               </div>
-              <div className="bg-white rounded-xl p-4">
-                <div className="font-bold text-[#FF941F] mb-1.5">Last-Over Checklist</div>
-                <ul className="space-y-1 text-[#17251A]">{tactics.lastOverChecklist.map((p, i) => <li key={i}>• {p}</li>)}</ul>
+              <div className="bg-[#D7EEF8] border border-[#0284C7]/20 rounded-xl p-4">
+                <div className="font-bold text-[#075985] mb-1.5">Last-Over Checklist</div>
+                <ul className="space-y-1 text-[#102419]">{tactics.lastOverChecklist.map((p, i) => <li key={i}>• {p}</li>)}</ul>
               </div>
             </div>
           </div>

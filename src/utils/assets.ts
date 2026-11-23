@@ -19,6 +19,13 @@ import lessonPlayingSpinImg from '../assets/images/lesson_playing_spin_sweep_179
 import lessonForwardDefenseImg from '../assets/images/lesson_forward_defense_1795165423716.jpg';
 import lessonYorkerImg from '../assets/images/lesson_yorker_bowling_1795165423347.jpg';
 import lessonUmpireImg from '../assets/images/lesson_umpire_cricket_match_1795165423139.jpg';
+import matchIqScoreboardImg from '../assets/images/match_iq_scoreboard_1795422606777.jpg';
+import quizSquadHuddleImg from '../assets/images/quiz_squad_huddle_1795422623891.jpg';
+import trainingRoutineDrillsImg from '../assets/images/training_routine_drills_1795422605831.jpg';
+import videoPracticeCaptureImg from '../assets/images/video_practice_capture_1795423450211.jpg';
+import aiCoachRobotImg from '../assets/images/ai_coach_robot_1795423451798.jpg';
+import matchPlayerScoreboardImg from '../assets/images/match_player_scoreboard_1795425779799.jpg';
+import cricketQuizRulesImg from '../assets/images/cricket_quiz_rules_1795425766218.jpg';
 
 export const CRICKIFY_IMAGES = {
   heroStadium: heroStadiumImg,
@@ -42,6 +49,13 @@ export const CRICKIFY_IMAGES = {
   lessonForwardDefense: lessonForwardDefenseImg,
   lessonYorker: lessonYorkerImg,
   lessonUmpire: lessonUmpireImg,
+  matchIqScoreboard: matchIqScoreboardImg,
+  quizSquadHuddle: quizSquadHuddleImg,
+  trainingRoutineDrills: trainingRoutineDrillsImg,
+  videoPracticeCapture: videoPracticeCaptureImg,
+  aiCoachRobot: aiCoachRobotImg,
+  matchPlayerScoreboard: matchPlayerScoreboardImg,
+  cricketQuizRules: cricketQuizRulesImg,
 } as const;
 
 export const PITCHIQ_IMAGES = CRICKIFY_IMAGES;

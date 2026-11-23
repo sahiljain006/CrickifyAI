@@ -302,15 +302,15 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
       {/* Sleek Charcoal & Emerald AI Suite Header */}
       <div className="relative rounded-3xl overflow-hidden coach-dark-panel text-white p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-xl">
         <img
-          src={CRICKIFY_IMAGES.heroStadium}
-          alt="Floodlit cricket coaching arena"
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          src={CRICKIFY_IMAGES.aiCoachRobot}
+          alt="AI cricket coach robot speaking and chatting messages"
+          className="absolute inset-0 w-full h-full object-cover opacity-55"
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(108deg, rgba(11, 20, 16, 0.94) 0%, rgba(17, 36, 26, 0.88) 55%, rgba(16, 185, 129, 0.22) 100%)',
+              'linear-gradient(108deg, rgba(6, 22, 15, 0.94) 0%, rgba(12, 36, 25, 0.80) 55%, rgba(16, 185, 129, 0.25) 100%)',
           }}
         />
 
@@ -335,7 +335,7 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
             value={language}
             onChange={(e) => setLanguage(e.target.value as LanguageChoice)}
             aria-label="Coaching language"
-            className="min-h-[42px] px-3.5 py-2 rounded-xl bg-white text-[#17251A] text-xs font-bold shadow-xs"
+            className="min-h-[42px] px-3.5 py-2 rounded-xl bg-[#DCF2E2] text-[#102419] text-xs font-bold shadow-xs border border-[#B7F34A]/40"
           >
             <option value="English">English</option>
             <option value="Tamil">Tamil (தமிழ்)</option>
@@ -350,7 +350,7 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
             className={`min-h-[42px] inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-colors ${
               speakReplies
                 ? 'bg-[#A8D94E] text-[#17251A]'
-                : 'bg-white/20 text-white border border-white/30 hover:bg-white/30'
+                : 'bg-[#103B2A]/80 text-white border border-[#B7F34A]/35 hover:bg-[#165039]'
             }`}
           >
             {speakReplies ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -362,7 +362,7 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
               value={selectedReportId}
               onChange={(e) => setSelectedReportId(e.target.value)}
               aria-label="Attach video analysis report"
-              className="min-h-[42px] px-3.5 py-2 rounded-xl bg-white text-[#17251A] text-xs font-bold max-w-[230px]"
+              className="min-h-[42px] px-3.5 py-2 rounded-xl bg-[#DCF2E2] text-[#102419] text-xs font-bold max-w-[230px] border border-[#B7F34A]/40"
             >
               <option value="">No Video Attached</option>
               {state.reports.map((r) => (
@@ -389,30 +389,41 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
         </div>
       )}
 
-      {/* Conversation Container (Dark Suite Frame with High-Contrast Thread) */}
-      <div className="rounded-3xl overflow-hidden flex flex-col border border-[#1E3B2B] bg-[#0F1813] shadow-2xl">
-        <div className="p-4 sm:p-6 space-y-5 min-h-[340px] max-h-[58vh] sm:max-h-[540px] overflow-y-auto bg-[#131F18]">
+      {/* Conversation Container (Very Light White-Green Panel & Composer) */}
+      <div className="rounded-3xl overflow-hidden flex flex-col border border-[#087F55]/25 bg-[#F6FCF5] shadow-lg">
+        <div
+          className="p-4 sm:p-6 space-y-5 min-h-[320px] max-h-[58vh] sm:max-h-[540px] overflow-y-auto"
+          style={{
+            backgroundColor: '#F6FCF5',
+            backgroundImage:
+              'radial-gradient(circle at 90% 10%, rgba(183, 243, 74, 0.14) 0%, transparent 45%), repeating-linear-gradient(90deg, rgba(8, 127, 85, 0.018) 0px, rgba(8, 127, 85, 0.018) 32px, transparent 32px, transparent 64px)',
+          }}
+        >
           {state.coachMessages.length === 0 ? (
-            <div className="space-y-5 py-2">
-              <div className="bg-[#1A2C22] rounded-2xl border border-[#A8D94E]/25 p-5 max-w-2xl shadow-sm">
-                <div className="text-xs font-bold text-[#B7F34A] mb-1">CRICKIFY Coach Ready</div>
-                <p className="text-sm text-[#DCE7DD] leading-relaxed">
+            <div className="space-y-5 py-1">
+              <div className="bg-[#FFFFFF]/90 rounded-2xl border border-[#087F55]/20 p-4 sm:p-5 max-w-2xl shadow-xs">
+                <div className="text-xs font-extrabold uppercase tracking-wider text-[#087F55] mb-1">
+                  CRICKIFY AI Coach Ready
+                </div>
+                <p className="text-sm text-[#244030] leading-relaxed">
                   Ask any batting, bowling, fielding, fitness, or match-tactics question below. If you do not attach a video report, I will never pretend to see your mechanics—I will ask clarifying questions, explain the technique clearly, and link exact drills.
                 </p>
               </div>
 
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-xs font-bold text-white">Suggested Cricket Coaching Prompts</div>
+                  <div className="text-xs font-extrabold uppercase tracking-wider text-[#102419]">
+                    Suggested Cricket Coaching Prompts
+                  </div>
                   <div className="flex flex-wrap gap-1.5">
                     {(Object.keys(QUICK_PROMPTS_BY_TOPIC) as Array<keyof typeof QUICK_PROMPTS_BY_TOPIC>).map((topic) => (
                       <button
                         key={topic}
                         onClick={() => setPromptTopic(topic)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                           promptTopic === topic
-                            ? 'bg-[#A8D94E] text-[#09180F]'
-                            : 'bg-[#1A2C22] border border-white/10 text-[#C7D7C9] hover:text-white'
+                            ? 'bg-[#103B2A] text-white shadow-xs'
+                            : 'bg-[#FFFFFF] border border-[#087F55]/20 text-[#264232] hover:bg-[#E7F5E6] hover:text-[#102419]'
                         }`}
                       >
                         {topic}
@@ -425,7 +436,7 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
                     <button
                       key={q}
                       onClick={() => sendMessage(q)}
-                      className="text-left p-4 rounded-xl bg-[#192920] border border-white/12 text-xs font-semibold text-white hover:border-[#A8D94E] hover:bg-[#1E3528] transition-colors"
+                      className="text-left p-4 rounded-xl bg-[#FAFDFA] border border-[#087F55]/20 text-xs font-semibold text-[#102419] hover:border-[#087F55] hover:bg-[#E8F6E7] transition-colors shadow-2xs"
                     >
                       {q}
                     </button>
@@ -448,25 +459,25 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
                   <div
                     className={`max-w-3xl rounded-2xl p-4 md:p-5 space-y-3 ${
                       isUser
-                        ? 'bg-[#397B32] text-white shadow-sm'
-                        : 'bg-white border border-[#17251A]/10 text-[#17251A] shadow-sm'
+                        ? 'bg-[#087F55] text-white shadow-sm'
+                        : 'bg-[#FFFFFF] border border-[#087F55]/22 text-[#102419] shadow-xs'
                     }`}
                   >
-                    <div className={`flex items-center justify-between gap-4 text-[11px] ${isUser ? 'text-white/80' : 'text-[#68766A]'}`}>
+                    <div className={`flex items-center justify-between gap-4 text-[11px] ${isUser ? 'text-white/85' : 'text-[#4B6856]'}`}>
                       <span>{isUser ? state.profile.name : 'CRICKIFY AI Coach'} · {msg.language}</span>
                       {!isUser && (
                         <div className="flex items-center gap-2.5">
                           <button
                             onClick={() => speakText(msg.content, msg.language)}
                             aria-label="Listen to coaching advice"
-                            className="hover:text-[#397B32] transition-colors"
+                            className="hover:text-[#087F55] transition-colors"
                           >
                             <Volume2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => onToggleSaveMessage(msg.id)}
                             aria-label="Save coaching advice"
-                            className={msg.saved ? 'text-[#397B32]' : 'hover:text-[#397B32]'}
+                            className={msg.saved ? 'text-[#087F55]' : 'hover:text-[#087F55]'}
                           >
                             <Bookmark className={`w-3.5 h-3.5 ${msg.saved ? 'fill-current' : ''}`} />
                           </button>
@@ -484,7 +495,7 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
                               <button
                                 key={l.id}
                                 onClick={() => onOpenLesson(l.id)}
-                                className="px-3 py-1.5 rounded-lg bg-[#EDF1E7] border border-[#17251A]/10 text-xs font-semibold text-[#153D25] hover:bg-[#dfe6d6]"
+                                className="px-3 py-1.5 rounded-lg bg-[#EDF6EC] border border-[#087F55]/20 text-xs font-semibold text-[#103B2A] hover:bg-[#DFF0DE]"
                               >
                                 Lesson: {l.title}
                               </button>
@@ -496,7 +507,7 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
                               <button
                                 key={ex.id}
                                 onClick={() => onOpenExercise(ex.id)}
-                                className="px-3 py-1.5 rounded-lg bg-[#A8D94E]/30 border border-[#397B32]/30 text-xs font-semibold text-[#153D25] hover:bg-[#A8D94E]/45"
+                                className="px-3 py-1.5 rounded-lg bg-[#E4F7C7] border border-[#4D7C0F]/25 text-xs font-semibold text-[#103B2A] hover:bg-[#D5F0AD]"
                               >
                                 Drill: {ex.name}
                               </button>
@@ -510,7 +521,7 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
             })
           )}
           {loading && (
-            <div className="flex items-center gap-2 text-xs text-[#397B32] font-semibold">
+            <div className="flex items-center gap-2 text-xs text-[#087F55] font-semibold">
               <Loader2 className="w-4 h-4 animate-spin" /> Coach is preparing tailored cricket guidance...
             </div>
           )}
@@ -533,13 +544,13 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
           </div>
         )}
 
-        {/* Dark Suite Composer */}
+        {/* Light White-Green Message Input Composer */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
             sendMessage();
           }}
-          className="p-3 sm:p-4 bg-[#0D1611] border-t border-white/10 flex items-center gap-2"
+          className="p-3 sm:p-4 bg-[#EAF6E8] border-t border-[#087F55]/20 flex items-center gap-2"
         >
           <button
             type="button"
@@ -548,10 +559,10 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
             className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl border transition-colors shrink-0 ${
               listening
                 ? 'bg-red-600 text-white border-red-600'
-                : 'bg-[#192920] text-white border-white/15 hover:bg-[#23392D]'
+                : 'bg-[#FFFFFF] text-[#087F55] border-[#087F55]/25 hover:bg-[#DFF0DE]'
             }`}
           >
-            {listening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4 text-[#A8D94E]" />}
+            {listening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
           </button>
 
           <input
@@ -565,13 +576,13 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
                   ? 'अपना क्रिकेट प्रश्न पूछें...'
                   : 'Ask your AI cricket coach...'
             }
-            className="flex-1 min-w-0 min-h-[44px] px-3.5 py-2.5 rounded-xl border border-white/15 bg-[#17261E] text-sm text-white placeholder:text-[#8DA290] focus:outline-none focus:ring-2 focus:ring-[#A8D94E]"
+            className="flex-1 min-w-0 min-h-[44px] px-3.5 py-2.5 rounded-xl border border-[#087F55]/25 bg-[#FAFDFA] text-sm text-[#102419] placeholder:text-[#5B7564] focus:outline-none focus:ring-2 focus:ring-[#087F55] shadow-2xs"
           />
 
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="min-h-[44px] inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-xl bg-[#A8D94E] text-[#09180F] text-xs font-extrabold hover:bg-[#b8e465] transition-colors disabled:opacity-50 whitespace-nowrap shrink-0"
+            className="min-h-[44px] inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-xl bg-[#087F55] text-white text-xs font-extrabold hover:bg-[#103B2A] transition-colors disabled:opacity-50 whitespace-nowrap shrink-0 shadow-xs"
           >
             <Send className="w-4 h-4" />
             <span className="hidden sm:inline">Ask Coach</span>

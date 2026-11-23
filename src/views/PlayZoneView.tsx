@@ -18,6 +18,7 @@ import { NavSectionId, PlayZoneSession } from '../types';
 
 interface PlayZoneViewProps {
   onNavigate: (section: NavSectionId) => void;
+  onBack?: () => void;
   onSaveSession?: (session: PlayZoneSession) => void;
   onActiveGameplayChange?: (active: boolean) => void;
 }
@@ -233,6 +234,7 @@ function playSynthSound(kind: 'bat' | 'boundary' | 'wicket' | 'bowler', muted: b
 
 export const PlayZoneView: React.FC<PlayZoneViewProps> = ({
   onNavigate,
+  onBack,
   onSaveSession,
   onActiveGameplayChange,
 }) => {
@@ -806,14 +808,14 @@ export const PlayZoneView: React.FC<PlayZoneViewProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#B7F34A]">
               <Gamepad2 className="w-4 h-4" />
-              <span>CRICKIFY PlayZone · Batting Challenge</span>
+              <span>CRICKIFY AI PlayZone · Batting Challenge</span>
             </div>
             <button
               type="button"
-              onClick={() => onNavigate('home-landing')}
+              onClick={() => (onBack ? onBack() : onNavigate('home-landing'))}
               className="min-h-[42px] px-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-bold inline-flex items-center gap-1.5 transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" /> Back Home
+              <ArrowLeft className="w-4 h-4" /> Back
             </button>
           </div>
 
@@ -1068,7 +1070,7 @@ export const PlayZoneView: React.FC<PlayZoneViewProps> = ({
           </button>
           <div className="min-w-0">
             <div className="font-display text-base sm:text-lg font-bold leading-none text-white truncate">
-              CRICKIFY PLAYZONE
+              CRICKIFY AI PLAYZONE
             </div>
             <div className="text-[10px] font-mono uppercase tracking-wider text-[#B7F34A] truncate">
               {mode} · {difficulty}
@@ -1461,8 +1463,8 @@ export const PlayZoneView: React.FC<PlayZoneViewProps> = ({
                     ? 'bg-[#FFF7ED] border-[#FF941F] text-[#7C2D12]'
                     : lastOutcomeBanner.tone === 'red'
                       ? 'bg-red-50 border-red-500 text-red-900'
-                      : 'bg-white border-[#17251A]/15 text-[#17251A]'
-                : 'bg-white border-[#087F55]/18 text-[#103B2A]'
+                      : 'bg-[#DFF4E3] border-[#087F55]/25 text-[#102419]'
+                : 'bg-[#DFF4E3] border-[#087F55]/25 text-[#103B2A]'
             }`}
           >
             <div className="font-display text-base sm:text-xl font-extrabold leading-none truncate">
@@ -1539,7 +1541,7 @@ export const PlayZoneView: React.FC<PlayZoneViewProps> = ({
 
           {/* Desktop Live Over Summary Strip */}
           {ballLog.length > 0 && (
-            <div className="hidden lg:flex flex-wrap items-center gap-1.5 rounded-2xl bg-white border border-[#087F55]/15 p-3">
+            <div className="hidden lg:flex flex-wrap items-center gap-1.5 rounded-2xl bg-[#D7F0DC] border border-[#087F55]/25 p-3">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#55635B] mr-1">Over:</span>
               {ballLog.map((b) => (
                 <span
@@ -1565,7 +1567,7 @@ export const PlayZoneView: React.FC<PlayZoneViewProps> = ({
       {/* Inline Quick Help Modal During Match */}
       {helpOpen && (
         <div className="fixed inset-0 z-50 bg-[#0A1610]/70 backdrop-blur-xs p-4 flex items-center justify-center">
-          <div className="w-full max-w-md bg-white rounded-3xl border border-[#087F55]/20 p-6 space-y-4 shadow-2xl text-[#17251A]">
+          <div className="w-full max-w-md bg-gradient-to-b from-[#E1F4E5] to-[#D1ECD7] rounded-3xl border border-[#B7F34A]/45 p-6 space-y-4 shadow-2xl text-[#102419]">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-2xl font-bold">How to Play PlayZone</h2>
               <button

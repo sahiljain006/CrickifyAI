@@ -135,7 +135,7 @@ export const CricketAcademyView: React.FC<CricketAcademyViewProps> = ({
         };
       default:
         return {
-          title: 'CRICKIFY CRICKET ACADEMY.',
+          title: 'CRICKIFY AI CRICKET ACADEMY.',
           subtitle: 'Structured technical lessons, verified YouTube masterclasses, and targeted drills.',
           heroImg: CRICKIFY_IMAGES.heroStadium,
           lessonFilter: () => true,
@@ -258,7 +258,7 @@ export const CricketAcademyView: React.FC<CricketAcademyViewProps> = ({
         <div className="relative z-10 p-7 md:p-11 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div className="max-w-2xl space-y-4">
             <div className="text-xs font-bold uppercase tracking-wider text-[#B7F34A]">
-              CRICKIFY Cricket Academy · Structured Curriculum
+              CRICKIFY AI Cricket Academy · Structured Curriculum
             </div>
             <h1 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-white">
               {sectionMeta.title}
@@ -324,10 +324,10 @@ export const CricketAcademyView: React.FC<CricketAcademyViewProps> = ({
       {/* CHOOSE YOUR LEARNING PATH — 6 Distinct Photographic Cards */}
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="font-display text-2xl font-bold text-[#17251A] uppercase tracking-wide">
+          <h2 className="font-display text-2xl font-extrabold text-[#102419] uppercase tracking-wide">
             CHOOSE YOUR LEARNING PATH
           </h2>
-          <span className="text-xs font-semibold text-[#5C6B5F]">6 Academy Disciplines</span>
+          <span className="text-xs font-bold text-[#087F55]">6 Academy Disciplines</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {categoryQuickCards.map((cat) => {
@@ -388,13 +388,13 @@ export const CricketAcademyView: React.FC<CricketAcademyViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search lessons or videos..."
-              className="w-full min-h-[40px] pl-9 pr-3 py-2 rounded-xl border border-[#17251A]/15 bg-white text-xs"
+              className="w-full min-h-[40px] pl-9 pr-3 py-2 rounded-xl border border-[#087F55]/25 bg-[#ECFAEE] text-[#102419] text-xs"
             />
           </div>
           <select
             value={levelFilter}
             onChange={(e) => setLevelFilter(e.target.value)}
-            className="min-h-[40px] px-3 py-2 rounded-xl border border-[#17251A]/15 bg-white text-xs font-medium"
+            className="min-h-[40px] px-3 py-2 rounded-xl border border-[#087F55]/25 bg-[#ECFAEE] text-[#102419] text-xs font-medium"
           >
             <option value="All">All Levels</option>
             <option value="Beginner">Beginner</option>
@@ -447,7 +447,7 @@ export const CricketAcademyView: React.FC<CricketAcademyViewProps> = ({
                   </div>
                 </div>
 
-                <div className="px-5 py-3.5 border-t border-[#17251A]/10 flex items-center justify-between bg-white">
+                <div className="px-5 py-3.5 border-t border-[#087F55]/18 flex items-center justify-between bg-[#D7F0DC]">
                   <span className="text-xs font-mono text-[#68766A] tabular-nums">
                     {lesson.durationMinutes} min · {lesson.steps.length} steps
                   </span>
@@ -474,11 +474,11 @@ export const CricketAcademyView: React.FC<CricketAcademyViewProps> = ({
         <div className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h2 className="font-display text-2xl md:text-3xl font-bold text-[#17251A]">
+              <h2 className="font-display text-2xl md:text-3xl font-extrabold text-[#102419]">
                 LEARN FROM THE BEST — CRICKET MASTERCLASS
               </h2>
-              <p className="text-xs text-[#68766A]">
-                Genuine, verified cricket coaching tutorials embedded directly inside CRICKIFY.
+              <p className="text-xs text-[#3C5646] font-medium">
+                Genuine, verified cricket coaching tutorials embedded directly inside CRICKIFY AI.
               </p>
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -486,8 +486,10 @@ export const CricketAcademyView: React.FC<CricketAcademyViewProps> = ({
                 <button
                   key={cat}
                   onClick={() => setTutorialCatFilter(cat)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${
-                    effectiveTutCat === cat ? 'bg-[#397B32] text-white' : 'bg-white border border-[#17251A]/12 text-[#17251A]'
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+                    effectiveTutCat === cat
+                      ? 'bg-[#103B2A] text-white'
+                      : 'bg-[#FAFDFA] border border-[#087F55]/25 text-[#102419] hover:bg-[#E7F5E6]'
                   }`}
                 >
                   {cat}

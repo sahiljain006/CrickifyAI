@@ -7,7 +7,7 @@ interface DiagramProps {
 
 export const CricketTechniqueDiagram: React.FC<DiagramProps> = ({ type }) => {
   return (
-    <div className="rounded-2xl bg-white border border-[#17251A]/10 p-5 text-[#17251A] shadow-sm">
+    <div className="rounded-2xl bg-[#E1F4E5] border border-[#087F55]/25 p-5 text-[#102419] shadow-sm">
       <div className="flex items-center justify-between mb-3 text-xs text-[#397B32] font-mono font-semibold">
         <span>TECHNIQUE GUIDE</span>
         <span>CRICKIFY VISUAL GUIDE</span>

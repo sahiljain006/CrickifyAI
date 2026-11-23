@@ -251,7 +251,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
                           {q.options.map((opt, oIdx) => {
                             const isSelected = chosen === oIdx;
                             const isCorrect = oIdx === q.correctIndex;
-                            let style = 'bg-white border-[#17251A]/15 text-[#17251A] hover:bg-[#EDF1E7]';
+                            let style = 'bg-[#ECFAEE] border-[#087F55]/20 text-[#102419] hover:bg-[#D5F1DC]';
                             if (chosen !== undefined) {
                               if (isCorrect) style = 'bg-[#A8D94E]/25 border-[#397B32] text-[#153D25] font-semibold';
                               else if (isSelected) style = 'bg-red-50 border-red-400 text-red-900';
@@ -284,7 +284,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
                     {lesson.practicalChecklist.map((item, idx) => (
                       <label
                         key={idx}
-                        className="flex items-start gap-3 p-3 rounded-lg bg-white border border-[#17251A]/10 cursor-pointer"
+                        className="flex items-start gap-3 p-3 rounded-lg bg-[#ECFAEE] border border-[#087F55]/20 cursor-pointer"
                       >
                         <input
                           type="checkbox"
@@ -315,7 +315,7 @@ export const LessonDetailModal: React.FC<LessonDetailModalProps> = ({
 
             <button
               onClick={() => onSelectLesson(lesson.nextLessonId)}
-              className="min-h-[44px] inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-[#17251A]/15 bg-white text-[#17251A] text-sm font-semibold hover:bg-[#EDF1E7] transition-colors"
+              className="min-h-[44px] inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-[#087F55]/25 bg-[#DDF4E2] text-[#102419] text-sm font-semibold hover:bg-[#C6EBD0] transition-colors"
             >
               Recommended Next Lesson <ArrowRight className="w-4 h-4" />
             </button>

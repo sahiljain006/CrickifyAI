@@ -203,7 +203,7 @@ export const ProfilePhotoEditor: React.FC<ProfilePhotoEditorProps> = ({
           type="button"
           onClick={onCancel}
           aria-label="Close photo editor"
-          className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl bg-white border border-[#17251A]/10 text-[#68766A] hover:text-[#17251A]"
+          className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl bg-[#ECFAEE] border border-[#17251A]/10 text-[#68766A] hover:text-[#17251A]"
         >
           <X className="w-4 h-4" />
         </button>
@@ -294,7 +294,7 @@ export const ProfilePhotoEditor: React.FC<ProfilePhotoEditorProps> = ({
                   setImgDimensions(null);
                   onRemoveCustomPhoto();
                 }}
-                className="min-h-[42px] px-3.5 py-2 rounded-xl bg-white border border-red-200 text-red-700 text-xs font-semibold hover:bg-red-50 inline-flex items-center gap-1.5 transition-colors"
+                className="min-h-[42px] px-3.5 py-2 rounded-xl bg-[#ECFAEE] border border-red-200 text-red-700 text-xs font-semibold hover:bg-red-50 inline-flex items-center gap-1.5 transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>{googlePhotoUrl ? 'Restore Google Photo' : 'Remove Custom Photo'}</span>
@@ -303,7 +303,7 @@ export const ProfilePhotoEditor: React.FC<ProfilePhotoEditorProps> = ({
           </div>
 
           {selectedDataUrl && (
-            <div className="bg-white rounded-xl border border-[#397B32]/15 p-3 space-y-2">
+            <div className="bg-[#ECFAEE] rounded-xl border border-[#397B32]/15 p-3 space-y-2">
               <div className="flex items-center justify-between text-xs font-semibold text-[#17251A]">
                 <span className="inline-flex items-center gap-1.5">
                   <ZoomIn className="w-3.5 h-3.5 text-[#397B32]" />
@@ -343,7 +343,7 @@ export const ProfilePhotoEditor: React.FC<ProfilePhotoEditorProps> = ({
                 <span>Saving photo...</span>
                 <span className="font-mono tabular-nums">{uploadPct}%</span>
               </div>
-              <div className="h-2 rounded-full bg-white overflow-hidden border border-[#397B32]/15">
+              <div className="h-2 rounded-full bg-[#ECFAEE] overflow-hidden border border-[#397B32]/15">
                 <div
                   className="h-full bg-gradient-to-r from-[#397B32] to-[#A8D94E] transition-all duration-150"
                   style={{ width: `${uploadPct}%` }}
@@ -383,7 +383,7 @@ export const ProfilePhotoEditor: React.FC<ProfilePhotoEditorProps> = ({
                 type="button"
                 disabled={uploading}
                 onClick={onCancel}
-                className="min-h-[42px] px-4 py-2 rounded-xl bg-white border border-[#17251A]/15 text-xs font-semibold text-[#17251A] hover:bg-[#EDF3E8]"
+                className="min-h-[42px] px-4 py-2 rounded-xl bg-[#ECFAEE] border border-[#17251A]/15 text-xs font-semibold text-[#17251A] hover:bg-[#EDF3E8]"
               >
                 Cancel
               </button>

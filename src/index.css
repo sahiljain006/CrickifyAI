@@ -21,15 +21,15 @@
 @layer base {
   html {
     font-family: var(--font-sans);
-    background-color: #F4F7EF;
-    color: #101714;
+    background-color: #F4FAF3;
+    color: #102419;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
   }
 
   body {
-    background-color: #F4F7EF;
-    color: #101714;
+    background-color: #F4FAF3;
+    color: #102419;
     overflow-x: hidden;
   }
 
@@ -43,25 +43,38 @@
   }
 }
 
-/* Global Subtle Cricket Ground Mowed Turf & Pitch Atmosphere */
+/* Global Light White-Green Cricket Turf & Sunlit Outfield Atmosphere */
 .cricket-turf-canvas {
-  background-color: #F4F7EF;
+  background-color: #F4FAF3;
   background-image:
-    radial-gradient(ellipse 80% 420px at 50% 0%, rgba(168, 217, 78, 0.14) 0%, rgba(8, 127, 85, 0.05) 55%, transparent 100%),
+    radial-gradient(ellipse 90% 520px at 50% 0%, rgba(183, 243, 74, 0.22) 0%, rgba(16, 185, 129, 0.09) 48%, rgba(244, 250, 243, 0.94) 100%),
+    radial-gradient(circle at 12% 35%, rgba(255, 148, 31, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 88% 70%, rgba(8, 127, 85, 0.09) 0%, transparent 48%),
     repeating-linear-gradient(
       90deg,
-      rgba(16, 59, 42, 0.024) 0px,
-      rgba(16, 59, 42, 0.024) 64px,
-      transparent 64px,
-      transparent 128px
+      rgba(8, 127, 85, 0.028) 0px,
+      rgba(8, 127, 85, 0.028) 64px,
+      rgba(255, 255, 255, 0.35) 64px,
+      rgba(255, 255, 255, 0.35) 128px
     );
 }
 
-/* Light Athletic Card Surfaces */
+/* Very Light White-Green Athletic Card Surfaces with Subtle Turf Texture */
 .athletic-card {
-  background-color: #FFFFFF;
-  border: 1px solid rgba(16, 59, 42, 0.13);
-  box-shadow: 0 12px 30px -16px rgba(16, 23, 20, 0.1);
+  background-color: #F7FCF6;
+  background-image:
+    radial-gradient(circle at 100% 0%, rgba(183, 243, 74, 0.14) 0%, transparent 46%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(8, 127, 85, 0.018) 0px,
+      rgba(8, 127, 85, 0.018) 12px,
+      transparent 12px,
+      transparent 24px
+    ),
+    linear-gradient(155deg, #F9FDF8 0%, #EBF7EA 100%);
+  color: #102419;
+  border: 1px solid rgba(8, 127, 85, 0.18);
+  box-shadow: 0 14px 32px -18px rgba(10, 46, 28, 0.2);
 }
 
 .athletic-card-hover {
@@ -70,81 +83,102 @@
 
 .athletic-card-hover:hover {
   transform: translateY(-3px);
-  border-color: rgba(8, 127, 85, 0.48);
-  box-shadow: 0 20px 40px -16px rgba(16, 59, 42, 0.18);
+  border-color: rgba(8, 127, 85, 0.45);
+  box-shadow: 0 20px 38px -16px rgba(10, 46, 28, 0.28);
 }
 
 /* Page-Distinct Visual Identities */
 /* PlayZone — Immersive Dark Gaming Arena */
 .stadium-dark-panel {
   background:
-    radial-gradient(circle at 82% 18%, rgba(183, 243, 74, 0.2) 0%, rgba(16, 23, 20, 0) 48%),
-    radial-gradient(circle at 14% 88%, rgba(8, 127, 85, 0.22) 0%, transparent 45%),
+    radial-gradient(circle at 82% 18%, rgba(183, 243, 74, 0.22) 0%, rgba(16, 23, 20, 0) 48%),
+    radial-gradient(circle at 14% 88%, rgba(8, 127, 85, 0.26) 0%, transparent 45%),
     linear-gradient(135deg, #09120E 0%, #103B2A 54%, #0C1512 100%);
-  border: 1px solid rgba(183, 243, 74, 0.28);
-  box-shadow: 0 24px 54px -22px rgba(5, 14, 10, 0.68);
+  border: 1px solid rgba(183, 243, 74, 0.34);
+  box-shadow: 0 24px 54px -22px rgba(5, 14, 10, 0.45);
 }
 
-/* Academy — Emerald & Warm Ivory */
+/* Academy — Very Light White-Green Pitch Surface */
 .ivory-academy-surface {
-  background: linear-gradient(180deg, #FFFFFF 0%, #FBFDF7 100%);
-  border: 1px solid rgba(8, 127, 85, 0.16);
-  box-shadow: 0 12px 30px -18px rgba(16, 59, 42, 0.14);
+  background-color: #F7FCF6;
+  background-image:
+    radial-gradient(circle at 92% 8%, rgba(183, 243, 74, 0.18) 0%, transparent 48%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(8, 127, 85, 0.02) 0px,
+      rgba(8, 127, 85, 0.02) 32px,
+      transparent 32px,
+      transparent 64px
+    ),
+    linear-gradient(155deg, #FAFDFA 0%, #ECF8EC 62%, #F6FBE9 100%);
+  color: #102419;
+  border: 1px solid rgba(8, 127, 85, 0.2);
+  box-shadow: 0 14px 32px -18px rgba(10, 46, 28, 0.2);
 }
 
 /* Video Analysis — Midnight Charcoal & Energetic Orange */
 .studio-dark-panel {
   background:
-    radial-gradient(circle at 88% 12%, rgba(255, 148, 31, 0.22) 0%, transparent 48%),
-    radial-gradient(circle at 10% 90%, rgba(255, 148, 31, 0.08) 0%, transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(255, 148, 31, 0.24) 0%, transparent 48%),
+    radial-gradient(circle at 10% 90%, rgba(255, 148, 31, 0.1) 0%, transparent 42%),
     linear-gradient(145deg, #0D1412 0%, #141C1A 58%, #0A0E0D 100%);
-  border: 1px solid rgba(255, 148, 31, 0.34);
-  box-shadow: 0 24px 48px -22px rgba(7, 14, 10, 0.68);
+  border: 1px solid rgba(255, 148, 31, 0.4);
+  box-shadow: 0 22px 44px -22px rgba(7, 14, 10, 0.5);
 }
 
 /* AI Coach — Deep Forest Green & Electric Lime */
 .coach-dark-panel {
   background:
-    radial-gradient(circle at 86% 12%, rgba(183, 243, 74, 0.22) 0%, transparent 50%),
-    radial-gradient(circle at 12% 92%, rgba(8, 127, 85, 0.28) 0%, transparent 48%),
+    radial-gradient(circle at 86% 12%, rgba(183, 243, 74, 0.24) 0%, transparent 50%),
+    radial-gradient(circle at 12% 92%, rgba(8, 127, 85, 0.3) 0%, transparent 48%),
     linear-gradient(145deg, #0B2D1F 0%, #103B2A 58%, #082016 100%);
-  border: 1px solid rgba(183, 243, 74, 0.32);
-  box-shadow: 0 24px 48px -22px rgba(10, 32, 22, 0.58);
+  border: 1px solid rgba(183, 243, 74, 0.38);
+  box-shadow: 0 22px 44px -22px rgba(10, 32, 22, 0.48);
 }
 
 /* Match IQ — Broadcast Scoreboard Dark */
 .scoreboard-dark-panel {
   background:
-    radial-gradient(circle at 85% 15%, rgba(255, 148, 31, 0.14) 0%, transparent 45%),
-    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.022) 0px, rgba(255, 255, 255, 0.022) 1px, transparent 1px, transparent 22px),
-    linear-gradient(135deg, #0F171A 0%, #162326 60%, #0E251E 100%);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 20px 44px -22px rgba(8, 15, 18, 0.55);
+    radial-gradient(circle at 85% 15%, rgba(255, 148, 31, 0.18) 0%, transparent 45%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0px, rgba(255, 255, 255, 0.025) 1px, transparent 1px, transparent 22px),
+    linear-gradient(135deg, #0F171A 0%, #16282C 60%, #0E2B22 100%);
+  border: 1px solid rgba(255, 148, 31, 0.32);
+  box-shadow: 0 22px 44px -22px rgba(8, 15, 18, 0.5);
 }
 
-/* Training Planner — Fresh Green & Clean Ivory */
+/* Training Planner — Very Light White-Green Turf & Soft Gold */
 .training-clean-surface {
-  background:
-    radial-gradient(circle at 90% 10%, rgba(168, 217, 78, 0.14) 0%, transparent 48%),
-    linear-gradient(180deg, #FFFFFF 0%, #F4F8EC 100%);
-  border: 1px solid rgba(8, 127, 85, 0.2);
-  box-shadow: 0 12px 30px -18px rgba(16, 59, 42, 0.12);
+  background-color: #F6FCF5;
+  background-image:
+    radial-gradient(circle at 92% 10%, rgba(255, 148, 31, 0.11) 0%, transparent 45%),
+    radial-gradient(circle at 8% 92%, rgba(183, 243, 74, 0.18) 0%, transparent 46%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(8, 127, 85, 0.02) 0px,
+      rgba(8, 127, 85, 0.02) 36px,
+      transparent 36px,
+      transparent 72px
+    ),
+    linear-gradient(145deg, #FAFDFA 0%, #EDF8EA 60%, #F7FBEC 100%);
+  color: #102419;
+  border: 1px solid rgba(8, 127, 85, 0.22);
+  box-shadow: 0 16px 34px -18px rgba(10, 46, 28, 0.22);
 }
 
 /* Turf IQ — Cricket Pitch Green */
 .turf-arena-panel {
   background:
-    radial-gradient(circle at 82% 20%, rgba(168, 217, 78, 0.2) 0%, transparent 50%),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0px, rgba(255, 255, 255, 0.025) 36px, transparent 36px, transparent 72px),
-    linear-gradient(135deg, #0A281C 0%, #113F2C 62%, #0C2119 100%);
-  border: 1px solid rgba(183, 243, 74, 0.28);
-  box-shadow: 0 22px 44px -22px rgba(8, 28, 18, 0.58);
+    radial-gradient(circle at 82% 20%, rgba(168, 217, 78, 0.24) 0%, transparent 50%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.028) 0px, rgba(255, 255, 255, 0.028) 36px, transparent 36px, transparent 72px),
+    linear-gradient(135deg, #0A281C 0%, #114430 62%, #0C2119 100%);
+  border: 1px solid rgba(183, 243, 74, 0.35);
+  box-shadow: 0 22px 44px -22px rgba(8, 28, 18, 0.5);
 }
 
 .glass-panel {
-  background-color: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  box-shadow: 0 12px 32px -12px rgba(16, 23, 20, 0.16);
+  background-color: rgba(244, 251, 243, 0.94);
+  border: 1px solid rgba(8, 127, 85, 0.22);
+  box-shadow: 0 14px 32px -12px rgba(10, 46, 28, 0.22);
 }
 
 .hero-mote {
@@ -282,6 +316,34 @@
 .animate-particle-rise {
   animation: particle-rise 5.2s ease-in-out infinite;
   will-change: transform, opacity;
+}
+
+@keyframes cricket-float {
+  0%, 100% {
+    transform: translate3d(0px, 0px, 0px);
+  }
+  50% {
+    transform: translate3d(6px, -16px, 0px);
+  }
+}
+
+@keyframes cricket-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-cricket-float {
+  animation: cricket-float 9.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-cricket-spin {
+  animation: cricket-spin 28s linear infinite;
+  will-change: transform;
 }
 
 .animate-drawer-in {

@@ -10,7 +10,7 @@ interface HelpModalProps {
 export const HelpModal: React.FC<HelpModalProps> = ({ onClose, onNavigate }) => {
   const sections = [
     {
-      title: '1. Getting Started on CRICKIFY',
+      title: '1. Getting Started on CRICKIFY AI',
       icon: BookOpen,
       body: 'Start in Cricket Academy to learn structured batting, bowling, fielding, wicketkeeping, and rules lessons. Sign in with Google to save your progress, training routines, and video reports across sessions.',
       actionLabel: 'Open Cricket Academy',
@@ -40,12 +40,12 @@ export const HelpModal: React.FC<HelpModalProps> = ({ onClose, onNavigate }) => 
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#17251A]/55 backdrop-blur-sm overflow-y-auto p-4 md:p-8 flex items-center justify-center">
-      <div className="w-full max-w-2xl bg-white rounded-3xl border border-[#397B32]/20 overflow-hidden shadow-2xl my-auto">
-        <div className="bg-gradient-to-r from-[#24552E] via-[#397B32] to-[#69A83F] text-white px-6 py-5 flex items-center justify-between gap-4">
+    <div className="fixed inset-0 z-50 bg-[#05140D]/75 backdrop-blur-sm overflow-y-auto p-4 md:p-8 flex items-center justify-center">
+      <div className="w-full max-w-2xl bg-gradient-to-b from-[#E1F4E5] to-[#D1ECD7] rounded-3xl border border-[#B7F34A]/45 overflow-hidden shadow-2xl my-auto">
+        <div className="bg-gradient-to-r from-[#0A2D1E] via-[#124630] to-[#1D5B39] text-white px-6 py-5 flex items-center justify-between gap-4 border-b border-[#B7F34A]/25">
           <div>
-            <div className="text-xs font-bold uppercase tracking-wider text-[#A8D94E]">CRICKIFY Guide</div>
-            <h2 className="font-display text-3xl font-bold">How to Use CRICKIFY</h2>
+            <div className="text-xs font-bold uppercase tracking-wider text-[#B7F34A]">CRICKIFY AI Guide</div>
+            <h2 className="font-display text-3xl font-bold">How to Use CRICKIFY AI</h2>
           </div>
           <button
             type="button"
@@ -62,13 +62,13 @@ export const HelpModal: React.FC<HelpModalProps> = ({ onClose, onNavigate }) => 
             {sections.map((sec) => {
               const Icon = sec.icon;
               return (
-                <div key={sec.title} className="p-4 rounded-2xl bg-[#F7FAF3] border border-[#397B32]/12 flex flex-col justify-between gap-3">
+                <div key={sec.title} className="p-4 rounded-2xl bg-[#ECF9EE] border border-[#087F55]/25 flex flex-col justify-between gap-3">
                   <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#397B32]">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#075E3F]">
                       <Icon className="w-4 h-4" />
                       <span>{sec.title}</span>
                     </div>
-                    <p className="text-xs text-[#68766A] leading-relaxed">{sec.body}</p>
+                    <p className="text-xs text-[#2B4234] leading-relaxed">{sec.body}</p>
                   </div>
                   <button
                     type="button"
