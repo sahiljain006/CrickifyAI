@@ -1,14 +1,12 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import {
-  browserLocalPersistence,
   getAuth,
   GoogleAuthProvider,
-  setPersistence,
   signInWithPopup,
   signOut,
   User,
 } from 'firebase/auth';
-import { doc, getDocFromServer, getFirestore } from 'firebase/firestore';
+import { doc, getDocFromServer, getFirestore, initializeFirestore } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import firebaseConfig from '../../firebase-applet-config.json';
 
@@ -22,16 +20,30 @@ export const isFirebaseConfigured: boolean = hasValidConfig;
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-// CRITICAL: Pass the named firestoreDatabaseId provisioned for this applet
-export const db = firebaseConfig.firestoreDatabaseId
-  ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
-  : getFirestore(app);
-export const storage = firebaseConfig.storageBucket ? getStorage(app) : null;
 
-// Persist Google sign-in across refreshes and browser tabs
-setPersistence(auth, browserLocalPersistence).catch((err) => {
-  console.warn('[Firebase Auth] Failed to set local persistence:', err);
-});
+// CRITICAL: Pass the named firestoreDatabaseId provisioned for this applet and force
+// HTTP long-polling in browsers so sandboxed iframes/proxies never stall WebChannel streams for 10s.
+function createFirestoreInstance() {
+  const databaseId = firebaseConfig.firestoreDatabaseId || undefined;
+  if (typeof window === 'undefined') {
+    return databaseId ? getFirestore(app, databaseId) : getFirestore(app);
+  }
+  try {
+    return initializeFirestore(
+      app,
+      {
+        experimentalForceLongPolling: true,
+        ignoreUndefinedProperties: true,
+      },
+      databaseId
+    );
+  } catch {
+    return databaseId ? getFirestore(app, databaseId) : getFirestore(app);
+  }
+}
+
+export const db = createFirestoreInstance();
+export const storage = firebaseConfig.storageBucket ? getStorage(app) : null;
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
@@ -91,13 +103,40 @@ export function handleFirestoreError(
 }
 
 export async function testFirestoreConnection(): Promise<boolean> {
-  try {
+  if (!isFirebaseConfigured) {
+    return false;
+  }
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    return false;
+  }
+
+  const probe = async () => {
     await getDocFromServer(doc(db, 'test', 'connection'));
+  };
+
+  try {
+    await probe();
     return true;
   } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.error('Please check your Firebase configuration. Firestore client is offline.');
-      return false;
+    const msg = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+    if (msg.includes('client is offline')) {
+      // Retry once after a brief delay for transient cold-start connections
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        return false;
+      }
+      try {
+        await probe();
+        return true;
+      } catch (retryError) {
+        const retryMsg =
+          retryError instanceof Error ? retryError.message.toLowerCase() : String(retryError).toLowerCase();
+        if (retryMsg.includes('client is offline')) {
+          console.error('Please check your Firebase configuration. Firestore client is offline.');
+          return false;
+        }
+        return true;
+      }
     }
     return true;
   }
@@ -152,6 +191,7 @@ export async function signInWithGoogle(): Promise<GoogleSignInResult> {
   }
   try {
     const cred = await signInWithPopup(auth, googleProvider);
+    await cred.user.getIdToken();
     return {
       user: extractAuthUserSummary(cred.user),
       error: null,

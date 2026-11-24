@@ -14,7 +14,10 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: '25mb' }));
-app.use('/mediapipe-wasm', express.static(path.resolve(__dirname, 'node_modules/@mediapipe/tasks-vision/wasm')));
+const wasmDir = path.resolve(__dirname, 'node_modules/@mediapipe/tasks-vision/wasm');
+if (fs.existsSync(wasmDir)) {
+  app.use('/mediapipe-wasm', express.static(wasmDir));
+}
 
 const DATA_DIR = process.env.VERCEL ? path.join('/tmp', 'crickify-data') : path.resolve(__dirname, 'data');
 const STORE_PATH = path.join(DATA_DIR, 'pitchiq-store.json');
@@ -22,8 +25,12 @@ const STORE_PATH = path.join(DATA_DIR, 'pitchiq-store.json');
 // Initialize Firebase Admin Auth solely with projectId for verifyIdToken (requires no IAM role)
 let firebaseProjectId = '';
 try {
-  const cfgPath = path.resolve(__dirname, 'firebase-applet-config.json');
-  if (fs.existsSync(cfgPath)) {
+  const candidateCfgPaths = [
+    path.resolve(__dirname, 'firebase-applet-config.json'),
+    path.resolve(process.cwd(), 'firebase-applet-config.json'),
+  ];
+  const cfgPath = candidateCfgPaths.find((p) => fs.existsSync(p));
+  if (cfgPath) {
     const parsedCfg = JSON.parse(fs.readFileSync(cfgPath, 'utf-8')) as { projectId?: string };
     if (parsedCfg?.projectId && parsedCfg.projectId !== 'remixed-project-id') {
       firebaseProjectId = parsedCfg.projectId;
@@ -103,13 +110,15 @@ const DEPRECATED_MODELS = new Set([
 
 const DEFAULT_PRIMARY_MODEL = 'gemini-3.1-flash-lite';
 const DEFAULT_FALLBACK_MODEL = 'gemini-4-hydrogen';
-const PRIMARY_MAX_ATTEMPTS = 2;
+const RESILIENT_FALLBACK_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-3.5-flash'];
+const PRIMARY_MAX_ATTEMPTS = 1;
 const FALLBACK_MAX_ATTEMPTS = 2;
-const BASE_BACKOFF_MS = 650;
+const BASE_BACKOFF_MS = 550;
 const TEXT_PRIMARY_TIMEOUT_MS = 10000;
-const TEXT_FALLBACK_TIMEOUT_MS = 22000;
-const MULTIMODAL_PRIMARY_TIMEOUT_MS = 18000;
-const MULTIMODAL_FALLBACK_TIMEOUT_MS = 30000;
+const TEXT_FALLBACK_TIMEOUT_MS = 16000;
+const MULTIMODAL_PRIMARY_TIMEOUT_MS = 16000;
+const MULTIMODAL_FALLBACK_TIMEOUT_MS = 22000;
+const TOTAL_GENERATION_BUDGET_MS = 50000;
 const TRANSIENT_COOLDOWN_MS = 5 * 60 * 1000;
 const HARD_UNAVAILABLE_COOLDOWN_MS = 15 * 60 * 1000;
 
@@ -123,10 +132,15 @@ function getConfiguredModels(): string[] {
     .map((m) => m.trim())
     .filter(Boolean);
 
-  const candidates = [rawPrimary, rawFallback, ...extraFallbacks, DEFAULT_FALLBACK_MODEL].filter(
-    (m) => m && !DEPRECATED_MODELS.has(m)
-  );
-  return Array.from(new Set(candidates.length > 0 ? candidates : [DEFAULT_PRIMARY_MODEL, DEFAULT_FALLBACK_MODEL]));
+  const candidates = [
+    rawPrimary,
+    rawFallback,
+    ...extraFallbacks,
+    DEFAULT_PRIMARY_MODEL,
+    DEFAULT_FALLBACK_MODEL,
+    ...RESILIENT_FALLBACK_MODELS,
+  ].filter((m) => m && !DEPRECATED_MODELS.has(m));
+  return Array.from(new Set(candidates.length > 0 ? candidates : [DEFAULT_PRIMARY_MODEL, DEFAULT_FALLBACK_MODEL, ...RESILIENT_FALLBACK_MODELS]));
 }
 
 function getEffectiveModels(): string[] {
@@ -465,13 +479,20 @@ async function generateJsonWithGemini<T extends Record<string, unknown>>({
 }): Promise<{ data: T; modelUsed: string }> {
   const ai = getGeminiClient();
   const models = getEffectiveModels();
+  const requestStartedAt = Date.now();
   let lastError: GeminiClassifiedError | null = null;
 
   for (let mIdx = 0; mIdx < models.length; mIdx++) {
+    const remainingBudgetMs = TOTAL_GENERATION_BUDGET_MS - (Date.now() - requestStartedAt);
+    if (remainingBudgetMs < 3500) {
+      break;
+    }
+
     const model = models[mIdx];
     const hasNextModel = mIdx < models.length - 1;
-    const attemptTimeoutMs = hasNextModel ? primaryTimeoutMs : fallbackTimeoutMs;
-    const maxAttemptsForModel = mIdx === 0 && hasNextModel ? PRIMARY_MAX_ATTEMPTS : FALLBACK_MAX_ATTEMPTS;
+    const baseTimeoutMs = hasNextModel ? primaryTimeoutMs : fallbackTimeoutMs;
+    const attemptTimeoutMs = Math.max(3500, Math.min(baseTimeoutMs, remainingBudgetMs - 500));
+    const maxAttemptsForModel = hasNextModel ? PRIMARY_MAX_ATTEMPTS : FALLBACK_MAX_ATTEMPTS;
 
     for (let attempt = 0; attempt < maxAttemptsForModel; attempt++) {
       const controller = new AbortController();
@@ -516,25 +537,25 @@ async function generateJsonWithGemini<T extends Record<string, unknown>>({
           .replace(/AIza[0-9A-Za-z_-]+/g, '[REDACTED]')
           .slice(0, 180);
 
-        // Immediately fail on non-retryable auth/missing-key/bad-request errors
-        if (
-          classified.code === 'MISSING_API_KEY' ||
-          classified.code === 'INVALID_API_KEY' ||
-          classified.code === 'BAD_REQUEST'
-        ) {
+        // Immediately fail on non-retryable auth/missing-key errors
+        if (classified.code === 'MISSING_API_KEY' || classified.code === 'INVALID_API_KEY') {
           console.error(
             `[Gemini] model=${model} non-retryable error in ${elapsedMs}ms: code=${classified.code} status=${classified.status} detail=${safeSnippet}`
           );
           throw classified;
         }
 
-        const hasMoreAttemptsOnModel = attempt < maxAttemptsForModel - 1;
-        const willSwitchImmediately =
-          classified.code === 'QUOTA_EXHAUSTED' ||
-          classified.code === 'UNSUPPORTED_MODEL' ||
-          (timedOut && hasNextModel);
+        // If no fallback model remains and it's a bad request, fail immediately
+        if (classified.code === 'BAD_REQUEST' && !hasNextModel) {
+          console.error(
+            `[Gemini] model=${model} bad request in ${elapsedMs}ms: status=${classified.status} detail=${safeSnippet}`
+          );
+          throw classified;
+        }
 
-        if ((hasMoreAttemptsOnModel && !willSwitchImmediately) || hasNextModel) {
+        const hasMoreAttemptsOnModel = attempt < maxAttemptsForModel - 1;
+
+        if (hasNextModel || hasMoreAttemptsOnModel) {
           console.log(
             `[Gemini] model=${model} attempt=${attempt + 1}/${maxAttemptsForModel} switching/retrying after ${elapsedMs}ms (code=${classified.code}, timedOut=${timedOut})`
           );
@@ -552,22 +573,18 @@ async function generateJsonWithGemini<T extends Record<string, unknown>>({
             classified.code === 'MODEL_UNAVAILABLE' ||
             classified.code === 'RATE_LIMITED' ||
             classified.code === 'QUOTA_EXHAUSTED' ||
-            classified.code === 'UNSUPPORTED_MODEL')
+            classified.code === 'UNSUPPORTED_MODEL' ||
+            classified.code === 'INTERNAL_ERROR')
         ) {
           markModelCooldown(model, classified.code);
         }
 
-        // If quota exhausted or model unsupported (404), move straight to fallback model
-        if (classified.code === 'QUOTA_EXHAUSTED' || classified.code === 'UNSUPPORTED_MODEL') {
+        // Whenever another fallback model is available, fail over immediately instead of retrying an overloaded model
+        if (hasNextModel) {
           break;
         }
 
-        // If this attempt timed out and a fallback model exists, switch to fallback immediately rather than doubling wait time
-        if (timedOut && hasNextModel) {
-          break;
-        }
-
-        // Retry with bounded exponential backoff + jitter on transient errors (503, 429, 5xx, network)
+        // Retry with bounded exponential backoff + jitter only on the final available model
         if (classified.retryable && hasMoreAttemptsOnModel) {
           const jitter = Math.floor(Math.random() * 250);
           const delayMs = BASE_BACKOFF_MS * Math.pow(2, attempt) + jitter;
@@ -575,7 +592,6 @@ async function generateJsonWithGemini<T extends Record<string, unknown>>({
           continue;
         }
 
-        // Otherwise break to switch to fallback model
         break;
       } finally {
         if (timeoutHandle) {
@@ -669,17 +685,19 @@ app.post('/api/coach/chat', attachOptionalFirebaseUser, async (req, res) => {
 
     const reportContext = linkedReport
       ? `ATTACHED VIDEO ANALYSIS REPORT (observed from real frames and MediaPipe pose landmarks):
-- Skill & Technique: ${linkedReport.skillCategory} - ${linkedReport.technique}
-- Summary: ${linkedReport.summary}
-- Observed Strengths: ${(linkedReport.observedStrengths || []).join('; ')}
-- Areas to Improve: ${(linkedReport.areasToImprove || []).join('; ')}
-- Specific Observations: ${(linkedReport.observations || [])
+- Skill & Technique: ${linkedReport.skillCategory || 'Cricket'} - ${linkedReport.technique || 'General'}
+- Summary: ${linkedReport.summary || ''}
+- Observed Strengths: ${(Array.isArray(linkedReport.observedStrengths) ? linkedReport.observedStrengths : []).join('; ')}
+- Areas to Improve: ${(Array.isArray(linkedReport.areasToImprove) ? linkedReport.areasToImprove : []).join('; ')}
+- Specific Observations: ${(Array.isArray(linkedReport.observations) ? linkedReport.observations : [])
           .map(
-            (o: { title: string; timestampSec: number; confidence: string; evidence: string }) =>
-              `[${o.timestampSec}s, ${o.confidence} confidence] ${o.title}: ${o.evidence}`
+            (o: { title?: string; timestampSec?: number; confidence?: string; evidence?: string }) =>
+              `[${o?.timestampSec ?? 0}s, ${o?.confidence || 'Medium'} confidence] ${o?.title || 'Observation'}: ${o?.evidence || ''}`
           )
           .join(' | ')}`
       : 'NO VIDEO PROVIDED: Do NOT pretend to have seen the player perform. Explicitly base advice on general cricket biomechanics, ask 1-2 clarifying questions when helpful, and invite them to upload or record a practice clip in Practice & Analysis if they want visual feedback.';
+
+    const goalsList = Array.isArray(profile?.goals) ? profile.goals.join(', ') : '';
 
     const systemInstruction = `You are the CRICKIFY AI Cricket Coach — an experienced, safety-conscious cricket educator and biomechanics coach covering batting, bowling, fielding, wicketkeeping, cricket fitness, and match tactics.
 ${languageDirective}
@@ -692,7 +710,7 @@ PLAYER PROFILE:
 - Batting Hand: ${profile?.battingHand || 'Right-handed'}
 - Bowling Style: ${profile?.bowlingStyle || 'Medium Pace'}
 - Ball & Format: ${profile?.ballType || 'Leather Ball'}, ${profile?.environment || 'Regular Cricket'}
-- Goals: ${(profile?.goals || []).join(', ') || 'General improvement'}
+- Goals: ${goalsList || 'General improvement'}
 
 ${reportContext}
 
@@ -825,6 +843,8 @@ app.post('/api/analysis/video', attachOptionalFirebaseUser, async (req, res) => 
 
     const parts: Array<{ inlineData?: { mimeType: string; data: string }; text?: string }> = [];
 
+    const ALLOWED_IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
     validFrames.forEach(
       (f: {
         frameIndex: number;
@@ -836,9 +856,11 @@ app.post('/api/analysis/video', attachOptionalFirebaseUser, async (req, res) => 
       }) => {
         const rawUrl = f.imageDataUrl.trim();
         const mimeMatch = rawUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
-        const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
-        const base64 = rawUrl.includes(',') ? rawUrl.split(',')[1] : rawUrl;
-        if (!base64) return;
+        const candidateMime = mimeMatch ? mimeMatch[1].toLowerCase() : 'image/jpeg';
+        const mimeType = ALLOWED_IMAGE_MIME_TYPES.has(candidateMime) ? candidateMime : 'image/jpeg';
+        const rawBase64 = rawUrl.includes(',') ? rawUrl.split(',')[1] : rawUrl;
+        const base64 = rawBase64 ? rawBase64.replace(/\s+/g, '') : '';
+        if (!base64 || base64.length < 32) return;
 
         parts.push({
           inlineData: {
@@ -888,7 +910,7 @@ CRITICAL ACCURACY & HONESTY RULES:
 
     const { data, modelUsed } = await generateJsonWithGemini<Record<string, unknown>>({
       contents: { parts },
-      requiredKeys: ['insufficientEvidence', 'summary', 'observations'],
+      requiredKeys: ['summary'],
       nonEmptyStringKeys: ['summary'],
       primaryTimeoutMs: MULTIMODAL_PRIMARY_TIMEOUT_MS,
       fallbackTimeoutMs: MULTIMODAL_FALLBACK_TIMEOUT_MS,
@@ -937,19 +959,35 @@ CRITICAL ACCURACY & HONESTY RULES:
       },
     });
 
+    const normalizedObservations = Array.isArray(data.observations)
+      ? data.observations
+          .filter((o): o is Record<string, unknown> => Boolean(o && typeof o === 'object'))
+          .map((o) => ({
+            title: String(o.title || 'Observed Movement Checkpoint'),
+            timestampSec: Number.isFinite(Number(o.timestampSec)) ? Number(o.timestampSec) : 0,
+            frameIndex: Number.isFinite(Number(o.frameIndex)) ? Math.max(1, Math.round(Number(o.frameIndex))) : 1,
+            confidence: ['High', 'Medium', 'Low'].includes(String(o.confidence)) ? String(o.confidence) : 'Medium',
+            evidence: String(o.evidence || ''),
+            whyItMatters: String(o.whyItMatters || ''),
+            correctionSteps: Array.isArray(o.correctionSteps) ? o.correctionSteps.map((s) => String(s)) : [],
+          }))
+      : [];
+
     res.json({
       insufficientEvidence: Boolean(data.insufficientEvidence),
       summary: String(data.summary || ''),
-      observedStrengths: Array.isArray(data.observedStrengths) ? data.observedStrengths : [],
-      areasToImprove: Array.isArray(data.areasToImprove) ? data.areasToImprove : [],
-      observations: Array.isArray(data.observations) ? data.observations : [],
+      observedStrengths: Array.isArray(data.observedStrengths) ? data.observedStrengths.map((s) => String(s)) : [],
+      areasToImprove: Array.isArray(data.areasToImprove) ? data.areasToImprove.map((s) => String(s)) : [],
+      observations: normalizedObservations,
       recommendedExerciseIds: Array.isArray(data.recommendedExerciseIds)
         ? data.recommendedExerciseIds.filter((id) => validExerciseIds.size === 0 || validExerciseIds.has(String(id))).slice(0, 4)
         : [],
       recommendedTutorialIds: Array.isArray(data.recommendedTutorialIds)
         ? data.recommendedTutorialIds.filter((id) => validTutorialIds.size === 0 || validTutorialIds.has(String(id))).slice(0, 3)
         : [],
-      personalImprovementPlan: Array.isArray(data.personalImprovementPlan) ? data.personalImprovementPlan : [],
+      personalImprovementPlan: Array.isArray(data.personalImprovementPlan)
+        ? data.personalImprovementPlan.map((s) => String(s))
+        : [],
       limitationsNotice: String(
         data.limitationsNotice ||
           'Analysis is based strictly on sampled video keyframes and available MediaPipe pose landmarks.'
@@ -1298,6 +1336,15 @@ app.get('/api/youtube/search', async (req, res) => {
   } catch (err) {
     res.status(500).json({ configured: true, error: err instanceof Error ? err.message : 'YouTube fetch error' });
   }
+});
+
+// Ensure unmatched /api/* routes always return JSON (never fall through to Vite/SPA index.html)
+app.use('/api', (_req: Request, res: Response) => {
+  res.status(404).json({
+    error: 'API endpoint not found.',
+    code: 'NOT_FOUND',
+    retryable: false,
+  });
 });
 
 // Ensure API errors (such as oversized payloads or malformed JSON) always return JSON

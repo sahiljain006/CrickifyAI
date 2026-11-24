@@ -25,7 +25,11 @@ import {
   VideoAnalysisReport,
 } from '../types';
 import { DEFAULT_PITCHIQ_STATE } from '../data/tipsAndQuiz';
-import { AuthUserSummary, db, handleFirestoreError, OperationType } from './firebase';
+import { auth, AuthUserSummary, db, handleFirestoreError, OperationType } from './firebase';
+
+function isCurrentUserAuthorized(uid: string): boolean {
+  return Boolean(auth.currentUser && auth.currentUser.uid === uid);
+}
 
 export interface SavedMatchAnalysis {
   id: string;
@@ -122,6 +126,19 @@ function sanitizeFirestoreAvatarUrl(raw: unknown): string {
   return trimmed.slice(0, 512);
 }
 
+const ALLOWED_AGE_GROUPS = ['Under-14', '14-18', '19-25', '26-35', '35+'] as const;
+const ALLOWED_SKILL_LEVELS = ['Beginner', 'Intermediate', 'Advanced', 'Competitive'] as const;
+const ALLOWED_ROLES = ['Batter', 'Fast Bowler', 'Spin Bowler', 'All-Rounder', 'Wicketkeeper'] as const;
+const ALLOWED_BATTING_HANDS = ['Right-handed', 'Left-handed'] as const;
+const ALLOWED_BOWLING_STYLES = ['Fast', 'Medium Pace', 'Off-Spin', 'Leg-Spin', 'None'] as const;
+const ALLOWED_BALL_TYPES = ['Leather Ball', 'Tennis Ball', 'Both'] as const;
+const ALLOWED_ENVIRONMENTS = ['Regular Cricket', 'Turf / Box Cricket', 'Both'] as const;
+const ALLOWED_LANGUAGES = ['English', 'Tamil', 'Hindi'] as const;
+
+function pickEnum<T extends string>(val: unknown, allowed: readonly T[], fallback: T): T {
+  return typeof val === 'string' && (allowed as readonly string[]).includes(val) ? (val as T) : fallback;
+}
+
 function buildWorkspaceProfileFields(uid: string, email: string, profile: PlayerProfile) {
   const safeName = clampString(profile.name, 80).trim() || 'Player';
   return {
@@ -129,18 +146,18 @@ function buildWorkspaceProfileFields(uid: string, email: string, profile: Player
     name: safeName,
     email: clampString(email, 160),
     avatarUrl: sanitizeFirestoreAvatarUrl(profile.avatarUrl),
-    ageGroup: profile.ageGroup || '19-25',
+    ageGroup: pickEnum(profile.ageGroup, ALLOWED_AGE_GROUPS, '19-25'),
     experience: clampString(profile.experience, 160, 'Club / Weekend Cricket'),
-    skillLevel: profile.skillLevel || 'Intermediate',
-    role: profile.role || 'Batter',
-    battingHand: profile.battingHand || 'Right-handed',
-    bowlingStyle: profile.bowlingStyle || 'Medium Pace',
-    ballType: profile.ballType || 'Leather Ball',
-    environment: profile.environment || 'Both',
+    skillLevel: pickEnum(profile.skillLevel, ALLOWED_SKILL_LEVELS, 'Intermediate'),
+    role: pickEnum(profile.role, ALLOWED_ROLES, 'Batter'),
+    battingHand: pickEnum(profile.battingHand, ALLOWED_BATTING_HANDS, 'Right-handed'),
+    bowlingStyle: pickEnum(profile.bowlingStyle, ALLOWED_BOWLING_STYLES, 'Medium Pace'),
+    ballType: pickEnum(profile.ballType, ALLOWED_BALL_TYPES, 'Both'),
+    environment: pickEnum(profile.environment, ALLOWED_ENVIRONMENTS, 'Both'),
     goals: clampStringArray(profile.goals, 12, 80),
     dailyMinutes: Math.min(360, Math.max(5, Number(profile.dailyMinutes) || 45)),
     trainingDaysPerWeek: Math.min(7, Math.max(1, Number(profile.trainingDaysPerWeek) || 4)),
-    language: profile.language || 'English',
+    language: pickEnum(profile.language, ALLOWED_LANGUAGES, 'English'),
     equipment: clampStringArray(profile.equipment, 20, 60),
     onboardingCompleted: Boolean(profile.onboardingCompleted),
   };
@@ -160,12 +177,18 @@ function buildWorkspaceProgressFields(state: PitchIQState) {
   };
 }
 
-async function ensureParentWorkspaceExists(uid: string, email: string, state: PitchIQState): Promise<void> {
+async function ensureParentWorkspaceExists(uid: string, email: string, state: PitchIQState): Promise<boolean> {
+  if (!isCurrentUserAuthorized(uid)) {
+    return false;
+  }
   const userPath = `users/${uid}`;
   const userRef = doc(db, 'users', uid);
   try {
     const snap = await getDoc(userRef);
     if (!snap.exists()) {
+      if (!isCurrentUserAuthorized(uid)) {
+        return false;
+      }
       await setDoc(userRef, {
         ...buildWorkspaceProfileFields(uid, email, state.profile),
         ...buildWorkspaceProgressFields(state),
@@ -173,7 +196,11 @@ async function ensureParentWorkspaceExists(uid: string, email: string, state: Pi
         updatedAt: serverTimestamp(),
       });
     }
+    return true;
   } catch (err) {
+    if (!isCurrentUserAuthorized(uid)) {
+      return false;
+    }
     handleFirestoreError(err, OperationType.WRITE, userPath);
   }
 }
@@ -183,10 +210,12 @@ export async function saveWorkspaceProfileToFirestore(
   email: string,
   state: PitchIQState
 ): Promise<void> {
+  if (!isCurrentUserAuthorized(uid)) return;
   const userPath = `users/${uid}`;
   const userRef = doc(db, 'users', uid);
   try {
     const snap = await getDoc(userRef);
+    if (!isCurrentUserAuthorized(uid)) return;
     if (!snap.exists()) {
       await setDoc(userRef, {
         ...buildWorkspaceProfileFields(uid, email, state.profile),
@@ -203,6 +232,7 @@ export async function saveWorkspaceProfileToFirestore(
       });
     }
   } catch (err) {
+    if (!isCurrentUserAuthorized(uid)) return;
     handleFirestoreError(err, OperationType.UPDATE, userPath);
   }
 }
@@ -212,10 +242,12 @@ export async function saveWorkspaceProgressToFirestore(
   email: string,
   state: PitchIQState
 ): Promise<void> {
+  if (!isCurrentUserAuthorized(uid)) return;
   const userPath = `users/${uid}`;
   const userRef = doc(db, 'users', uid);
   try {
     const snap = await getDoc(userRef);
+    if (!isCurrentUserAuthorized(uid)) return;
     if (!snap.exists()) {
       await setDoc(userRef, {
         ...buildWorkspaceProfileFields(uid, email, state.profile),
@@ -230,6 +262,7 @@ export async function saveWorkspaceProgressToFirestore(
       });
     }
   } catch (err) {
+    if (!isCurrentUserAuthorized(uid)) return;
     handleFirestoreError(err, OperationType.UPDATE, userPath);
   }
 }
@@ -264,9 +297,14 @@ export async function saveVideoReportToFirestore(
   email: string,
   state: PitchIQState,
   report: VideoAnalysisReport,
-  videoRecord?: SavedVideoRecord
+  videoRecord?: SavedVideoRecord,
+  options?: { skipParentCheck?: boolean }
 ): Promise<void> {
-  await ensureParentWorkspaceExists(uid, email, state);
+  if (!isCurrentUserAuthorized(uid)) return;
+  if (!options?.skipParentCheck) {
+    const ok = await ensureParentWorkspaceExists(uid, email, state);
+    if (!ok) return;
+  }
   const reportId = sanitizeDocId(report.id, 'rep');
   const reportPath = `users/${uid}/reports/${reportId}`;
   const reportRef = doc(db, 'users', uid, 'reports', reportId);
@@ -275,15 +313,15 @@ export async function saveVideoReportToFirestore(
     await setDoc(reportRef, {
       ownerId: uid,
       clientCreatedAt: clampString(report.createdAt, 64, new Date().toISOString()),
-      title: clampString(report.title, 160, 'Cricket Video Analysis'),
-      skillCategory: report.skillCategory || 'Batting',
-      technique: clampString(report.technique, 120, 'General Technique'),
-      skillLevel: report.skillLevel || 'Intermediate',
-      handedness: report.handedness || 'Right-handed',
+      title: clampString(report.title, 160).trim() || 'Cricket Video Analysis',
+      skillCategory: pickEnum(report.skillCategory, ['Batting', 'Bowling', 'Fielding'] as const, 'Batting'),
+      technique: clampString(report.technique, 120).trim() || 'General Technique',
+      skillLevel: pickEnum(report.skillLevel, ALLOWED_SKILL_LEVELS, 'Intermediate'),
+      handedness: pickEnum(report.handedness, ALLOWED_BATTING_HANDS, 'Right-handed'),
       cameraAngle: clampString(report.cameraAngle, 80, 'Side View'),
       playerNotes: clampString(report.playerNotes, 2000),
       insufficientEvidence: Boolean(report.insufficientEvidence),
-      summary: clampString(report.summary, 4000, 'Analysis completed.'),
+      summary: clampString(report.summary, 4000).trim() || 'Analysis completed.',
       cameraAngleNotes: clampString(report.cameraAngleNotes, 1000),
       observedStrengths: clampStringArray(report.observedStrengths, 20, 400),
       areasToImprove: clampStringArray(report.areasToImprove, 20, 400),
@@ -316,10 +354,11 @@ export async function saveVideoReportToFirestore(
       updatedAt: serverTimestamp(),
     });
   } catch (err) {
+    if (!isCurrentUserAuthorized(uid)) return;
     handleFirestoreError(err, OperationType.CREATE, reportPath);
   }
 
-  if (videoRecord) {
+  if (videoRecord && isCurrentUserAuthorized(uid)) {
     const vidId = sanitizeDocId(videoRecord.id, 'vid');
     const vidPath = `users/${uid}/savedVideos/${vidId}`;
     const vidRef = doc(db, 'users', uid, 'savedVideos', vidId);
@@ -327,9 +366,9 @@ export async function saveVideoReportToFirestore(
       await setDoc(vidRef, {
         ownerId: uid,
         clientCreatedAt: clampString(videoRecord.createdAt, 64, new Date().toISOString()),
-        title: clampString(videoRecord.title, 160, 'Cricket Practice Clip'),
-        skillCategory: videoRecord.skillCategory || 'Batting',
-        technique: clampString(videoRecord.technique, 120, 'General Technique'),
+        title: clampString(videoRecord.title, 160).trim() || 'Cricket Practice Clip',
+        skillCategory: pickEnum(videoRecord.skillCategory, ['Batting', 'Bowling', 'Fielding'] as const, 'Batting'),
+        technique: clampString(videoRecord.technique, 120).trim() || 'General Technique',
         durationSec: Math.min(1800, Math.max(0, Number(videoRecord.durationSec) || 0)),
         thumbnailDataUrl: clampString(videoRecord.thumbnailDataUrl, 195000),
         reportId,
@@ -337,6 +376,7 @@ export async function saveVideoReportToFirestore(
         updatedAt: serverTimestamp(),
       });
     } catch (err) {
+      if (!isCurrentUserAuthorized(uid)) return;
       handleFirestoreError(err, OperationType.CREATE, vidPath);
     }
   }
@@ -347,20 +387,24 @@ export async function deleteVideoReportFromFirestore(
   reportId: string,
   linkedVideoIds: string[]
 ): Promise<void> {
+  if (!isCurrentUserAuthorized(uid)) return;
   const safeRepId = sanitizeDocId(reportId, 'rep');
   const reportPath = `users/${uid}/reports/${safeRepId}`;
   try {
     await deleteDoc(doc(db, 'users', uid, 'reports', safeRepId));
   } catch (err) {
+    if (!isCurrentUserAuthorized(uid)) return;
     handleFirestoreError(err, OperationType.DELETE, reportPath);
   }
 
   for (const rawVidId of linkedVideoIds) {
+    if (!isCurrentUserAuthorized(uid)) return;
     const safeVidId = sanitizeDocId(rawVidId, 'vid');
     const vidPath = `users/${uid}/savedVideos/${safeVidId}`;
     try {
       await deleteDoc(doc(db, 'users', uid, 'savedVideos', safeVidId));
     } catch (err) {
+      if (!isCurrentUserAuthorized(uid)) return;
       handleFirestoreError(err, OperationType.DELETE, vidPath);
     }
   }
@@ -370,20 +414,26 @@ export async function saveCoachMessagesToFirestore(
   uid: string,
   email: string,
   state: PitchIQState,
-  messages: CoachMessage[]
+  messages: CoachMessage[],
+  options?: { skipParentCheck?: boolean }
 ): Promise<void> {
-  await ensureParentWorkspaceExists(uid, email, state);
+  if (!isCurrentUserAuthorized(uid)) return;
+  if (!options?.skipParentCheck) {
+    const ok = await ensureParentWorkspaceExists(uid, email, state);
+    if (!ok) return;
+  }
   for (const msg of messages) {
+    if (!isCurrentUserAuthorized(uid)) return;
     const msgId = sanitizeDocId(msg.id, 'msg');
     const msgPath = `users/${uid}/coachMessages/${msgId}`;
     const msgRef = doc(db, 'users', uid, 'coachMessages', msgId);
     try {
       await setDoc(msgRef, {
         ownerId: uid,
-        role: msg.role,
-        content: clampString(msg.content, 12000, '...'),
+        role: msg.role === 'user' ? 'user' : 'assistant',
+        content: clampString(msg.content, 12000).trim() || '...',
         clientTimestamp: clampString(msg.timestamp, 64, new Date().toISOString()),
-        language: msg.language || 'English',
+        language: pickEnum(msg.language, ALLOWED_LANGUAGES, 'English'),
         linkedReportId: clampString(msg.linkedReportId, 128),
         recommendedExerciseIds: clampStringArray(msg.recommendedExerciseIds, 10, 80),
         recommendedLessonIds: clampStringArray(msg.recommendedLessonIds, 10, 80),
@@ -393,6 +443,7 @@ export async function saveCoachMessagesToFirestore(
         updatedAt: serverTimestamp(),
       });
     } catch (err) {
+      if (!isCurrentUserAuthorized(uid)) return;
       handleFirestoreError(err, OperationType.CREATE, msgPath);
     }
   }
@@ -402,11 +453,13 @@ export async function toggleCoachMessageSavedInFirestore(
   uid: string,
   msg: CoachMessage
 ): Promise<void> {
+  if (!isCurrentUserAuthorized(uid)) return;
   const msgId = sanitizeDocId(msg.id, 'msg');
   const msgPath = `users/${uid}/coachMessages/${msgId}`;
   const msgRef = doc(db, 'users', uid, 'coachMessages', msgId);
   try {
     const snap = await getDoc(msgRef);
+    if (!isCurrentUserAuthorized(uid)) return;
     if (snap.exists()) {
       await updateDoc(msgRef, {
         saved: Boolean(msg.saved),
@@ -415,10 +468,10 @@ export async function toggleCoachMessageSavedInFirestore(
     } else {
       await setDoc(msgRef, {
         ownerId: uid,
-        role: msg.role,
+        role: msg.role === 'user' ? 'user' : 'assistant',
         content: clampString(msg.content, 12000, '...'),
         clientTimestamp: clampString(msg.timestamp, 64, new Date().toISOString()),
-        language: msg.language || 'English',
+        language: pickEnum(msg.language, ALLOWED_LANGUAGES, 'English'),
         linkedReportId: clampString(msg.linkedReportId, 128),
         recommendedExerciseIds: clampStringArray(msg.recommendedExerciseIds, 10, 80),
         recommendedLessonIds: clampStringArray(msg.recommendedLessonIds, 10, 80),
@@ -429,6 +482,7 @@ export async function toggleCoachMessageSavedInFirestore(
       });
     }
   } catch (err) {
+    if (!isCurrentUserAuthorized(uid)) return;
     handleFirestoreError(err, OperationType.UPDATE, msgPath);
   }
 }
@@ -437,9 +491,14 @@ export async function saveTrainingPlanToFirestore(
   uid: string,
   email: string,
   state: PitchIQState,
-  plan: TrainingPlan
+  plan: TrainingPlan,
+  options?: { skipParentCheck?: boolean }
 ): Promise<void> {
-  await ensureParentWorkspaceExists(uid, email, state);
+  if (!isCurrentUserAuthorized(uid)) return;
+  if (!options?.skipParentCheck) {
+    const ok = await ensureParentWorkspaceExists(uid, email, state);
+    if (!ok) return;
+  }
   const planId = sanitizeDocId(plan.id, 'plan');
   const planPath = `users/${uid}/trainingPlans/${planId}`;
   const planRef = doc(db, 'users', uid, 'trainingPlans', planId);
@@ -466,9 +525,14 @@ export async function saveTrainingHistoryEntryToFirestore(
   uid: string,
   email: string,
   state: PitchIQState,
-  entry: TrainingHistoryEntry
+  entry: TrainingHistoryEntry,
+  options?: { skipParentCheck?: boolean }
 ): Promise<void> {
-  await ensureParentWorkspaceExists(uid, email, state);
+  if (!isCurrentUserAuthorized(uid)) return;
+  if (!options?.skipParentCheck) {
+    const ok = await ensureParentWorkspaceExists(uid, email, state);
+    if (!ok) return;
+  }
   const entryId = sanitizeDocId(entry.id, 'hist');
   const entryPath = `users/${uid}/trainingHistory/${entryId}`;
   const entryRef = doc(db, 'users', uid, 'trainingHistory', entryId);
@@ -492,9 +556,14 @@ export async function saveSquadPlayerToFirestore(
   uid: string,
   email: string,
   state: PitchIQState,
-  player: CoachSquadPlayer
+  player: CoachSquadPlayer,
+  options?: { skipParentCheck?: boolean }
 ): Promise<void> {
-  await ensureParentWorkspaceExists(uid, email, state);
+  if (!isCurrentUserAuthorized(uid)) return;
+  if (!options?.skipParentCheck) {
+    const ok = await ensureParentWorkspaceExists(uid, email, state);
+    if (!ok) return;
+  }
   const playerId = sanitizeDocId(player.id, 'sq');
   const playerPath = `users/${uid}/squadPlayers/${playerId}`;
   const playerRef = doc(db, 'users', uid, 'squadPlayers', playerId);
@@ -502,8 +571,8 @@ export async function saveSquadPlayerToFirestore(
     const snap = await getDoc(playerRef);
     if (snap.exists()) {
       await updateDoc(playerRef, {
-        role: player.role || 'Batter',
-        level: player.level || 'Intermediate',
+        role: pickEnum(player.role, ALLOWED_ROLES, 'Batter'),
+        level: pickEnum(player.level, ALLOWED_SKILL_LEVELS, 'Intermediate'),
         group: clampString(player.group, 80, 'Squad'),
         consentGranted: Boolean(player.consentGranted),
         assignedLessonIds: clampStringArray(player.assignedLessonIds, 100, 80),
@@ -515,8 +584,8 @@ export async function saveSquadPlayerToFirestore(
       await setDoc(playerRef, {
         ownerId: uid,
         name: clampString(player.name, 80, 'Squad Player'),
-        role: player.role || 'Batter',
-        level: player.level || 'Intermediate',
+        role: pickEnum(player.role, ALLOWED_ROLES, 'Batter'),
+        level: pickEnum(player.level, ALLOWED_SKILL_LEVELS, 'Intermediate'),
         group: clampString(player.group, 80, 'Squad'),
         consentGranted: Boolean(player.consentGranted),
         assignedLessonIds: clampStringArray(player.assignedLessonIds, 100, 80),
@@ -535,9 +604,14 @@ export async function savePlayZoneSessionToFirestore(
   uid: string,
   email: string,
   state: PitchIQState,
-  session: PlayZoneSession
+  session: PlayZoneSession,
+  options?: { skipParentCheck?: boolean }
 ): Promise<void> {
-  await ensureParentWorkspaceExists(uid, email, state);
+  if (!isCurrentUserAuthorized(uid)) return;
+  if (!options?.skipParentCheck) {
+    const ok = await ensureParentWorkspaceExists(uid, email, state);
+    if (!ok) return;
+  }
   const sessionId = sanitizeDocId(session.id, 'pz');
   const sessionPath = `users/${uid}/playzoneSessions/${sessionId}`;
   const sessionRef = doc(db, 'users', uid, 'playzoneSessions', sessionId);
@@ -572,7 +646,9 @@ export async function saveMatchAnalysisToFirestore(
   state: PitchIQState,
   record: SavedMatchAnalysis
 ): Promise<void> {
-  await ensureParentWorkspaceExists(uid, email, state);
+  if (!isCurrentUserAuthorized(uid)) return;
+  const ok = await ensureParentWorkspaceExists(uid, email, state);
+  if (!ok || !isCurrentUserAuthorized(uid)) return;
   const matchId = sanitizeDocId(record.id, 'match');
   const matchPath = `users/${uid}/matchAnalyses/${matchId}`;
   const matchRef = doc(db, 'users', uid, 'matchAnalyses', matchId);
@@ -590,11 +666,13 @@ export async function saveMatchAnalysisToFirestore(
       updatedAt: serverTimestamp(),
     });
   } catch (err) {
+    if (!isCurrentUserAuthorized(uid)) return;
     handleFirestoreError(err, OperationType.CREATE, matchPath);
   }
 }
 
 export async function listMatchAnalysesFromFirestore(uid: string): Promise<SavedMatchAnalysis[]> {
+  if (!isCurrentUserAuthorized(uid)) return [];
   const path = `users/${uid}/matchAnalyses`;
   try {
     const q = query(collection(db, 'users', uid, 'matchAnalyses'), where('ownerId', '==', uid));
@@ -617,16 +695,19 @@ export async function listMatchAnalysesFromFirestore(uid: string): Promise<Saved
       })
       .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
   } catch (err) {
+    if (!isCurrentUserAuthorized(uid)) return [];
     handleFirestoreError(err, OperationType.LIST, path);
   }
 }
 
 export async function deleteMatchAnalysisFromFirestore(uid: string, matchId: string): Promise<void> {
+  if (!isCurrentUserAuthorized(uid)) return;
   const safeId = sanitizeDocId(matchId, 'match');
   const path = `users/${uid}/matchAnalyses/${safeId}`;
   try {
     await deleteDoc(doc(db, 'users', uid, 'matchAnalyses', safeId));
   } catch (err) {
+    if (!isCurrentUserAuthorized(uid)) return;
     handleFirestoreError(err, OperationType.DELETE, path);
   }
 }
@@ -636,6 +717,10 @@ export async function loadOrCreateUserWorkspace(
   localGuestState?: PitchIQState
 ): Promise<PitchIQState> {
   const uid = authUser.id;
+  if (!isCurrentUserAuthorized(uid)) {
+    return localGuestState || DEFAULT_PITCHIQ_STATE;
+  }
+
   const userPath = `users/${uid}`;
   const userRef = doc(db, 'users', uid);
 
@@ -643,10 +728,16 @@ export async function loadOrCreateUserWorkspace(
   try {
     workspaceSnap = await getDoc(userRef);
   } catch (err) {
+    if (!isCurrentUserAuthorized(uid)) {
+      return localGuestState || DEFAULT_PITCHIQ_STATE;
+    }
     handleFirestoreError(err, OperationType.GET, userPath);
   }
 
   if (!workspaceSnap.exists()) {
+    if (!isCurrentUserAuthorized(uid)) {
+      return localGuestState || DEFAULT_PITCHIQ_STATE;
+    }
     // First Firebase login: migrate any existing local/guest records cleanly into Firestore
     const seed = localGuestState || DEFAULT_PITCHIQ_STATE;
     const seededState: PitchIQState = {
@@ -671,26 +762,31 @@ export async function loadOrCreateUserWorkspace(
         updatedAt: serverTimestamp(),
       });
     } catch (err) {
+      if (!isCurrentUserAuthorized(uid)) {
+        return seededState;
+      }
       handleFirestoreError(err, OperationType.CREATE, userPath);
     }
 
     // Migrate existing local reports, videos, messages, plans, history, squad if present
     for (const rep of seededState.reports.slice(0, 15)) {
+      if (!isCurrentUserAuthorized(uid)) return seededState;
       const vid = seededState.savedVideos.find((v) => v.reportId === rep.id);
-      await saveVideoReportToFirestore(uid, authUser.email, seededState, rep, vid);
+      await saveVideoReportToFirestore(uid, authUser.email, seededState, rep, vid, { skipParentCheck: true });
     }
     const orphanVideos = seededState.savedVideos
       .filter((v) => !seededState.reports.some((r) => r.id === v.reportId))
       .slice(0, 15);
     for (const vid of orphanVideos) {
+      if (!isCurrentUserAuthorized(uid)) return seededState;
       const vidId = sanitizeDocId(vid.id, 'vid');
       try {
         await setDoc(doc(db, 'users', uid, 'savedVideos', vidId), {
           ownerId: uid,
           clientCreatedAt: clampString(vid.createdAt, 64, new Date().toISOString()),
-          title: clampString(vid.title, 160),
-          skillCategory: vid.skillCategory || 'Batting',
-          technique: clampString(vid.technique, 120),
+          title: clampString(vid.title, 160, 'Cricket Practice Clip'),
+          skillCategory: pickEnum(vid.skillCategory, ['Batting', 'Bowling', 'Fielding'] as const, 'Batting'),
+          technique: clampString(vid.technique, 120, 'General Technique'),
           durationSec: Math.min(1800, Math.max(0, Number(vid.durationSec) || 0)),
           thumbnailDataUrl: clampString(vid.thumbnailDataUrl, 195000),
           reportId: clampString(vid.reportId, 128),
@@ -698,23 +794,31 @@ export async function loadOrCreateUserWorkspace(
           updatedAt: serverTimestamp(),
         });
       } catch (err) {
+        if (!isCurrentUserAuthorized(uid)) return seededState;
         handleFirestoreError(err, OperationType.CREATE, `users/${uid}/savedVideos/${vidId}`);
       }
     }
-    if (seededState.coachMessages.length > 0) {
-      await saveCoachMessagesToFirestore(uid, authUser.email, seededState, seededState.coachMessages.slice(-40));
+    if (seededState.coachMessages.length > 0 && isCurrentUserAuthorized(uid)) {
+      await saveCoachMessagesToFirestore(uid, authUser.email, seededState, seededState.coachMessages.slice(-40), {
+        skipParentCheck: true,
+      });
     }
-    if (seededState.activeTrainingPlan) {
-      await saveTrainingPlanToFirestore(uid, authUser.email, seededState, seededState.activeTrainingPlan);
+    if (seededState.activeTrainingPlan && isCurrentUserAuthorized(uid)) {
+      await saveTrainingPlanToFirestore(uid, authUser.email, seededState, seededState.activeTrainingPlan, {
+        skipParentCheck: true,
+      });
     }
     for (const hist of seededState.trainingHistory.slice(0, 25)) {
-      await saveTrainingHistoryEntryToFirestore(uid, authUser.email, seededState, hist);
+      if (!isCurrentUserAuthorized(uid)) return seededState;
+      await saveTrainingHistoryEntryToFirestore(uid, authUser.email, seededState, hist, { skipParentCheck: true });
     }
     for (const sq of seededState.squadPlayers.slice(0, 25)) {
-      await saveSquadPlayerToFirestore(uid, authUser.email, seededState, sq);
+      if (!isCurrentUserAuthorized(uid)) return seededState;
+      await saveSquadPlayerToFirestore(uid, authUser.email, seededState, sq, { skipParentCheck: true });
     }
     for (const pz of (seededState.playzoneSessions || []).slice(0, 20)) {
-      await savePlayZoneSessionToFirestore(uid, authUser.email, seededState, pz);
+      if (!isCurrentUserAuthorized(uid)) return seededState;
+      await savePlayZoneSessionToFirestore(uid, authUser.email, seededState, pz, { skipParentCheck: true });
     }
 
     return seededState;
@@ -724,12 +828,14 @@ export async function loadOrCreateUserWorkspace(
 
   // Load subcollections using ownerId filter to satisfy Firestore query rules cleanly
   const fetchSub = async (sub: string) => {
+    if (!isCurrentUserAuthorized(uid)) return [];
     const subPath = `users/${uid}/${sub}`;
     try {
       const q = query(collection(db, 'users', uid, sub), where('ownerId', '==', uid));
       const snap = await getDocs(q);
       return snap.docs;
     } catch (err) {
+      if (!isCurrentUserAuthorized(uid)) return [];
       handleFirestoreError(err, OperationType.LIST, subPath);
     }
   };

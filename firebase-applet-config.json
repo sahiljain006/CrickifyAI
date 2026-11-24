@@ -1,12 +1,12 @@
 {
-  "projectId": "natural-curve-7vr20",
-  "appId": "1:697263829751:web:1dcd5e7e76401f7f8c59f2",
-  "apiKey": "AIzaSyAQzpGw880LnMOj96shu25S0M04iUs3gEs",
-  "authDomain": "natural-curve-7vr20.firebaseapp.com",
+  "projectId": "crickify-ai",
+  "appId": "1:800186757756:web:77163eac6b3e2775c3cff9",
+  "apiKey": "AIzaSyC3_1guTuDg0Gjq9AimLdQORX0NpQz7GBo",
+  "authDomain": "crickify-ai.firebaseapp.com",
   "firestoreDatabaseId": "ai-studio-pitchiq-974db78d-f4a9-425d-99c2-8a8608403cd6",
-  "storageBucket": "natural-curve-7vr20.firebasestorage.app",
-  "messagingSenderId": "697263829751",
+  "storageBucket": "crickify-ai.firebasestorage.app",
+  "messagingSenderId": "800186757756",
   "measurementId": "",
-  "oAuthClientId": "697263829751-bmjh104308p3olequv3qcdkp0lmf9n3d.apps.googleusercontent.com",
+  "oAuthClientId": "800186757756-mv4o5ntk9glsik1dc3of06frmmf7ev1d.apps.googleusercontent.com",
   "recaptchaSiteKey": ""
 }

@@ -287,6 +287,8 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  const authLoadSeqRef = useRef(0);
+
   // Verify Firestore connectivity on boot & sync Firebase Auth session (persisted in local browser storage)
   useEffect(() => {
     testFirestoreConnection();
@@ -294,6 +296,7 @@ export default function App() {
     let active = true;
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       if (!active) return;
+      const seq = ++authLoadSeqRef.current;
       const summary = extractAuthUserSummary(fbUser);
       setAuthUser(summary);
 
@@ -306,6 +309,11 @@ export default function App() {
       setAuthPromptMessage(null);
 
       try {
+        await auth.authStateReady();
+        if (!active || seq !== authLoadSeqRef.current || auth.currentUser?.uid !== summary.id) {
+          return;
+        }
+
         let localSeed: PitchIQState | undefined;
         try {
           const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
@@ -315,9 +323,14 @@ export default function App() {
         }
 
         const loadedState = await loadOrCreateUserWorkspace(summary, localSeed);
-        if (!active) return;
+        if (!active || seq !== authLoadSeqRef.current || auth.currentUser?.uid !== summary.id) {
+          return;
+        }
         setState(loadedState);
       } catch (err) {
+        if (!active || seq !== authLoadSeqRef.current || !auth.currentUser) {
+          return;
+        }
         console.error('[Firestore Workspace Load Error]:', err);
       }
     });
