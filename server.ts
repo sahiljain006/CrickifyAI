@@ -1,11 +1,17 @@
 import express from 'express';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { app, getConfiguredModels } from './serverApp.js';
+import { app, getConfiguredModels } from './api/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PORT = Number(process.env.PORT) || 3000;
+
+const wasmDir = path.resolve(__dirname, 'node_modules/@mediapipe/tasks-vision/wasm');
+if (fs.existsSync(wasmDir)) {
+  app.use('/mediapipe-wasm', express.static(wasmDir));
+}
 
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {

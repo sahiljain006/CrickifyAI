@@ -47,13 +47,48 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: 
   });
 }
 
+const TFLITE_BENIGN_INFO_RE = /^(?:I\d{4}\s|INFO:\s*(?:Created TensorFlow Lite|XNNPACK|TensorFlow Lite))/i;
+let tfliteLogFilterDepth = 0;
+let originalConsoleError: typeof console.error | null = null;
+
+function isBenignTfliteInfoLog(args: unknown[]): boolean {
+  const first = args[0];
+  return typeof first === 'string' && TFLITE_BENIGN_INFO_RE.test(first.trim());
+}
+
+async function runWithFilteredTfliteLogs<T>(fn: () => Promise<T> | T): Promise<T> {
+  if (typeof console === 'undefined') {
+    return await fn();
+  }
+  if (tfliteLogFilterDepth === 0) {
+    originalConsoleError = console.error;
+    console.error = (...args: unknown[]) => {
+      if (isBenignTfliteInfoLog(args)) {
+        console.info(...args);
+        return;
+      }
+      originalConsoleError?.apply(console, args);
+    };
+  }
+  tfliteLogFilterDepth += 1;
+  try {
+    return await fn();
+  } finally {
+    tfliteLogFilterDepth = Math.max(0, tfliteLogFilterDepth - 1);
+    if (tfliteLogFilterDepth === 0 && originalConsoleError) {
+      console.error = originalConsoleError;
+      originalConsoleError = null;
+    }
+  }
+}
+
 async function getPoseLandmarker(signal?: AbortSignal): Promise<PoseLandmarker | null> {
   throwIfAborted(signal);
   if (cachedLandmarker) return cachedLandmarker;
   if (landmarkerUnavailable) return null;
 
   try {
-    const initPromise = (async () => {
+    const initPromise = runWithFilteredTfliteLogs(async () => {
       let vision;
       try {
         vision = await FilesetResolver.forVisionTasks('/mediapipe-wasm');
@@ -71,7 +106,7 @@ async function getPoseLandmarker(signal?: AbortSignal): Promise<PoseLandmarker |
         runningMode: 'IMAGE',
         numPoses: 1,
       });
-    })();
+    });
 
     cachedLandmarker = await withTimeout(
       initPromise,
@@ -465,7 +500,7 @@ export async function analyzeVideoWithMediaPipe(
 
       if (landmarker) {
         try {
-          const result = landmarker.detect(item.imgBitmapCanvas);
+          const result = await runWithFilteredTfliteLogs(() => landmarker.detect(item.imgBitmapCanvas));
           if (result.landmarks && result.landmarks.length > 0) {
             const lm = result.landmarks[0];
             poseDetected = true;
