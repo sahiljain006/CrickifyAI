@@ -10,8 +10,25 @@ import { getApp, getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth as getFirebaseAdminAuth } from 'firebase-admin/auth';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+function resolveBaseDir(): string {
+  try {
+    if (typeof __dirname === 'string' && __dirname) {
+      return __dirname;
+    }
+  } catch {
+    // ignore in ESM
+  }
+  try {
+    if (typeof import.meta !== 'undefined' && typeof import.meta.url === 'string' && import.meta.url) {
+      return path.dirname(fileURLToPath(import.meta.url));
+    }
+  } catch {
+    // ignore in CJS
+  }
+  return process.cwd();
+}
+
+const BASE_DIR = resolveBaseDir();
 
 export const app = express();
 
@@ -19,7 +36,7 @@ app.use(express.json({ limit: '25mb' }));
 
 const DATA_DIR = process.env.VERCEL
   ? path.join('/tmp', 'crickify-data')
-  : path.resolve(__dirname, '..', 'data');
+  : path.resolve(BASE_DIR, '..', 'data');
 const STORE_PATH = path.join(DATA_DIR, 'pitchiq-store.json');
 
 // Initialize Firebase Admin Auth solely with projectId for verifyIdToken (requires no IAM role)
@@ -31,8 +48,8 @@ let firebaseProjectId =
 if (!firebaseProjectId) {
   try {
     const candidateCfgPaths = [
-      path.resolve(__dirname, 'firebase-applet-config.json'),
-      path.resolve(__dirname, '..', 'firebase-applet-config.json'),
+      path.resolve(BASE_DIR, 'firebase-applet-config.json'),
+      path.resolve(BASE_DIR, '..', 'firebase-applet-config.json'),
       path.resolve(process.cwd(), 'firebase-applet-config.json'),
     ];
     const cfgPath = candidateCfgPaths.find((p) => fs.existsSync(p));
@@ -47,11 +64,14 @@ if (!firebaseProjectId) {
   }
 }
 
-const firebaseAdminApp = firebaseProjectId
-  ? getApps().length
-    ? getApp()
-    : initializeApp({ projectId: firebaseProjectId })
-  : null;
+let firebaseAdminApp: ReturnType<typeof getApp> | null = null;
+if (firebaseProjectId) {
+  try {
+    firebaseAdminApp = getApps().length ? getApp() : initializeApp({ projectId: firebaseProjectId });
+  } catch {
+    firebaseAdminApp = null;
+  }
+}
 
 interface AuthenticatedRequest extends Request {
   firebaseUser?: DecodedIdToken | null;
