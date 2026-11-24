@@ -25,6 +25,7 @@ import { CRICKET_EXERCISES } from '../data/exercises';
 import { VERIFIED_TUTORIALS } from '../data/tutorials';
 import { CRICKIFY_IMAGES } from '../utils/assets';
 import { authFetch } from '../lib/firebase';
+import { parseApiJsonResponse } from '../lib/apiResponse';
 
 interface VideoAnalysisStudioViewProps {
   mode: 'camera' | 'upload' | 'batting' | 'bowling' | 'fielding' | 'studio' | 'dismissal';
@@ -325,8 +326,7 @@ export const VideoAnalysisStudioView: React.FC<VideoAnalysisStudioViewProps> = (
       setProgressPct(92);
       setProgressStage('Processing & validating AI coaching report...');
 
-      const rawText = await res.text();
-      let data: {
+      const data = await parseApiJsonResponse<{
         error?: string;
         insufficientEvidence?: boolean;
         summary?: string;
@@ -337,16 +337,7 @@ export const VideoAnalysisStudioView: React.FC<VideoAnalysisStudioViewProps> = (
         recommendedTutorialIds?: string[];
         personalImprovementPlan?: string[];
         limitationsNotice?: string;
-      } = {};
-      try {
-        data = rawText ? JSON.parse(rawText) : {};
-      } catch {
-        throw new Error(
-          !res.ok
-            ? `Analysis server error (HTTP ${res.status}). Please tap Retry.`
-            : 'Analysis server returned an unexpected response. Please tap Retry.'
-        );
-      }
+      }>(res, '/api/analysis/video', 'Analysis server error');
 
       if (!res.ok || !data.summary) {
         throw new Error(data.error || 'Video analysis failed.');
@@ -446,17 +437,12 @@ export const VideoAnalysisStudioView: React.FC<VideoAnalysisStudioViewProps> = (
           availableTutorials: VERIFIED_TUTORIALS.map((t) => ({ id: t.id, title: t.title })),
         }),
       });
-      const rawText = await res.text();
-      let data: Record<string, unknown> = {};
-      try {
-        data = rawText ? JSON.parse(rawText) : {};
-      } catch {
-        throw new Error(
-          !res.ok
-            ? `Dismissal analysis error (HTTP ${res.status}). Please try again.`
-            : 'Dismissal analysis server returned an unexpected response. Please try again.'
-        );
-      }
+      const data = await parseApiJsonResponse<Record<string, unknown>>(
+        res,
+        '/api/analysis/dismissal',
+        'Dismissal analysis error',
+        false
+      );
       if (!res.ok) throw new Error(String(data.error || 'Dismissal analysis failed.'));
       setDismissalResult(data as typeof dismissalResult);
     } catch (err) {

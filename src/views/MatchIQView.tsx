@@ -4,6 +4,7 @@ import { Bookmark, Loader2, Plus, Trash2, Upload } from 'lucide-react';
 import { NavSectionId, PitchIQState, ScorecardBattingRow, ScorecardBowlingRow } from '../types';
 import { CRICKIFY_IMAGES } from '../utils/assets';
 import { authFetch } from '../lib/firebase';
+import { parseApiJsonResponse } from '../lib/apiResponse';
 import {
   deleteMatchAnalysisFromFirestore,
   listMatchAnalysesFromFirestore,
@@ -128,13 +129,12 @@ export const MatchIQView: React.FC<MatchIQViewProps> = ({
           notes,
         }),
       });
-      const rawText = await res.text();
-      let data: Record<string, unknown> = {};
-      try {
-        data = rawText ? JSON.parse(rawText) : {};
-      } catch {
-        throw new Error(!res.ok ? `Scorecard analysis error (HTTP ${res.status}).` : 'Server returned an unexpected response.');
-      }
+      const data = await parseApiJsonResponse<Record<string, unknown>>(
+        res,
+        '/api/match/analyze',
+        'Scorecard analysis error',
+        false
+      );
       if (!res.ok) throw new Error(String(data.error || 'Scorecard analysis failed.'));
       setAnalysis(data as typeof analysis);
     } catch (err) {

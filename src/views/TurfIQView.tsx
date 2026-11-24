@@ -3,6 +3,7 @@ import { Loader2, Sliders, Sparkles } from 'lucide-react';
 import { NavSectionId, PitchIQState, TurfRulesConfig } from '../types';
 import { CRICKIFY_IMAGES } from '../utils/assets';
 import { authFetch } from '../lib/firebase';
+import { parseApiJsonResponse } from '../lib/apiResponse';
 
 interface TurfIQViewProps {
   section: NavSectionId;
@@ -96,13 +97,12 @@ export const TurfIQView: React.FC<TurfIQViewProps> = ({ section, state, onSaveTu
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rules, scenario, focusArea }),
       });
-      const rawText = await res.text();
-      let data: Record<string, unknown> = {};
-      try {
-        data = rawText ? JSON.parse(rawText) : {};
-      } catch {
-        throw new Error(!res.ok ? `Turf tactics error (HTTP ${res.status}).` : 'Server returned an unexpected response.');
-      }
+      const data = await parseApiJsonResponse<Record<string, unknown>>(
+        res,
+        '/api/turf/tactics',
+        'Turf tactics error',
+        false
+      );
       if (!res.ok) throw new Error(String(data.error || 'Could not generate turf tactics.'));
       setTactics(data as typeof tactics);
     } catch (err) {

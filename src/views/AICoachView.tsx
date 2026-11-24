@@ -6,6 +6,7 @@ import { CRICKET_EXERCISES } from '../data/exercises';
 import { VERIFIED_TUTORIALS } from '../data/tutorials';
 import { CRICKIFY_IMAGES } from '../utils/assets';
 import { authFetch } from '../lib/firebase';
+import { parseApiJsonResponse } from '../lib/apiResponse';
 
 interface AICoachViewProps {
   mode: 'chat' | 'voice' | 'no-video' | 'history';
@@ -177,23 +178,13 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
         }),
       });
 
-      const rawText = await res.text();
-      let data: {
+      const data = await parseApiJsonResponse<{
         error?: string;
         reply?: string;
         recommendedExerciseIds?: string[];
         recommendedLessonIds?: string[];
         recommendedTutorialIds?: string[];
-      } = {};
-      try {
-        data = rawText ? JSON.parse(rawText) : {};
-      } catch {
-        throw new Error(
-          !res.ok
-            ? `Coach service error (HTTP ${res.status}). Please tap Retry.`
-            : 'Coach server returned an unexpected response. Please try again.'
-        );
-      }
+      }>(res, '/api/coach/chat', 'Coach service error');
 
       if (!res.ok || !data.reply) {
         throw new Error(data.error || 'Failed to get AI coaching response.');

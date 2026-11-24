@@ -1,16 +1,19 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import express from 'express';
-import type { NextFunction, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
-import type { GenerateContentParameters } from '@google/genai';
 import { getApp, getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth as getFirebaseAdminAuth } from 'firebase-admin/auth';
-import type { DecodedIdToken } from 'firebase-admin/auth';
 
-function resolveBaseDir(): string {
+try {
+  dotenv.config();
+} catch {
+  // Ignore missing .env file in production serverless runtimes
+}
+
+function resolveBaseDir() {
   try {
     if (typeof __dirname === 'string' && __dirname) {
       return __dirname;
@@ -54,7 +57,7 @@ if (!firebaseProjectId) {
     ];
     const cfgPath = candidateCfgPaths.find((p) => fs.existsSync(p));
     if (cfgPath) {
-      const parsedCfg = JSON.parse(fs.readFileSync(cfgPath, 'utf-8')) as { projectId?: string };
+      const parsedCfg = JSON.parse(fs.readFileSync(cfgPath, 'utf-8'));
       if (parsedCfg?.projectId && parsedCfg.projectId !== 'remixed-project-id') {
         firebaseProjectId = parsedCfg.projectId;
       }
@@ -64,7 +67,7 @@ if (!firebaseProjectId) {
   }
 }
 
-let firebaseAdminApp: ReturnType<typeof getApp> | null = null;
+let firebaseAdminApp = null;
 if (firebaseProjectId) {
   try {
     firebaseAdminApp = getApps().length ? getApp() : initializeApp({ projectId: firebaseProjectId });
@@ -73,11 +76,7 @@ if (firebaseProjectId) {
   }
 }
 
-interface AuthenticatedRequest extends Request {
-  firebaseUser?: DecodedIdToken | null;
-}
-
-async function verifyBearerTokenIfPresent(req: AuthenticatedRequest): Promise<DecodedIdToken | null> {
+async function verifyBearerTokenIfPresent(req, { allowUnconfiguredServer = false } = {}) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null;
@@ -87,14 +86,17 @@ async function verifyBearerTokenIfPresent(req: AuthenticatedRequest): Promise<De
     throw new Error('Empty Bearer token');
   }
   if (!firebaseAdminApp) {
+    if (allowUnconfiguredServer) {
+      return null;
+    }
     throw new Error('Firebase project is not configured on the server.');
   }
   return await getFirebaseAdminAuth(firebaseAdminApp).verifyIdToken(token);
 }
 
-async function attachOptionalFirebaseUser(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+async function attachOptionalFirebaseUser(req, res, next) {
   try {
-    req.firebaseUser = await verifyBearerTokenIfPresent(req);
+    req.firebaseUser = await verifyBearerTokenIfPresent(req, { allowUnconfiguredServer: true });
     return next();
   } catch {
     return res.status(401).json({
@@ -105,7 +107,7 @@ async function attachOptionalFirebaseUser(req: AuthenticatedRequest, res: Respon
   }
 }
 
-async function requireFirebaseAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+async function requireFirebaseAuth(req, res, next) {
   try {
     const decoded = await verifyBearerTokenIfPresent(req);
     if (!decoded) {
@@ -148,9 +150,9 @@ const TOTAL_GENERATION_BUDGET_MS = 50000;
 const TRANSIENT_COOLDOWN_MS = 5 * 60 * 1000;
 const HARD_UNAVAILABLE_COOLDOWN_MS = 15 * 60 * 1000;
 
-const modelCooldownUntil = new Map<string, number>();
+const modelCooldownUntil = new Map();
 
-export function getConfiguredModels(): string[] {
+export function getConfiguredModels() {
   const rawPrimary = process.env.GEMINI_PRIMARY_MODEL?.trim() || DEFAULT_PRIMARY_MODEL;
   const rawFallback = process.env.GEMINI_FALLBACK_MODEL?.trim() || DEFAULT_FALLBACK_MODEL;
   const extraFallbacks = (process.env.GEMINI_FALLBACK_MODELS || '')
@@ -168,11 +170,11 @@ export function getConfiguredModels(): string[] {
   return Array.from(new Set(candidates.length > 0 ? candidates : [DEFAULT_PRIMARY_MODEL, DEFAULT_FALLBACK_MODEL]));
 }
 
-function getEffectiveModels(): string[] {
+function getEffectiveModels() {
   const configured = getConfiguredModels();
   const now = Date.now();
-  const healthy: string[] = [];
-  const coolingDown: Array<{ model: string; until: number }> = [];
+  const healthy = [];
+  const coolingDown = [];
 
   for (const model of configured) {
     const until = modelCooldownUntil.get(model);
@@ -188,7 +190,7 @@ function getEffectiveModels(): string[] {
   return [...healthy, ...coolingDown.map((entry) => entry.model)];
 }
 
-function markModelCooldown(model: string, code: GeminiErrorCode) {
+function markModelCooldown(model, code) {
   const durationMs =
     code === 'QUOTA_EXHAUSTED' || code === 'UNSUPPORTED_MODEL'
       ? HARD_UNAVAILABLE_COOLDOWN_MS
@@ -196,12 +198,12 @@ function markModelCooldown(model: string, code: GeminiErrorCode) {
   modelCooldownUntil.set(model, Date.now() + durationMs);
 }
 
-function getUserStorePath(uid: string) {
+function getUserStorePath(uid) {
   const safeUid = uid.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 128);
   return path.join(DATA_DIR, 'users', `${safeUid}.json`);
 }
 
-function readPersistedState(uid?: string) {
+function readPersistedState(uid) {
   const targetPath = uid ? getUserStorePath(uid) : STORE_PATH;
   const dir = path.dirname(targetPath);
   if (!fs.existsSync(dir)) {
@@ -218,7 +220,7 @@ function readPersistedState(uid?: string) {
   }
 }
 
-function writePersistedState(state: unknown, uid?: string) {
+function writePersistedState(state, uid) {
   const targetPath = uid ? getUserStorePath(uid) : STORE_PATH;
   const dir = path.dirname(targetPath);
   if (!fs.existsSync(dir)) {
@@ -227,8 +229,18 @@ function writePersistedState(state: unknown, uid?: string) {
   fs.writeFileSync(targetPath, JSON.stringify({ state }, null, 2), 'utf-8');
 }
 
+class GeminiClassifiedError extends Error {
+  constructor(status, code, retryable, message) {
+    super(message);
+    this.name = 'GeminiClassifiedError';
+    this.status = status;
+    this.code = code;
+    this.retryable = retryable;
+  }
+}
+
 function getGeminiClient() {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
     throw new GeminiClassifiedError(
       400,
@@ -247,38 +259,11 @@ function getGeminiClient() {
   });
 }
 
-type GeminiErrorCode =
-  | 'MISSING_API_KEY'
-  | 'INVALID_API_KEY'
-  | 'QUOTA_EXHAUSTED'
-  | 'RATE_LIMITED'
-  | 'MODEL_UNAVAILABLE'
-  | 'UNSUPPORTED_MODEL'
-  | 'TIMEOUT_OR_NETWORK'
-  | 'MALFORMED_RESPONSE'
-  | 'BAD_REQUEST'
-  | 'INTERNAL_ERROR';
-
-class GeminiClassifiedError extends Error {
-  status: number;
-  code: GeminiErrorCode;
-  retryable: boolean;
-
-  constructor(status: number, code: GeminiErrorCode, retryable: boolean, message: string) {
-    super(message);
-    this.name = 'GeminiClassifiedError';
-    this.status = status;
-    this.code = code;
-    this.retryable = retryable;
-  }
-}
-
-function extractNumericStatus(err: unknown): number | null {
+function extractNumericStatus(err) {
   if (typeof err === 'object' && err !== null) {
-    const anyErr = err as { status?: unknown; code?: unknown; cause?: { status?: unknown } };
-    if (typeof anyErr.status === 'number') return anyErr.status;
-    if (typeof anyErr.code === 'number') return anyErr.code;
-    if (typeof anyErr.cause?.status === 'number') return anyErr.cause.status;
+    if (typeof err.status === 'number') return err.status;
+    if (typeof err.code === 'number') return err.code;
+    if (typeof err.cause?.status === 'number') return err.cause.status;
   }
   const msg = err instanceof Error ? err.message : String(err);
   const jsonCodeMatch = msg.match(/"code"\s*:\s*(\d{3})/);
@@ -288,7 +273,7 @@ function extractNumericStatus(err: unknown): number | null {
   return null;
 }
 
-function classifyGeminiError(err: unknown): GeminiClassifiedError {
+function classifyGeminiError(err) {
   if (err instanceof GeminiClassifiedError) {
     return err;
   }
@@ -399,11 +384,7 @@ function classifyGeminiError(err: unknown): GeminiClassifiedError {
   );
 }
 
-function safeParseJsonResponse<T extends Record<string, unknown>>(
-  text: string | undefined,
-  requiredKeys: string[] = [],
-  nonEmptyStringKeys: string[] = []
-): T {
+function safeParseJsonResponse(text, requiredKeys = [], nonEmptyStringKeys = []) {
   const trimmed = (text || '').trim();
   if (!trimmed) {
     throw new GeminiClassifiedError(502, 'MALFORMED_RESPONSE', true, 'AI model returned an empty response.');
@@ -414,7 +395,7 @@ function safeParseJsonResponse<T extends Record<string, unknown>>(
     .replace(/\s*```$/i, '')
     .trim();
 
-  let parsed: unknown;
+  let parsed;
   try {
     parsed = JSON.parse(cleaned);
   } catch {
@@ -435,32 +416,27 @@ function safeParseJsonResponse<T extends Record<string, unknown>>(
     throw new GeminiClassifiedError(502, 'MALFORMED_RESPONSE', true, 'AI response did not match the expected structure.');
   }
 
-  const record = parsed as Record<string, unknown>;
   for (const key of requiredKeys) {
-    if (!(key in record)) {
+    if (!(key in parsed)) {
       throw new GeminiClassifiedError(502, 'MALFORMED_RESPONSE', true, `AI response missed required field "${key}".`);
     }
   }
   for (const key of nonEmptyStringKeys) {
-    const val = record[key];
+    const val = parsed[key];
     if (typeof val !== 'string' || !val.trim()) {
       throw new GeminiClassifiedError(502, 'MALFORMED_RESPONSE', true, `AI response returned empty "${key}".`);
     }
   }
 
-  return record as T;
+  return parsed;
 }
 
-function sleep(ms: number) {
+function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function buildConfigForModel(
-  model: string,
-  baseConfig: NonNullable<GenerateContentParameters['config']>,
-  signal: AbortSignal
-): NonNullable<GenerateContentParameters['config']> {
-  const nextConfig: NonNullable<GenerateContentParameters['config']> = {
+function buildConfigForModel(model, baseConfig, signal) {
+  const nextConfig = {
     ...baseConfig,
     abortSignal: signal,
   };
@@ -484,25 +460,18 @@ function buildConfigForModel(
   return nextConfig;
 }
 
-async function generateJsonWithGemini<T extends Record<string, unknown>>({
+async function generateJsonWithGemini({
   contents,
   config,
   requiredKeys = [],
   nonEmptyStringKeys = [],
   primaryTimeoutMs = TEXT_PRIMARY_TIMEOUT_MS,
   fallbackTimeoutMs = TEXT_FALLBACK_TIMEOUT_MS,
-}: {
-  contents: GenerateContentParameters['contents'];
-  config: NonNullable<GenerateContentParameters['config']>;
-  requiredKeys?: string[];
-  nonEmptyStringKeys?: string[];
-  primaryTimeoutMs?: number;
-  fallbackTimeoutMs?: number;
-}): Promise<{ data: T; modelUsed: string }> {
+}) {
   const ai = getGeminiClient();
   const models = getEffectiveModels();
   const requestStartedAt = Date.now();
-  let lastError: GeminiClassifiedError | null = null;
+  let lastError = null;
 
   for (let mIdx = 0; mIdx < models.length; mIdx++) {
     const remainingBudgetMs = TOTAL_GENERATION_BUDGET_MS - (Date.now() - requestStartedAt);
@@ -518,11 +487,11 @@ async function generateJsonWithGemini<T extends Record<string, unknown>>({
 
     for (let attempt = 0; attempt < maxAttemptsForModel; attempt++) {
       const controller = new AbortController();
-      let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+      let timeoutHandle;
       const startedAt = Date.now();
 
       try {
-        const timeoutPromise = new Promise<never>((_, reject) => {
+        const timeoutPromise = new Promise((_, reject) => {
           timeoutHandle = setTimeout(() => {
             controller.abort();
             reject(
@@ -546,7 +515,7 @@ async function generateJsonWithGemini<T extends Record<string, unknown>>({
         ]);
 
         modelCooldownUntil.delete(model);
-        const data = safeParseJsonResponse<T>(response.text, requiredKeys, nonEmptyStringKeys);
+        const data = safeParseJsonResponse(response.text, requiredKeys, nonEmptyStringKeys);
         console.log(`[Gemini] model=${model} succeeded in ${Date.now() - startedAt}ms`);
         return { data, modelUsed: model };
       } catch (err) {
@@ -633,6 +602,7 @@ app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
     service: 'CRICKIFY API',
+    runtime: process.env.VERCEL ? 'vercel' : 'node',
     authProvider: 'firebase',
     firebaseConfigured: Boolean(firebaseProjectId),
     geminiConfigured: Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'MY_GEMINI_API_KEY'),
@@ -641,33 +611,31 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
-app.get('/api/state', requireFirebaseAuth, (req: AuthenticatedRequest, res) => {
-  const data = readPersistedState(req.firebaseUser!.uid);
+app.get('/api/state', requireFirebaseAuth, (req, res) => {
+  const data = readPersistedState(req.firebaseUser.uid);
   res.json(data);
 });
 
-app.post('/api/state', requireFirebaseAuth, (req: AuthenticatedRequest, res) => {
+app.post('/api/state', requireFirebaseAuth, (req, res) => {
   try {
     if (!req.body || !('state' in req.body)) {
       return res.status(400).json({ error: 'Missing state payload.' });
     }
-    writePersistedState(req.body.state, req.firebaseUser!.uid);
+    writePersistedState(req.body.state, req.firebaseUser.uid);
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : 'Failed to save state' });
   }
 });
 
-app.delete('/api/state/reports/:id', requireFirebaseAuth, (req: AuthenticatedRequest, res) => {
+app.delete('/api/state/reports/:id', requireFirebaseAuth, (req, res) => {
   try {
-    const uid = req.firebaseUser!.uid;
+    const uid = req.firebaseUser.uid;
     const data = readPersistedState(uid);
     if (data.state && Array.isArray(data.state.reports)) {
-      data.state.reports = data.state.reports.filter((r: { id: string }) => r.id !== req.params.id);
+      data.state.reports = data.state.reports.filter((r) => r.id !== req.params.id);
       if (Array.isArray(data.state.savedVideos)) {
-        data.state.savedVideos = data.state.savedVideos.filter(
-          (v: { reportId?: string }) => v.reportId !== req.params.id
-        );
+        data.state.savedVideos = data.state.savedVideos.filter((v) => v.reportId !== req.params.id);
       }
       writePersistedState(data.state, uid);
     }
@@ -710,7 +678,7 @@ app.post('/api/coach/chat', attachOptionalFirebaseUser, async (req, res) => {
 - Areas to Improve: ${(Array.isArray(linkedReport.areasToImprove) ? linkedReport.areasToImprove : []).join('; ')}
 - Specific Observations: ${(Array.isArray(linkedReport.observations) ? linkedReport.observations : [])
           .map(
-            (o: { title?: string; timestampSec?: number; confidence?: string; evidence?: string }) =>
+            (o) =>
               `[${o?.timestampSec ?? 0}s, ${o?.confidence || 'Medium'} confidence] ${o?.title || 'Observation'}: ${o?.evidence || ''}`
           )
           .join(' | ')}`
@@ -747,7 +715,7 @@ STRICT COACHING RULES:
 
     const safeHistory = Array.isArray(history)
       ? history
-          .filter((m): m is { role: string; content: string } => Boolean(m && typeof m.content === 'string' && m.content.trim()))
+          .filter((m) => Boolean(m && typeof m.content === 'string' && m.content.trim()))
           .slice(-8)
       : [];
 
@@ -758,21 +726,16 @@ STRICT COACHING RULES:
     const prompt = `${formattedHistory ? `Recent conversation:\n${formattedHistory}\n\n` : ''}Player's current message: ${message.trim()}`;
 
     const validExerciseIds = new Set(
-      Array.isArray(availableExercises) ? availableExercises.map((e: { id?: string }) => e?.id).filter(Boolean) : []
+      Array.isArray(availableExercises) ? availableExercises.map((e) => e?.id).filter(Boolean) : []
     );
     const validLessonIds = new Set(
-      Array.isArray(availableLessons) ? availableLessons.map((l: { id?: string }) => l?.id).filter(Boolean) : []
+      Array.isArray(availableLessons) ? availableLessons.map((l) => l?.id).filter(Boolean) : []
     );
     const validTutorialIds = new Set(
-      Array.isArray(availableTutorials) ? availableTutorials.map((t: { id?: string }) => t?.id).filter(Boolean) : []
+      Array.isArray(availableTutorials) ? availableTutorials.map((t) => t?.id).filter(Boolean) : []
     );
 
-    const { data, modelUsed } = await generateJsonWithGemini<{
-      reply: string;
-      recommendedExerciseIds: string[];
-      recommendedLessonIds: string[];
-      recommendedTutorialIds: string[];
-    }>({
+    const { data, modelUsed } = await generateJsonWithGemini({
       contents: prompt,
       requiredKeys: ['reply'],
       nonEmptyStringKeys: ['reply'],
@@ -854,44 +817,34 @@ app.post('/api/analysis/video', attachOptionalFirebaseUser, async (req, res) => 
 
     const validFrames = frames
       .slice(0, 8)
-      .filter((f: { imageDataUrl?: unknown }) => typeof f?.imageDataUrl === 'string' && f.imageDataUrl.trim().length > 0);
+      .filter((f) => typeof f?.imageDataUrl === 'string' && f.imageDataUrl.trim().length > 0);
 
     if (validFrames.length === 0) {
       return res.status(400).json({ error: 'Extracted frames did not contain valid image data.', code: 'BAD_REQUEST' });
     }
 
-    const parts: Array<{ inlineData?: { mimeType: string; data: string }; text?: string }> = [];
-
+    const parts = [];
     const ALLOWED_IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
-    validFrames.forEach(
-      (f: {
-        frameIndex: number;
-        timestampSec: number;
-        imageDataUrl: string;
-        poseDetected?: boolean;
-        avgVisibility?: number;
-        metrics?: Record<string, unknown>;
-      }) => {
-        const rawUrl = f.imageDataUrl.trim();
-        const mimeMatch = rawUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
-        const candidateMime = mimeMatch ? mimeMatch[1].toLowerCase() : 'image/jpeg';
-        const mimeType = ALLOWED_IMAGE_MIME_TYPES.has(candidateMime) ? candidateMime : 'image/jpeg';
-        const rawBase64 = rawUrl.includes(',') ? rawUrl.split(',')[1] : rawUrl;
-        const base64 = rawBase64 ? rawBase64.replace(/\s+/g, '') : '';
-        if (!base64 || base64.length < 32) return;
+    validFrames.forEach((f) => {
+      const rawUrl = f.imageDataUrl.trim();
+      const mimeMatch = rawUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
+      const candidateMime = mimeMatch ? mimeMatch[1].toLowerCase() : 'image/jpeg';
+      const mimeType = ALLOWED_IMAGE_MIME_TYPES.has(candidateMime) ? candidateMime : 'image/jpeg';
+      const rawBase64 = rawUrl.includes(',') ? rawUrl.split(',')[1] : rawUrl;
+      const base64 = rawBase64 ? rawBase64.replace(/\s+/g, '') : '';
+      if (!base64 || base64.length < 32) return;
 
-        parts.push({
-          inlineData: {
-            mimeType,
-            data: base64,
-          },
-        });
-        parts.push({
-          text: `Frame #${Number(f.frameIndex) || 1} at ${Number(f.timestampSec || 0).toFixed(2)}s | MediaPipe Pose Detected: ${Boolean(f.poseDetected)} (Visibility: ${Math.round(Number(f.avgVisibility || 0) * 100)}%) | Telemetry: ${JSON.stringify(f.metrics || {})}`,
-        });
-      }
-    );
+      parts.push({
+        inlineData: {
+          mimeType,
+          data: base64,
+        },
+      });
+      parts.push({
+        text: `Frame #${Number(f.frameIndex) || 1} at ${Number(f.timestampSec || 0).toFixed(2)}s | MediaPipe Pose Detected: ${Boolean(f.poseDetected)} (Visibility: ${Math.round(Number(f.avgVisibility || 0) * 100)}%) | Telemetry: ${JSON.stringify(f.metrics || {})}`,
+      });
+    });
 
     if (parts.length === 0) {
       return res.status(400).json({ error: 'Could not decode any valid frame images for analysis.', code: 'BAD_REQUEST' });
@@ -921,13 +874,13 @@ CRITICAL ACCURACY & HONESTY RULES:
     });
 
     const validExerciseIds = new Set(
-      Array.isArray(availableExercises) ? availableExercises.map((e: { id?: string }) => e?.id).filter(Boolean) : []
+      Array.isArray(availableExercises) ? availableExercises.map((e) => e?.id).filter(Boolean) : []
     );
     const validTutorialIds = new Set(
-      Array.isArray(availableTutorials) ? availableTutorials.map((t: { id?: string }) => t?.id).filter(Boolean) : []
+      Array.isArray(availableTutorials) ? availableTutorials.map((t) => t?.id).filter(Boolean) : []
     );
 
-    const { data, modelUsed } = await generateJsonWithGemini<Record<string, unknown>>({
+    const { data, modelUsed } = await generateJsonWithGemini({
       contents: { parts },
       requiredKeys: ['summary'],
       nonEmptyStringKeys: ['summary'],
@@ -980,7 +933,7 @@ CRITICAL ACCURACY & HONESTY RULES:
 
     const normalizedObservations = Array.isArray(data.observations)
       ? data.observations
-          .filter((o): o is Record<string, unknown> => Boolean(o && typeof o === 'object'))
+          .filter((o) => Boolean(o && typeof o === 'object'))
           .map((o) => ({
             title: String(o.title || 'Observed Movement Checkpoint'),
             timestampSec: Number.isFinite(Number(o.timestampSec)) ? Number(o.timestampSec) : 0,
@@ -1036,10 +989,10 @@ app.post('/api/analysis/dismissal', attachOptionalFirebaseUser, async (req, res)
       availableTutorials = [],
     } = req.body || {};
 
-    const parts: Array<{ inlineData?: { mimeType: string; data: string }; text?: string }> = [];
+    const parts = [];
 
     if (Array.isArray(frames) && frames.length > 0) {
-      frames.slice(0, 6).forEach((f: { frameIndex: number; timestampSec: number; imageDataUrl: string }) => {
+      frames.slice(0, 6).forEach((f) => {
         if (!f?.imageDataUrl) return;
         const base64 = f.imageDataUrl.includes(',') ? f.imageDataUrl.split(',')[1] : f.imageDataUrl;
         if (!base64) return;
@@ -1062,7 +1015,7 @@ CRITICAL RULE: If no video was provided, "observedEvidence" must explicitly stat
     });
 
     const hasFrames = Array.isArray(frames) && frames.length > 0;
-    const { data, modelUsed } = await generateJsonWithGemini<Record<string, unknown>>({
+    const { data, modelUsed } = await generateJsonWithGemini({
       contents: { parts },
       requiredKeys: ['observedEvidence', 'possibleReasons', 'technicalExplanation', 'correctionSteps'],
       nonEmptyStringKeys: ['observedEvidence', 'technicalExplanation'],
@@ -1147,7 +1100,7 @@ SAFETY & STRUCTURE REQUIREMENTS:
 2. Weekly schedule must cover Monday to Sunday (7 days), marking rest/recovery days appropriately based on ${daysPerWeek} active days and age group (${ageGroup}).
 3. Never prescribe excessive fast-bowling or sprint loads; include an explicit workloadNote.`;
 
-    const { data, modelUsed } = await generateJsonWithGemini<Record<string, unknown>>({
+    const { data, modelUsed } = await generateJsonWithGemini({
       contents: prompt,
       requiredKeys: ['workloadNote', 'dailyRoutine', 'weeklySchedule'],
       nonEmptyStringKeys: ['workloadNote'],
@@ -1232,7 +1185,7 @@ Match Scenario / Question: ${scenario}
 
 Provide concrete batting, bowling, and fielding adjustments tailored to these exact side-wall, back-net, ball-type, and over-limit rules.`;
 
-    const { data, modelUsed } = await generateJsonWithGemini<Record<string, unknown>>({
+    const { data, modelUsed } = await generateJsonWithGemini({
       contents: prompt,
       requiredKeys: ['tacticalSummary', 'battingPlan', 'bowlingPlan'],
       nonEmptyStringKeys: ['tacticalSummary'],
@@ -1280,7 +1233,7 @@ Additional Context: ${notes || 'None'}
 
 Provide honest performance insights, dismissal/scoring pattern observations, and tactical plans for Powerplay, Middle Overs, and Death Overs.`;
 
-    const { data, modelUsed } = await generateJsonWithGemini<Record<string, unknown>>({
+    const { data, modelUsed } = await generateJsonWithGemini({
       contents: prompt,
       requiredKeys: ['summary', 'battingPatterns', 'bowlingPatterns'],
       nonEmptyStringKeys: ['summary'],
@@ -1339,18 +1292,13 @@ app.get('/api/youtube/search', async (req, res) => {
     if (!r.ok) {
       return res.status(r.status).json({ configured: true, error: data.error?.message || 'YouTube API error' });
     }
-    const items = (data.items || []).map(
-      (item: {
-        id: { videoId: string };
-        snippet: { title: string; channelTitle: string; description: string; thumbnails: { high?: { url: string } } };
-      }) => ({
-        videoId: item.id.videoId,
-        title: item.snippet.title,
-        channel: item.snippet.channelTitle,
-        summary: item.snippet.description,
-        thumbnail: item.snippet.thumbnails?.high?.url,
-      })
-    );
+    const items = (data.items || []).map((item) => ({
+      videoId: item.id.videoId,
+      title: item.snippet.title,
+      channel: item.snippet.channelTitle,
+      summary: item.snippet.description,
+      thumbnail: item.snippet.thumbnails?.high?.url,
+    }));
     res.json({ configured: true, items });
   } catch (err) {
     res.status(500).json({ configured: true, error: err instanceof Error ? err.message : 'YouTube fetch error' });
@@ -1358,7 +1306,7 @@ app.get('/api/youtube/search', async (req, res) => {
 });
 
 // Ensure unmatched /api/* routes always return JSON (never fall through to Vite/SPA index.html)
-app.use('/api', (_req: Request, res: Response) => {
+app.use('/api', (_req, res) => {
   res.status(404).json({
     error: 'API endpoint not found.',
     code: 'NOT_FOUND',
@@ -1367,27 +1315,53 @@ app.use('/api', (_req: Request, res: Response) => {
 });
 
 // Ensure API errors (such as oversized payloads or malformed JSON) always return JSON
-app.use('/api', (err: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  const errObj = err as { status?: number; type?: string; message?: string };
-  if (errObj?.type === 'entity.too.large' || errObj?.status === 413) {
+app.use('/api', (err, _req, res, _next) => {
+  const errObj = err || {};
+  if (errObj.type === 'entity.too.large' || errObj.status === 413) {
     return res.status(413).json({
       error: 'Video payload is too large. Please upload a shorter clip (5–20 seconds).',
       code: 'PAYLOAD_TOO_LARGE',
       retryable: false,
     });
   }
-  if (errObj?.type === 'entity.parse.failed' || errObj?.status === 400) {
+  if (errObj.type === 'entity.parse.failed' || errObj.status === 400) {
     return res.status(400).json({
       error: 'Invalid request payload sent to API.',
       code: 'BAD_REQUEST',
       retryable: false,
     });
   }
-  return res.status(errObj?.status || 500).json({
-    error: errObj?.message || 'Unexpected API error.',
+  return res.status(errObj.status || 500).json({
+    error: errObj.message || 'Unexpected API error.',
     code: 'INTERNAL_ERROR',
     retryable: false,
   });
 });
 
-export default app;
+export default function handler(req, res) {
+  try {
+    if (typeof req.url === 'string' && (req.url === '/api/index' || req.url.startsWith('/api/index?'))) {
+      const originalPath =
+        req.headers['x-vercel-original-uri'] ||
+        req.headers['x-invoke-path'] ||
+        req.headers['x-matched-path'];
+      if (typeof originalPath === 'string' && originalPath.startsWith('/api/') && !originalPath.startsWith('/api/index')) {
+        req.url = originalPath;
+      }
+    }
+    return app(req, res);
+  } catch (err) {
+    console.error('[CRICKIFY API] Unhandled invocation error:', err);
+    if (!res.headersSent) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(
+        JSON.stringify({
+          error: err instanceof Error ? err.message : 'Unexpected server invocation error.',
+          code: 'INTERNAL_ERROR',
+          retryable: true,
+        })
+      );
+    }
+  }
+}

@@ -4,6 +4,7 @@ import { ExerciseItem, NavSectionId, PitchIQState, TrainingPlan, TrainingSession
 import { CRICKET_EXERCISES } from '../data/exercises';
 import { CRICKIFY_IMAGES } from '../utils/assets';
 import { authFetch } from '../lib/firebase';
+import { parseApiJsonResponse } from '../lib/apiResponse';
 
 interface TrainingCentreViewProps {
   section: NavSectionId;
@@ -127,18 +128,12 @@ export const TrainingCentreView: React.FC<TrainingCentreViewProps> = ({
           availableExercises: CRICKET_EXERCISES.map((ex) => ({ id: ex.id, name: ex.name, category: ex.category })),
         }),
       });
-      const rawText = await res.text();
-      let data: {
+      const data = await parseApiJsonResponse<{
         error?: string;
         workloadNote?: string;
         dailyRoutine?: TrainingPlan['dailyRoutine'];
         weeklySchedule?: TrainingPlan['weeklySchedule'];
-      } = {};
-      try {
-        data = rawText ? JSON.parse(rawText) : {};
-      } catch {
-        throw new Error(!res.ok ? `Planner service error (HTTP ${res.status}).` : 'Server returned an unexpected response.');
-      }
+      }>(res, '/api/planner/generate', 'Planner service error', false);
       if (!res.ok) throw new Error(data.error || 'Could not generate training plan.');
 
       const plan: TrainingPlan = {
