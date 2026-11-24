@@ -1,8 +1,9 @@
+import 'dotenv/config';
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { app, getConfiguredModels } from './api/index.mjs';
+import { app, getConfiguredModels } from './lib/apiApp.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
